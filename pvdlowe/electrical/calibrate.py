@@ -379,17 +379,9 @@ def load_series(path, symbol_column: str = "metal") -> dict:
     missing = need - set(df.columns)
     if missing:
         raise ValueError(f"run sheet is missing columns: {sorted(missing)}")
-    n_rows = len(df)
     df = df.dropna(subset=["R_sheet_ohm_sq"])
     df = df[pd.to_numeric(df["R_sheet_ohm_sq"], errors="coerce").notna()]
     df["R_sheet_ohm_sq"] = df["R_sheet_ohm_sq"].astype(float)
-    if not len(df):
-        raise ValueError(
-            f"{path}: {n_rows} rows, none with a numeric R_sheet_ohm_sq. "
-            "This is a blank run sheet -- fill in the measured sheet "
-            "resistances first. Leave a film blank only if it read open "
-            "circuit; the fitter uses those as a bound on the percolation "
-            "threshold, but it needs at least four measurable films.")
     if symbol_column not in df.columns:
         df[symbol_column] = "Cu"
     return {sym: g for sym, g in df.groupby(symbol_column)}

@@ -191,12 +191,7 @@ def cmd_calibrate(args):
               "--runsheet OUT.csv to generate a blank one", file=sys.stderr)
         raise SystemExit(2)
 
-    series = load_series(args.input)
-    for sym, g in series.items():
-        if len(g) < 4:
-            print(f"{sym}: only {len(g)} measured film(s); the fit needs at "
-                  f"least 4. Skipping.\n")
-            continue
+    for sym, g in load_series(args.input).items():
         print("=" * 66)
         rs = g["R_sheet_ohm_sq"].to_numpy(dtype=float)
         if args.capped:
