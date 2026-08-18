@@ -3,3 +3,4 @@ __pycache__/
 *.egg-info/
 results/*.xlsx
 results/*.log
+apply_multimetal.py
