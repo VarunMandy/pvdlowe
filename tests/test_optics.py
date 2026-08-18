@@ -210,3 +210,54 @@ def test_band_emissivity_exceeds_full_band_for_a_metal_stack():
         full = I.normal_emissivity(st)
         band = I.band_emissivity(st, (8.0, 14.0))
         assert 1.02 < band / full < 1.15, (metal, d, band / full)
+
+
+def test_illuminant_approximation_matters_for_solar_not_visible():
+    """Quantifies a caveat that was previously unquantified.
+
+    V(lambda) is narrow and dominates the visible weighting, so T_vis barely
+    moves with the assumed illuminant. The solar band has no such weighting
+    function -- the spectrum IS the weighting -- so T_sol does move.
+    """
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optimize.thickness import build
+    r = I.illuminant_sensitivity(build("Ag", 10.0, 35.0, 35.0, tco("AZO")))
+    assert r["T_vis_spread_pct"] < 1.0, r
+    assert r["T_sol_spread_pct"] > 3.0, r
+
+
+def test_manufacturability_flags_an_implausibly_thin_top_layer():
+    """The optimiser found a 15 nm top oxide: optically fine, physically not."""
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optimize.thickness import build
+    assert not build("Ag", 10., 35., 15., tco("AZO")).manufacturability()["manufacturable"]
+    assert build("Ag", 10., 25., 35., tco("AZO")).manufacturability()["manufacturable"]
+
+
+def test_third_metal_layer_gives_diminishing_returns():
+    """Closes the triple-metal question with a negative result.
+
+    Going from one metal layer to two buys a large LSG gain; the third buys
+    almost nothing and triples the silver. The architecture argument stops at
+    two for this specification.
+    """
+    from pvdlowe.materials.alloys import Alloy
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optics.stack import MultiMetalCoating
+    a, p = Alloy({"Ag": 1.0}), tco("Si3N4")
+
+    def lsg(n, dm, outer, mid):
+        c = MultiMetalCoating(
+            metal_alloys=(a,) * n, metal_thicknesses_nm=(dm,) * n,
+            dielectrics=(p,) * (n + 1),
+            dielectric_thicknesses_nm=(outer,) + (mid,) * (n - 1) + (outer,))
+        return I.light_to_solar_gain(c.stack()), c.silver_areal_mass()
+
+    l1, ag1 = lsg(1, 11.0, 15.0, 0.0)
+    l2, ag2 = lsg(2, 12.0, 15.0, 60.0)
+    l3, ag3 = lsg(3, 10.0, 15.0, 45.0)
+    assert l2 - l1 > 0.2, (l1, l2)          # the second layer earns its place
+    assert l3 - l2 < 0.15, (l2, l3)         # the third adds little
+    # and each layer costs silver: 0.115 -> 0.252 -> 0.315 g/m2
+    assert ag1 < ag2 < ag3, (ag1, ag2, ag3)
+    assert ag3 > 2.5 * ag1, (ag1, ag3)

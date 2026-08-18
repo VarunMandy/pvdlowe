@@ -158,6 +158,60 @@ def normal_emissivity(stack, weighting: Weighting | None = None,
 EN673_COEFFICIENTS = (1.1887, -0.4967, 0.2452)
 
 
+def illuminant_sensitivity(stack, temperatures=(5000., 5500., 6504., 7500.),
+                           solar_temperatures=(5000., 5778., 6000.)) -> dict:
+    """How much do the illuminant approximations move T_vis and T_sol?
+
+    D65 and AM1.5 are approximated here by Planck spectra and flagged MODEL.
+    Rather than leave that as an unquantified caveat, this measures it: vary
+    the assumed colour temperature and see what moves.
+
+    The answer differs sharply between the two bands, and the difference is
+    structural rather than incidental. The photopic response V(lambda) is
+    narrow and peaked, so it dominates the visible weighting and the
+    illuminant contributes little -- T_vis shifts by about 0.1% across
+    5000-7500 K. The solar band has no such weighting function; the spectrum
+    *is* the weighting, so T_sol shifts by roughly 5-10% over a plausible
+    range.
+
+    Practical consequence: **T_vis is reportable as computed. T_sol, and the
+    g-value and LSG derived from it, carry a systematic uncertainty of order
+    5-10% until a tabulated AM1.5G spectrum is supplied** via
+    `Weighting.from_csv`. That does not affect rankings within a climate
+    profile, since the bias is common to all candidates, but it does affect
+    any absolute solar-gain figure quoted against a building code.
+    """
+    from ..constants import planck_spectral_radiance_wavelength as _planck
+    from ..spectra import solar_weighting, visible_weighting
+
+    st = _as_stack(stack)
+    vw, sw = visible_weighting(), solar_weighting()
+    res_v, res_s = st.evaluate(vw.wavelength_nm), st.evaluate(sw.wavelength_nm)
+
+    t_vis = {}
+    ref = _planck(vw.wavelength_nm, 6504.0)
+    for T in temperatures:
+        w = _planck(vw.wavelength_nm, T) * vw.weight / ref
+        t_vis[T] = float(np.trapezoid(res_v.T * w, vw.wavelength_nm)
+                         / np.trapezoid(w, vw.wavelength_nm))
+    t_sol = {}
+    for T in solar_temperatures:
+        w = _planck(sw.wavelength_nm, T)
+        t_sol[T] = float(np.trapezoid(res_s.T * w, sw.wavelength_nm)
+                         / np.trapezoid(w, sw.wavelength_nm))
+
+    vv, ss = list(t_vis.values()), list(t_sol.values())
+    return {
+        "T_vis": {k: round(v, 4) for k, v in t_vis.items()},
+        "T_sol": {k: round(v, 4) for k, v in t_sol.items()},
+        "T_vis_spread_pct": round(100 * (max(vv) - min(vv)) / np.mean(vv), 2),
+        "T_sol_spread_pct": round(100 * (max(ss) - min(ss)) / np.mean(ss), 2),
+        "verdict": ("T_vis is robust to the illuminant approximation; T_sol, "
+                    "g and LSG are not. Supply a tabulated AM1.5G spectrum "
+                    "before quoting an absolute solar heat gain figure."),
+    }
+
+
 def band_emissivity(stack, band_um=(8.0, 14.0), temperature_k: float = 293.0,
                     angle_deg: float = 0.0) -> float:
     """Emissivity averaged over a restricted spectral band.
@@ -399,6 +453,7 @@ __all__ = [
     "visible_transmittance", "visible_reflectance", "visible_absorptance",
     "solar_transmittance", "solar_reflectance", "solar_absorptance",
     "selectivity", "g_value", "light_to_solar_gain", "band_emissivity",
+    "illuminant_sensitivity",
     "INWARD_FRACTION_SINGLE", "INWARD_FRACTION_IGU_SURFACE2",
     "normal_emissivity", "hemispherical_emissivity",
     "hemispherical_emissivity_direct", "emissivity_diagnostics",

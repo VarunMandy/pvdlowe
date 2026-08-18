@@ -141,6 +141,28 @@ class LowECoating:
     label: str = ""
     _cache: dict = field(default_factory=dict, repr=False)
 
+    #: Minimum manufacturable dielectric thickness, nm. The top layer is the
+    #: metal's only mechanical and chemical protection; industrial Low-E uses
+    #: 25-40 nm. Without this bound an optimiser will walk the top oxide to
+    #: 15 nm, which is optically defensible and would not survive handling.
+    min_dielectric_nm: float = 0.0
+
+    def manufacturability(self) -> dict:
+        """Flag geometries that are optically fine and physically implausible."""
+        issues = []
+        floor = self.min_dielectric_nm or 25.0
+        if 0 < self.top_thickness_nm < floor:
+            issues.append(
+                f"top dielectric {self.top_thickness_nm:.1f} nm is below the "
+                f"{floor:.0f} nm needed for scratch and diffusion protection")
+        if 0 < self.bottom_thickness_nm < 10.0:
+            issues.append(
+                f"bottom dielectric {self.bottom_thickness_nm:.1f} nm is too "
+                "thin to seed the metal layer reliably")
+        if not self.is_continuous:
+            issues.append("metal layer is below percolation")
+        return {"manufacturable": not issues, "issues": issues}
+
     def __post_init__(self):
         if not self.label:
             self.label = (f"{self.bottom_tco.key}/{self.metal_alloy.label}/"

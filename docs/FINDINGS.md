@@ -422,6 +422,36 @@ the leading candidates.
 
 ---
 
+# 3.7 Thermodynamic screening: Ag-Cu has no stable ordered compound
+
+All 15 chemical systems from the brief's section 9 retrieved from the Materials
+Project. Screened at 50 meV/atom of the convex hull.
+
+**Ag-Cu is the only nominated binary with no stable intermediate phase.** Cu3Ag
+sits 0.0904 eV/atom above the hull and CuAg3 0.0857 -- both well above k_BT at
+deposition (26 meV at 300 K, 48 meV at 550 K). The system wants to separate, and
+the driving force is substantial.
+
+This is an equilibrium statement. A sputtered film is quenched from the vapour
+and can trap a metastable solution, so it does not predict the as-deposited
+state -- it predicts the direction of change on annealing. Resistivity should
+*fall* as Cu precipitates. That is the signature to look for in section 6.3's
+experiment, and it gives thermodynamic support to the segregated model under
+which section 3.1's dilute-Ag optimum is strongest.
+
+**A second finding, bearing on the Ti hypothesis.** Cu-Ti has 8 near-hull
+phases and Al-Cu has 10. A dilute Ti or Al addition to a Cu-bearing film has
+stable intermetallics available to form, so on annealing it is more likely to
+precipitate than to remain in solution acting as a stabiliser. That is a
+mechanism for the ternary underperforming beyond the Nordheim conductivity
+penalty in section 3.5.
+
+**Ag-Cu-O has 4 near-hull phases** including CuAgO2 -- relevant to durability,
+since an oxidising Ag-Cu film has stable ternary oxides available rather than
+just a mixture of Ag2O and CuO.
+
+---
+
 # 4. Limitations
 
 ## 4.1 What the framework does not predict
