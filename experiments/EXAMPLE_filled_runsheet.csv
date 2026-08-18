@@ -1,0 +1,9 @@
+run,metal,thickness_nm,target_power_W,pressure_mTorr,R_sheet_ohm_sq,measured_thickness_nm,notes
+1,Cu,20,,,9.82,,
+2,Cu,12,,,17.55,,
+3,Cu,10,,,30.04,,
+4,Ag,10,,,4.4,,
+5,Cu,14,,,14.82,,
+6,Cu,8,,,,,
+7,Cu,18,,,11.11,,
+8,Cu,16,,,12.74,,
