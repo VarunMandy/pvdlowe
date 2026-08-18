@@ -193,7 +193,14 @@ def cmd_calibrate(args):
 
     for sym, g in load_series(args.input).items():
         print("=" * 66)
-        d = diagnose(g["thickness_nm"], g["R_sheet_ohm_sq"], sym)
+        rs = g["R_sheet_ohm_sq"].to_numpy(dtype=float)
+        if args.capped:
+            from .electrical.calibrate import deembed_series
+            rs = deembed_series(rs, args.dielectric, args.cap_nm, args.cap_nm)
+            print(f"de-embedded {args.dielectric} shunt "
+                  f"({args.cap_nm:g} nm each side) from the measured "
+                  f"trilayer sheet resistance\n")
+        d = diagnose(g["thickness_nm"], rs, sym)
         fit = d["fit_with_excess"]
         print(fit.summary())
         print()
@@ -316,6 +323,11 @@ def build_parser() -> argparse.ArgumentParser:
                        help="fit transport parameters to a measured R_s series")
     s.add_argument("-i", "--input", help="run sheet with R_sheet_ohm_sq filled in")
     s.add_argument("--runsheet", help="generate a blank run sheet at this path")
+    s.add_argument("--capped", action="store_true",
+                   help="measurements are of a capped trilayer; subtract the "
+                        "dielectric shunt before fitting")
+    s.add_argument("--dielectric", default="AZO")
+    s.add_argument("--cap-nm", type=float, default=40.0)
     s.add_argument("--seed", type=int, default=0)
     s.set_defaults(func=cmd_calibrate)
 

@@ -150,6 +150,69 @@ def _model_with(symbol: str, p: float, r: float, dc: float,
         grain_size_ratio=3.0, percolation=perc)
 
 
+def deembed_parallel(measured_ohm_sq, *shunt_ohm_sq) -> float:
+    """Remove parallel conduction paths from a measured sheet resistance.
+
+        1/R_metal = 1/R_measured - sum(1/R_shunt)
+
+    Needed because bare copper cannot be measured honestly. A 10 nm Cu film
+    oxidises in air on a timescale of minutes, and the hypothesis under test is
+    precisely that oxygen degrades these films -- so a bare film measured after
+    venting reports air oxidation, not deposition quality. The films must be
+    capped, which means measuring the full AZO/Cu/AZO trilayer and subtracting
+    the oxide shunt.
+
+    The correction is strongly non-linear in the measured value, and it is
+    largest exactly where this experiment is interesting. Two 40 nm AZO layers
+    at 5e-4 ohm.cm shunt about 125 ohm/sq each:
+
+        measured 3.0 ohm/sq  ->  metal alone  3.15   (+5%)
+        measured 5.0 ohm/sq  ->  metal alone  5.44   (+9%)
+        measured 16.6 ohm/sq ->  metal alone 22.61   (+36%)
+
+    A poorly conducting metal layer is shunted proportionally harder by the
+    oxide, so the worse the copper, the more the raw trilayer reading
+    understates it. Skipping this correction would bias the fit toward
+    "the copper is fine".
+
+    Note that `LowECoating.sheet_resistance()` already combines metal and
+    oxides in parallel, so a *model* prediction is directly comparable with a
+    *measured trilayer*. De-embed only when fitting the metal layer alone.
+
+    Raises if the shunts alone would exceed the measured conductance, which
+    means either the metal layer is not conducting or the oxide resistivity is
+    wrong.
+    """
+    g = 1.0 / float(measured_ohm_sq)
+    for r in shunt_ohm_sq:
+        if r and np.isfinite(r) and r > 0:
+            g -= 1.0 / float(r)
+    if g <= 0:
+        raise ValueError(
+            f"shunt layers alone account for all of {measured_ohm_sq} ohm/sq; "
+            "either the metal layer is discontinuous or the assumed oxide "
+            "resistivity is too low")
+    return float(1.0 / g)
+
+
+def deembed_series(measured_ohm_sq, dielectric: str = "AZO",
+                   bottom_nm: float = 40.0, top_nm: float = 40.0):
+    """De-embed a whole series measured as capped trilayers."""
+    from ..materials.tco import tco as _tco
+    preset = _tco(dielectric)
+    shunts = [preset.sheet_resistance(bottom_nm), preset.sheet_resistance(top_nm)]
+    out = []
+    for v in np.atleast_1d(np.asarray(measured_ohm_sq, dtype=float)):
+        if not np.isfinite(v) or v <= 0:
+            out.append(np.inf)          # open circuit stays open
+            continue
+        try:
+            out.append(deembed_parallel(v, *shunts))
+        except ValueError:
+            out.append(np.inf)          # metal not conducting
+    return np.array(out)
+
+
 def fit_series(thickness_nm, sheet_resistance_ohm_sq, symbol: str = "Cu",
                allow_excess: bool = True) -> CalibrationResult:
     """Fit specularity, grain-boundary reflection, percolation and excess rho.
