@@ -12,189 +12,197 @@ themselves been checked against their primary sources. The framework is a tool
 for ranking candidates and designing experiments. It is not a substitute for
 depositing the films.
 
-6 of 8 benchmarks have not been located at all; 2 located and their numbers confirmed against the published abstract, but full text unread; 0 fully verified. A 'partial' entry means the transcription is right -- it does not mean the measurement basis has been checked, which for emissivity is the whole question.
+8 benchmarks: 0 fully verified, 6 located with numbers confirmed against the published abstract, 2 DISPUTED -- located sources do not match the quoted figures -- and 0 not located.
+  'partial' means the transcription is right and the source is identified; it does not mean the full text has been read.
+  'disputed' means do not cite: the numbers in the brief could not be matched to any located source.
 
 ## Specification and weighting
-| criterion                | key                      | direction   |   unacceptable_at |   satisfied_at | unit   |   weight | source                                                       |
-|:-------------------------|:-------------------------|:------------|------------------:|---------------:|:-------|---------:|:-------------------------------------------------------------|
-| Hemispherical emissivity | emissivity_hemispherical | lower       |              0.2  |           0.02 |        |     0.25 | brief section 17: <= 0.15; quantitative framework: <= 0.10,  |
-| Visible transmittance    | T_vis                    | higher      |              0.65 |           0.9  |        |     0.2  | brief section 17: >= 80% initial target                      |
-| Silver consumption       | Ag_g_per_m2              | lower       |              0.16 |           0    | g/m2   |     0.15 | brief section 20: minimise critical-material content. Floor  |
-| Thermal stability        | thermal_stability_c      | higher      |            200    |         500    | degC   |     0.1  | brief section 17: 300-500 C test window. NOT PREDICTED by th |
-| Supply risk              | supply_risk              | lower       |              9.5  |           4    |        |     0.05 | brief section 9 stage 1; composition-weighted element supply |
-| Metal cost               | cost_usd_per_m2          | lower       |              3    |           0.5  | USD/m2 |     0.05 | brief section 17: significantly below conventional benchmark |
-| Deposition efficiency    | deposition_efficiency    | higher      |              0.2  |           1    |        |     0.05 | brief section 15: performance per unit deposition energy, no |
-| Sheet resistance         | R_sheet                  | lower       |             15    |           5    | ohm/sq |     0    | brief section 17: <= 5 ohm/sq                                |
+```
+               criterion                      key direction  unacceptable_at  satisfied_at   unit  weight                                                       source
+Hemispherical emissivity emissivity_hemispherical     lower             0.20          0.02           0.25 brief section 17: <= 0.15; quantitative framework: <= 0.10, 
+   Visible transmittance                    T_vis    higher             0.65          0.90           0.20                      brief section 17: >= 80% initial target
+      Silver consumption              Ag_g_per_m2     lower             0.16          0.00   g/m2    0.15 brief section 20: minimise critical-material content. Floor 
+       Thermal stability      thermal_stability_c    higher           200.00        500.00   degC    0.10 brief section 17: 300-500 C test window. NOT PREDICTED by th
+             Supply risk              supply_risk     lower             9.50          4.00           0.05 brief section 9 stage 1; composition-weighted element supply
+              Metal cost          cost_usd_per_m2     lower             3.00          0.50 USD/m2    0.05 brief section 17: significantly below conventional benchmark
+   Deposition efficiency    deposition_efficiency    higher             0.20          1.00           0.05 brief section 15: performance per unit deposition energy, no
+        Sheet resistance                  R_sheet     lower            15.00          5.00 ohm/sq    0.00                                brief section 17: <= 5 ohm/sq
+```
 
 The weighting is from the brief's section 14. Note that emissivity and sheet resistance are both governed by the same free-carrier response, so their weights are not independent; see the scoring diagnostics.
 
 ## Candidate results
-| ID    | Architecture                      |   t_metal (nm) |   T_vis |   T_vis glazed |   T_sol |   g (SHGC) |   LSG |   Selectivity |   eps_n |   eps_h |   R_s (ohm/sq) |   U_g (W/m2K) |   Ag (g/m2) |   Metal cost (USD/m2) |   Supply risk |   Score | Limiting                 | Provenance            |
-|:------|:----------------------------------|---------------:|--------:|---------------:|--------:|-----------:|------:|--------------:|--------:|--------:|---------------:|--------------:|------------:|----------------------:|--------------:|--------:|:-------------------------|:----------------------|
-| E10e  | Si3N4/Ag10Cu90/Si3N4 (segregated) |             10 |   0.878 |          0.841 |   0.719 |      0.76  |  1.16 |          1.22 |  0.0389 |  0.0456 |           3.13 |          1.13 |       0.015 |                  0.12 |           4.8 |    89.3 | supply_risk              | model                 |
-| E5e   | Si3N4/Ag5Cu95/Si3N4 (segregated)  |             11 |   0.864 |          0.828 |   0.687 |      0.732 |  1.18 |          1.26 |  0.0365 |  0.0428 |           2.98 |          1.12 |       0.008 |                  0.07 |           4.6 |    89.3 | T_vis                    | model                 |
-| N6    | Si3N4/Cu/Si3N4                    |             11 |   0.859 |          0.824 |   0.685 |      0.731 |  1.18 |          1.25 |  0.0409 |  0.0478 |           3.41 |          1.14 |       0     |                  0.01 |           4.5 |    88.9 | T_vis                    | model                 |
-| E5    | Si3N4/Ag5Cu95/Si3N4               |             11 |   0.862 |          0.826 |   0.683 |      0.729 |  1.18 |          1.26 |  0.0463 |  0.054  |           3.99 |          1.16 |       0.008 |                  0.07 |           4.6 |    86.8 | emissivity_hemispherical | model                 |
-| N7    | Si3N4/Cu90Zn10/Si3N4              |             11 |   0.851 |          0.816 |   0.674 |      0.727 |  1.17 |          1.26 |  0.053  |  0.0616 |           4.66 |          1.18 |       0     |                  0.01 |           4.5 |    85   | emissivity_hemispherical | model                 |
-| E10   | Si3N4/Ag10Cu90/Si3N4              |             11 |   0.865 |          0.829 |   0.684 |      0.73  |  1.19 |          1.26 |  0.051  |  0.0594 |           4.5  |          1.17 |       0.016 |                  0.14 |           4.8 |    84.8 | emissivity_hemispherical | model                 |
-| N8    | Si3N4/Cu90Ag10/Si3N4              |             11 |   0.865 |          0.829 |   0.686 |      0.732 |  1.18 |          1.26 |  0.0511 |  0.0594 |           4.5  |          1.17 |       0.016 |                  0.14 |           4.8 |    84.7 | emissivity_hemispherical | model                 |
-| N35e  | Si3N4/Ag60Cu40/Si3N4 (segregated) |              9 |   0.904 |          0.866 |   0.768 |      0.794 |  1.14 |          1.18 |  0.038  |  0.0445 |           3.04 |          1.12 |       0.065 |                  0.53 |           6.3 |    81.6 | supply_risk              | model                 |
-| N5    | Si3N4/Ag25Cu75/Si3N4              |             11 |   0.874 |          0.838 |   0.691 |      0.735 |  1.19 |          1.27 |  0.0616 |  0.0714 |           5.67 |          1.21 |       0.038 |                  0.31 |           5.2 |    79.7 | emissivity_hemispherical | model                 |
-| N3e   | Si3N4/Ag70Cu30/Si3N4 (segregated) |              9 |   0.9   |          0.863 |   0.744 |      0.77  |  1.17 |          1.21 |  0.0387 |  0.0453 |           3.16 |          1.13 |       0.073 |                  0.59 |           6.6 |    79.2 | supply_risk              | model                 |
-| D15e  | AZO/Ag15Cu85/AZO (segregated)     |              9 |   0.794 |          0.762 |   0.585 |      0.643 |  1.23 |          1.36 |  0.0484 |  0.0564 |           3.31 |          1.16 |       0.019 |                  0.16 |           4.9 |    75.7 | T_vis                    | model                 |
-| D10e  | AZO/Ag10Cu90/AZO (segregated)     |              9 |   0.789 |          0.757 |   0.582 |      0.641 |  1.23 |          1.36 |  0.0503 |  0.0585 |           3.52 |          1.17 |       0.013 |                  0.11 |           4.8 |    75.4 | T_vis                    | model                 |
-| M35e  | AZO/Ag60Cu40/AZO (segregated)     |              9 |   0.843 |          0.808 |   0.614 |      0.659 |  1.28 |          1.37 |  0.0441 |  0.0514 |           2.95 |          1.15 |       0.065 |                  0.53 |           6.3 |    74.6 | supply_risk              | model                 |
-| N4    | Si3N4/Ag50Cu50/Si3N4              |             11 |   0.895 |          0.857 |   0.698 |      0.737 |  1.21 |          1.28 |  0.0683 |  0.0789 |           6.48 |          1.23 |       0.068 |                  0.56 |           6   |    74   | Ag_g_per_m2              | model                 |
-| N35   | Si3N4/Ag60Cu40/Si3N4              |             11 |   0.902 |          0.864 |   0.708 |      0.745 |  1.21 |          1.27 |  0.0675 |  0.078  |           6.41 |          1.23 |       0.079 |                  0.65 |           6.3 |    72   | Ag_g_per_m2              | model                 |
-| M3ema | AZO/Ag70Cu30/AZO (segregated)     |             10 |   0.84  |          0.805 |   0.589 |      0.635 |  1.32 |          1.43 |  0.0395 |  0.0462 |           2.63 |          1.13 |       0.081 |                  0.66 |           6.6 |    71.5 | Ag_g_per_m2              | model                 |
-| D10   | AZO/Ag10Cu90/AZO                  |              9 |   0.786 |          0.753 |   0.576 |      0.638 |  1.23 |          1.36 |  0.0678 |  0.0784 |           5.66 |          1.23 |       0.013 |                  0.11 |           4.8 |    70.9 | T_vis                    | model                 |
-| N3    | Si3N4/Ag70Cu30/Si3N4              |             11 |   0.901 |          0.863 |   0.704 |      0.739 |  1.22 |          1.28 |  0.0645 |  0.0747 |           6.12 |          1.22 |       0.089 |                  0.73 |           6.6 |    70   | Ag_g_per_m2              | model                 |
-| D15   | AZO/Ag15Cu85/AZO                  |              9 |   0.79  |          0.757 |   0.578 |      0.639 |  1.24 |          1.37 |  0.0718 |  0.0828 |           6.15 |          1.25 |       0.019 |                  0.16 |           4.9 |    69.7 | T_vis                    | model                 |
-| M6    | AZO/Cu/AZO (low-cost control)     |             12 |   0.738 |          0.707 |   0.491 |      0.558 |  1.32 |          1.5  |  0.0396 |  0.0463 |           2.87 |          1.13 |       0     |                  0.01 |           4.5 |    69.6 | T_vis                    | literature_unverified |
-| S10   | ITO/Ag70Cu30/ITO                  |             10 |   0.852 |          0.816 |   0.578 |      0.62  |  1.37 |          1.47 |  0.0593 |  0.0688 |           5.48 |          1.2  |       0.081 |                  0.66 |           6.6 |    68.7 | Ag_g_per_m2              | model                 |
-| N2    | Si3N4/Ag80Cu20/Si3N4              |             10 |   0.9   |          0.862 |   0.688 |      0.72  |  1.25 |          1.31 |  0.0674 |  0.0779 |           6.42 |          1.23 |       0.089 |                  0.73 |           6.9 |    68.7 | Ag_g_per_m2              | model                 |
-| N1    | Si3N4/Ag90Cu10/Si3N4              |              9 |   0.914 |          0.875 |   0.708 |      0.734 |  1.25 |          1.29 |  0.069  |  0.0797 |           6.53 |          1.24 |       0.088 |                  0.71 |           7.2 |    68.2 | supply_risk              | model                 |
-| M5    | AZO/Ag25Cu75/AZO                  |             10 |   0.784 |          0.751 |   0.551 |      0.612 |  1.28 |          1.42 |  0.0674 |  0.078  |           5.92 |          1.23 |       0.034 |                  0.28 |           5.2 |    68   | T_vis                    | model                 |
-| N0    | Si3N4/Ag/Si3N4                    |             10 |   0.9   |          0.863 |   0.677 |      0.697 |  1.29 |          1.33 |  0.0487 |  0.0567 |           4.44 |          1.16 |       0.105 |                  0.85 |           7.5 |    67.5 | Ag_g_per_m2              | model                 |
-| S9    | FTO/Ag70Cu30/FTO                  |             10 |   0.859 |          0.823 |   0.619 |      0.664 |  1.29 |          1.39 |  0.0704 |  0.0814 |           6.48 |          1.24 |       0.081 |                  0.66 |           6.6 |    67   | Ag_g_per_m2              | model                 |
-| M35   | AZO/Ag60Cu40/AZO                  |              9 |   0.833 |          0.798 |   0.584 |      0.644 |  1.29 |          1.43 |  0.0798 |  0.0918 |           7.22 |          1.27 |       0.065 |                  0.53 |           6.3 |    65.6 | supply_risk              | model                 |
-| M4    | AZO/Ag50Cu50/AZO                  |             10 |   0.809 |          0.775 |   0.564 |      0.621 |  1.3  |          1.43 |  0.0732 |  0.0844 |           6.68 |          1.25 |       0.062 |                  0.51 |           6   |    65.4 | Ag_g_per_m2              | model                 |
-| M0    | AZO/Ag/AZO (benchmark)            |             10 |   0.876 |          0.839 |   0.606 |      0.646 |  1.35 |          1.45 |  0.0518 |  0.0603 |           4.18 |          1.18 |       0.105 |                  0.85 |           7.5 |    65   | Ag_g_per_m2              | literature_unverified |
-| M1    | AZO/Ag90Cu10/AZO                  |             10 |   0.86  |          0.824 |   0.595 |      0.64  |  1.34 |          1.44 |  0.0602 |  0.0698 |           5.18 |          1.21 |       0.097 |                  0.79 |           7.2 |    64.5 | Ag_g_per_m2              | model                 |
-| M2    | AZO/Ag80Cu20/AZO                  |             10 |   0.846 |          0.81  |   0.586 |      0.635 |  1.33 |          1.44 |  0.0662 |  0.0766 |           5.89 |          1.23 |       0.089 |                  0.73 |           6.9 |    64.4 | Ag_g_per_m2              | model                 |
-| M3    | AZO/Ag70Cu30/AZO                  |             10 |   0.832 |          0.797 |   0.578 |      0.63  |  1.32 |          1.44 |  0.0703 |  0.0811 |           6.36 |          1.24 |       0.081 |                  0.66 |           6.6 |    64.4 | Ag_g_per_m2              | model                 |
-| S8    | GZO/Ag70Cu30/GZO                  |             10 |   0.827 |          0.793 |   0.57  |      0.623 |  1.33 |          1.45 |  0.071  |  0.082  |           6.33 |          1.24 |       0.081 |                  0.66 |           6.6 |    63.7 | Ag_g_per_m2              | model                 |
-| T2    | AZO/Ag70Cu29Al1/AZO               |             10 |   0.826 |          0.791 |   0.571 |      0.624 |  1.32 |          1.45 |  0.0711 |  0.0821 |           6.47 |          1.24 |       0.081 |                  0.66 |           6.6 |    63.7 | Ag_g_per_m2              | hypothesis            |
-| T1    | AZO/Ag70Cu29Ti1/AZO               |             10 |   0.825 |          0.79  |   0.574 |      0.628 |  1.31 |          1.44 |  0.08   |  0.0921 |           7.55 |          1.28 |       0.081 |                  0.66 |           6.6 |    61.5 | Ag_g_per_m2              | hypothesis            |
-| B1    | AZO/Ti(0.5)/Ag/Ti(0.5)/AZO        |             10 |   0.816 |          0.781 |   0.565 |      0.62  |  1.32 |          1.44 |  0.0515 |  0.0599 |           4.18 |          1.17 |       0.105 |                  0.85 |           7.5 |    59.5 | Ag_g_per_m2              | model                 |
+```
+   ID                      Architecture  t_metal (nm)  T_vis  T_vis glazed  T_sol  g (SHGC)  LSG  Selectivity  eps_n  eps_h  R_s (ohm/sq)  U_g (W/m2K)  Ag (g/m2)  Metal cost (USD/m2)  Supply risk  Score                 Limiting            Provenance
+ E10e Si3N4/Ag10Cu90/Si3N4 (segregated)          10.0  0.878         0.841  0.719     0.760 1.16         1.22 0.0389 0.0456          3.13         1.13      0.015                 0.12          4.8   89.3              supply_risk                 model
+  E5e  Si3N4/Ag5Cu95/Si3N4 (segregated)          11.0  0.864         0.828  0.687     0.732 1.18         1.26 0.0365 0.0428          2.98         1.12      0.008                 0.07          4.6   89.3                    T_vis                 model
+   N6                    Si3N4/Cu/Si3N4          11.0  0.859         0.824  0.685     0.731 1.18         1.25 0.0409 0.0478          3.41         1.14      0.000                 0.01          4.5   88.9                    T_vis                 model
+   E5               Si3N4/Ag5Cu95/Si3N4          11.0  0.862         0.826  0.683     0.729 1.18         1.26 0.0463 0.0540          3.99         1.16      0.008                 0.07          4.6   86.8 emissivity_hemispherical                 model
+   N7              Si3N4/Cu90Zn10/Si3N4          11.0  0.851         0.816  0.674     0.727 1.17         1.26 0.0530 0.0616          4.66         1.18      0.000                 0.01          4.5   85.0 emissivity_hemispherical                 model
+  E10              Si3N4/Ag10Cu90/Si3N4          11.0  0.865         0.829  0.684     0.730 1.19         1.26 0.0510 0.0594          4.50         1.17      0.016                 0.14          4.8   84.8 emissivity_hemispherical                 model
+   N8              Si3N4/Cu90Ag10/Si3N4          11.0  0.865         0.829  0.686     0.732 1.18         1.26 0.0511 0.0594          4.50         1.17      0.016                 0.14          4.8   84.7 emissivity_hemispherical                 model
+ N35e Si3N4/Ag60Cu40/Si3N4 (segregated)           9.0  0.904         0.866  0.768     0.794 1.14         1.18 0.0380 0.0445          3.04         1.12      0.065                 0.53          6.3   81.6              supply_risk                 model
+   N5              Si3N4/Ag25Cu75/Si3N4          11.0  0.874         0.838  0.691     0.735 1.19         1.27 0.0616 0.0714          5.67         1.21      0.038                 0.31          5.2   79.7 emissivity_hemispherical                 model
+  N3e Si3N4/Ag70Cu30/Si3N4 (segregated)           9.0  0.900         0.863  0.744     0.770 1.17         1.21 0.0387 0.0453          3.16         1.13      0.073                 0.59          6.6   79.2              supply_risk                 model
+ D15e     AZO/Ag15Cu85/AZO (segregated)           9.0  0.794         0.762  0.585     0.643 1.23         1.36 0.0484 0.0564          3.31         1.16      0.019                 0.16          4.9   75.7                    T_vis                 model
+ D10e     AZO/Ag10Cu90/AZO (segregated)           9.0  0.789         0.757  0.582     0.641 1.23         1.36 0.0503 0.0585          3.52         1.17      0.013                 0.11          4.8   75.4                    T_vis                 model
+ M35e     AZO/Ag60Cu40/AZO (segregated)           9.0  0.843         0.808  0.614     0.659 1.28         1.37 0.0441 0.0514          2.95         1.15      0.065                 0.53          6.3   74.6              supply_risk                 model
+   N4              Si3N4/Ag50Cu50/Si3N4          11.0  0.895         0.857  0.698     0.737 1.21         1.28 0.0683 0.0789          6.48         1.23      0.068                 0.56          6.0   74.0              Ag_g_per_m2                 model
+  N35              Si3N4/Ag60Cu40/Si3N4          11.0  0.902         0.864  0.708     0.745 1.21         1.27 0.0675 0.0780          6.41         1.23      0.079                 0.65          6.3   72.0              Ag_g_per_m2                 model
+M3ema     AZO/Ag70Cu30/AZO (segregated)          10.0  0.840         0.805  0.589     0.635 1.32         1.43 0.0395 0.0462          2.63         1.13      0.081                 0.66          6.6   71.5              Ag_g_per_m2                 model
+  D10                  AZO/Ag10Cu90/AZO           9.0  0.786         0.753  0.576     0.638 1.23         1.36 0.0678 0.0784          5.66         1.23      0.013                 0.11          4.8   70.9                    T_vis                 model
+   N3              Si3N4/Ag70Cu30/Si3N4          11.0  0.901         0.863  0.704     0.739 1.22         1.28 0.0645 0.0747          6.12         1.22      0.089                 0.73          6.6   70.0              Ag_g_per_m2                 model
+  D15                  AZO/Ag15Cu85/AZO           9.0  0.790         0.757  0.578     0.639 1.24         1.37 0.0718 0.0828          6.15         1.25      0.019                 0.16          4.9   69.7                    T_vis                 model
+   M6     AZO/Cu/AZO (low-cost control)          12.0  0.738         0.707  0.491     0.558 1.32         1.50 0.0396 0.0463          2.87         1.13      0.000                 0.01          4.5   69.6                    T_vis literature_unverified
+  S10                  ITO/Ag70Cu30/ITO          10.0  0.852         0.816  0.578     0.620 1.37         1.47 0.0593 0.0688          5.48         1.20      0.081                 0.66          6.6   68.7              Ag_g_per_m2                 model
+   N2              Si3N4/Ag80Cu20/Si3N4          10.0  0.900         0.862  0.688     0.720 1.25         1.31 0.0674 0.0779          6.42         1.23      0.089                 0.73          6.9   68.7              Ag_g_per_m2                 model
+   N1              Si3N4/Ag90Cu10/Si3N4           9.0  0.914         0.875  0.708     0.734 1.25         1.29 0.0690 0.0797          6.53         1.24      0.088                 0.71          7.2   68.2              supply_risk                 model
+   M5                  AZO/Ag25Cu75/AZO          10.0  0.784         0.751  0.551     0.612 1.28         1.42 0.0674 0.0780          5.92         1.23      0.034                 0.28          5.2   68.0                    T_vis                 model
+   N0                    Si3N4/Ag/Si3N4          10.0  0.900         0.863  0.677     0.697 1.29         1.33 0.0487 0.0567          4.44         1.16      0.105                 0.85          7.5   67.5              Ag_g_per_m2                 model
+   S9                  FTO/Ag70Cu30/FTO          10.0  0.859         0.823  0.619     0.664 1.29         1.39 0.0704 0.0814          6.48         1.24      0.081                 0.66          6.6   67.0              Ag_g_per_m2                 model
+  M35                  AZO/Ag60Cu40/AZO           9.0  0.833         0.798  0.584     0.644 1.29         1.43 0.0798 0.0918          7.22         1.27      0.065                 0.53          6.3   65.6              supply_risk                 model
+   M4                  AZO/Ag50Cu50/AZO          10.0  0.809         0.775  0.564     0.621 1.30         1.43 0.0732 0.0844          6.68         1.25      0.062                 0.51          6.0   65.4              Ag_g_per_m2                 model
+   M0            AZO/Ag/AZO (benchmark)          10.0  0.876         0.839  0.606     0.646 1.35         1.45 0.0518 0.0603          4.18         1.18      0.105                 0.85          7.5   65.0              Ag_g_per_m2 literature_unverified
+   M1                  AZO/Ag90Cu10/AZO          10.0  0.860         0.824  0.595     0.640 1.34         1.44 0.0602 0.0698          5.18         1.21      0.097                 0.79          7.2   64.5              Ag_g_per_m2                 model
+   M2                  AZO/Ag80Cu20/AZO          10.0  0.846         0.810  0.586     0.635 1.33         1.44 0.0662 0.0766          5.89         1.23      0.089                 0.73          6.9   64.4              Ag_g_per_m2                 model
+   M3                  AZO/Ag70Cu30/AZO          10.0  0.832         0.797  0.578     0.630 1.32         1.44 0.0703 0.0811          6.36         1.24      0.081                 0.66          6.6   64.4              Ag_g_per_m2                 model
+   S8                  GZO/Ag70Cu30/GZO          10.0  0.827         0.793  0.570     0.623 1.33         1.45 0.0710 0.0820          6.33         1.24      0.081                 0.66          6.6   63.7              Ag_g_per_m2                 model
+   T2               AZO/Ag70Cu29Al1/AZO          10.0  0.826         0.791  0.571     0.624 1.32         1.45 0.0711 0.0821          6.47         1.24      0.081                 0.66          6.6   63.7              Ag_g_per_m2            hypothesis
+   T1               AZO/Ag70Cu29Ti1/AZO          10.0  0.825         0.790  0.574     0.628 1.31         1.44 0.0800 0.0921          7.55         1.28      0.081                 0.66          6.6   61.5              Ag_g_per_m2            hypothesis
+   B1        AZO/Ti(0.5)/Ag/Ti(0.5)/AZO          10.0  0.816         0.781  0.565     0.620 1.32         1.44 0.0515 0.0599          4.18         1.17      0.105                 0.85          7.5   59.5              Ag_g_per_m2                 model
+```
 
 ## Against the silver benchmark
-| id    | architecture                      |   dT_vis_pct |   d_emissivity_pct |   dR_sheet_pct |   silver_saving_pct |   cost_saving_pct |
-|:------|:----------------------------------|-------------:|-------------------:|---------------:|--------------------:|------------------:|
-| M6    | AZO/Cu/AZO (low-cost control)     |        -15.8 |              -23.3 |          -31.2 |               100   |              99   |
-| M1    | AZO/Ag90Cu10/AZO                  |         -1.8 |               15.8 |           24   |                 7.1 |               7.1 |
-| M2    | AZO/Ag80Cu20/AZO                  |         -3.4 |               27   |           41   |                14.7 |              14.6 |
-| M3    | AZO/Ag70Cu30/AZO                  |         -4.9 |               34.6 |           52.4 |                22.8 |              22.6 |
-| M4    | AZO/Ag50Cu50/AZO                  |         -7.6 |               40   |           59.9 |                40.8 |              40.5 |
-| M5    | AZO/Ag25Cu75/AZO                  |        -10.4 |               29.3 |           41.8 |                67.4 |              66.8 |
-| T1    | AZO/Ag70Cu29Ti1/AZO               |         -5.8 |               52.7 |           80.8 |                23.1 |              22.9 |
-| T2    | AZO/Ag70Cu29Al1/AZO               |         -5.6 |               36.2 |           54.9 |                23.1 |              22.9 |
-| B1    | AZO/Ti(0.5)/Ag/Ti(0.5)/AZO        |         -6.8 |               -0.6 |            0   |                 0   |               0   |
-| S8    | GZO/Ag70Cu30/GZO                  |         -5.5 |               36   |           51.6 |                22.8 |              22.6 |
-| S9    | FTO/Ag70Cu30/FTO                  |         -1.8 |               34.9 |           55.1 |                22.8 |              22.6 |
-| S10   | ITO/Ag70Cu30/ITO                  |         -2.7 |               14.2 |           31.3 |                22.8 |              22.6 |
-| M3ema | AZO/Ag70Cu30/AZO (segregated)     |         -4   |              -23.3 |          -37.1 |                22.8 |              22.6 |
-| N0    | Si3N4/Ag/Si3N4                    |          2.8 |               -6   |            6.2 |                 0   |               0   |
-| N1    | Si3N4/Ag90Cu10/Si3N4              |          4.4 |               32.2 |           56.5 |                16.4 |              16.4 |
-| N2    | Si3N4/Ag80Cu20/Si3N4              |          2.8 |               29.2 |           53.7 |                14.7 |              14.6 |
-| N3    | Si3N4/Ag70Cu30/Si3N4              |          2.9 |               23.8 |           46.6 |                15.1 |              14.9 |
-| N3e   | Si3N4/Ag70Cu30/Si3N4 (segregated) |          2.8 |              -24.9 |          -24.3 |                30.5 |              30.4 |
-| N4    | Si3N4/Ag50Cu50/Si3N4              |          2.2 |               30.9 |           55.1 |                34.9 |              34.5 |
-| N5    | Si3N4/Ag25Cu75/Si3N4              |         -0.1 |               18.4 |           35.7 |                64.2 |              63.5 |
-| N6    | Si3N4/Cu/Si3N4                    |         -1.9 |              -20.7 |          -18.2 |               100   |              99.1 |
-| N7    | Si3N4/Cu90Zn10/Si3N4              |         -2.8 |                2.2 |           11.6 |               100   |              99.1 |
-| N8    | Si3N4/Cu90Ag10/Si3N4              |         -1.2 |               -1.4 |            7.8 |                84.7 |              83.9 |
-| M35   | AZO/Ag60Cu40/AZO                  |         -4.8 |               52.2 |           72.9 |                38.3 |              38.1 |
-| M35e  | AZO/Ag60Cu40/AZO (segregated)     |         -3.7 |              -14.7 |          -29.3 |                38.3 |              38.1 |
-| N35   | Si3N4/Ag60Cu40/Si3N4              |          3   |               29.4 |           53.6 |                24.6 |              24.4 |
-| N35e  | Si3N4/Ag60Cu40/Si3N4 (segregated) |          3.2 |              -26.2 |          -27.2 |                38.3 |              38.1 |
-| D10   | AZO/Ag10Cu90/AZO                  |        -10.3 |               30.1 |           35.5 |                87.5 |              86.9 |
-| D10e  | AZO/Ag10Cu90/AZO (segregated)     |         -9.9 |               -2.9 |          -15.8 |                87.5 |              86.9 |
-| D15   | AZO/Ag15Cu85/AZO                  |         -9.8 |               37.3 |           47.3 |                81.7 |              81.1 |
-| D15e  | AZO/Ag15Cu85/AZO (segregated)     |         -9.3 |               -6.4 |          -20.8 |                81.7 |              81.1 |
-| E10   | Si3N4/Ag10Cu90/Si3N4              |         -1.2 |               -1.5 |            7.8 |                84.7 |              83.9 |
-| E10e  | Si3N4/Ag10Cu90/Si3N4 (segregated) |          0.3 |              -24.5 |          -25   |                86.1 |              85.4 |
-| E5    | Si3N4/Ag5Cu95/Si3N4               |         -1.5 |              -10.5 |           -4.4 |                92.2 |              91.3 |
-| E5e   | Si3N4/Ag5Cu95/Si3N4 (segregated)  |         -1.3 |              -29.1 |          -28.7 |                92.2 |              91.3 |
+```
+   id                      architecture  dT_vis_pct  d_emissivity_pct  dR_sheet_pct  silver_saving_pct  cost_saving_pct
+   M6     AZO/Cu/AZO (low-cost control)       -15.8             -23.3         -31.2              100.0             99.0
+   M1                  AZO/Ag90Cu10/AZO        -1.8              15.8          24.0                7.1              7.1
+   M2                  AZO/Ag80Cu20/AZO        -3.4              27.0          41.0               14.7             14.6
+   M3                  AZO/Ag70Cu30/AZO        -4.9              34.6          52.4               22.8             22.6
+   M4                  AZO/Ag50Cu50/AZO        -7.6              40.0          59.9               40.8             40.5
+   M5                  AZO/Ag25Cu75/AZO       -10.4              29.3          41.8               67.4             66.8
+   T1               AZO/Ag70Cu29Ti1/AZO        -5.8              52.7          80.8               23.1             22.9
+   T2               AZO/Ag70Cu29Al1/AZO        -5.6              36.2          54.9               23.1             22.9
+   B1        AZO/Ti(0.5)/Ag/Ti(0.5)/AZO        -6.8              -0.6           0.0                0.0              0.0
+   S8                  GZO/Ag70Cu30/GZO        -5.5              36.0          51.6               22.8             22.6
+   S9                  FTO/Ag70Cu30/FTO        -1.8              34.9          55.1               22.8             22.6
+  S10                  ITO/Ag70Cu30/ITO        -2.7              14.2          31.3               22.8             22.6
+M3ema     AZO/Ag70Cu30/AZO (segregated)        -4.0             -23.3         -37.1               22.8             22.6
+   N0                    Si3N4/Ag/Si3N4         2.8              -6.0           6.2                0.0              0.0
+   N1              Si3N4/Ag90Cu10/Si3N4         4.4              32.2          56.5               16.4             16.4
+   N2              Si3N4/Ag80Cu20/Si3N4         2.8              29.2          53.7               14.7             14.6
+   N3              Si3N4/Ag70Cu30/Si3N4         2.9              23.8          46.6               15.1             14.9
+  N3e Si3N4/Ag70Cu30/Si3N4 (segregated)         2.8             -24.9         -24.3               30.5             30.4
+   N4              Si3N4/Ag50Cu50/Si3N4         2.2              30.9          55.1               34.9             34.5
+   N5              Si3N4/Ag25Cu75/Si3N4        -0.1              18.4          35.7               64.2             63.5
+   N6                    Si3N4/Cu/Si3N4        -1.9             -20.7         -18.2              100.0             99.1
+   N7              Si3N4/Cu90Zn10/Si3N4        -2.8               2.2          11.6              100.0             99.1
+   N8              Si3N4/Cu90Ag10/Si3N4        -1.2              -1.4           7.8               84.7             83.9
+  M35                  AZO/Ag60Cu40/AZO        -4.8              52.2          72.9               38.3             38.1
+ M35e     AZO/Ag60Cu40/AZO (segregated)        -3.7             -14.7         -29.3               38.3             38.1
+  N35              Si3N4/Ag60Cu40/Si3N4         3.0              29.4          53.6               24.6             24.4
+ N35e Si3N4/Ag60Cu40/Si3N4 (segregated)         3.2             -26.2         -27.2               38.3             38.1
+  D10                  AZO/Ag10Cu90/AZO       -10.3              30.1          35.5               87.5             86.9
+ D10e     AZO/Ag10Cu90/AZO (segregated)        -9.9              -2.9         -15.8               87.5             86.9
+  D15                  AZO/Ag15Cu85/AZO        -9.8              37.3          47.3               81.7             81.1
+ D15e     AZO/Ag15Cu85/AZO (segregated)        -9.3              -6.4         -20.8               81.7             81.1
+  E10              Si3N4/Ag10Cu90/Si3N4        -1.2              -1.5           7.8               84.7             83.9
+ E10e Si3N4/Ag10Cu90/Si3N4 (segregated)         0.3             -24.5         -25.0               86.1             85.4
+   E5               Si3N4/Ag5Cu95/Si3N4        -1.5             -10.5          -4.4               92.2             91.3
+  E5e  Si3N4/Ag5Cu95/Si3N4 (segregated)        -1.3             -29.1         -28.7               92.2             91.3
+```
 
 Positive silver and cost savings with small negative performance changes are the combinations worth taking to the sputter tool.
 
 ## Pareto front
-| id   | label                             |    T_vis |   emissivity_hemispherical |   cost_usd_per_m2 | is_knee   |
-|:-----|:----------------------------------|---------:|---------------------------:|------------------:|:----------|
-| M6   | AZO/Cu/AZO (low-cost control)     | 0.737529 |                  0.0462779 |        0.0087552  | False     |
-| N1   | Si3N4/Ag90Cu10/Si3N4              | 0.913643 |                  0.0797473 |        0.714514   | False     |
-| N6   | Si3N4/Cu/Si3N4                    | 0.859013 |                  0.0478357 |        0.0080256  | False     |
-| N7   | Si3N4/Cu90Zn10/Si3N4              | 0.851186 |                  0.061643  |        0.00726364 | False     |
-| N35e | Si3N4/Ag60Cu40/Si3N4 (segregated) | 0.903502 |                  0.0444747 |        0.528692   | False     |
-| E10e | Si3N4/Ag10Cu90/Si3N4 (segregated) | 0.877804 |                  0.0455522 |        0.1248     | True      |
-| E5e  | Si3N4/Ag5Cu95/Si3N4 (segregated)  | 0.863813 |                  0.0427766 |        0.0740745  | False     |
+```
+  id                             label    T_vis  emissivity_hemispherical  cost_usd_per_m2  is_knee
+  M6     AZO/Cu/AZO (low-cost control) 0.737529                  0.046278         0.008755    False
+  N1              Si3N4/Ag90Cu10/Si3N4 0.913643                  0.079747         0.714514    False
+  N6                    Si3N4/Cu/Si3N4 0.859013                  0.047836         0.008026    False
+  N7              Si3N4/Cu90Zn10/Si3N4 0.851186                  0.061643         0.007264    False
+N35e Si3N4/Ag60Cu40/Si3N4 (segregated) 0.903502                  0.044475         0.528692    False
+E10e Si3N4/Ag10Cu90/Si3N4 (segregated) 0.877804                  0.045552         0.124800     True
+ E5e  Si3N4/Ag5Cu95/Si3N4 (segregated) 0.863813                  0.042777         0.074074    False
+```
 
 These are the candidates not dominated on transmittance, emissivity and cost simultaneously. Anything absent from this table is beaten on every one of those axes by something in it.
 
 ## Evidence grade
-| id    | architecture                      | provenance            | reportable   | purpose                                                                |
-|:------|:----------------------------------|:----------------------|:-------------|:-----------------------------------------------------------------------|
-| M0    | AZO/Ag/AZO (benchmark)            | literature_unverified | True         | Reference. The performance to match while using less silver.           |
-| M6    | AZO/Cu/AZO (low-cost control)     | literature_unverified | True         | Ag-free control. The brief's section 16 argues from published AZO/Cu/A |
-| M1    | AZO/Ag90Cu10/AZO                  | model                 | True         | Small Ag reduction; tests whether dilute Cu is optically free.         |
-| M2    | AZO/Ag80Cu20/AZO                  | model                 | True         |                                                                        |
-| M3    | AZO/Ag70Cu30/AZO                  | model                 | True         | Priority composition. Ag-Cu Low-E work reports useful environmental ro |
-| M4    | AZO/Ag50Cu50/AZO                  | model                 | True         |                                                                        |
-| M5    | AZO/Ag25Cu75/AZO                  | model                 | True         |                                                                        |
-| T1    | AZO/Ag70Cu29Ti1/AZO               | hypothesis            | False        | Hypothesis: dilute Ti suppresses Cu surface segregation and improves a |
-| T2    | AZO/Ag70Cu29Al1/AZO               | hypothesis            | False        | As T1, with an abundant stabiliser instead of Ti.                      |
-| B1    | AZO/Ti(0.5)/Ag/Ti(0.5)/AZO        | model                 | True         | Tests the Ti-stabilisation hypothesis in the form industry actually us |
-| S8    | GZO/Ag70Cu30/GZO                  | model                 | True         |                                                                        |
-| S9    | FTO/Ag70Cu30/FTO                  | model                 | True         |                                                                        |
-| S10   | ITO/Ag70Cu30/ITO                  | model                 | True         | Performance benchmark only; excluded at stage 1 on In supply risk.     |
-| M3ema | AZO/Ag70Cu30/AZO (segregated)     | model                 | True         | The same composition under the phase-separated hypothesis. Paired with |
-| N0    | Si3N4/Ag/Si3N4                    | model                 | True         | Ag reference in the nitride architecture, for direct comparison with M |
-| N1    | Si3N4/Ag90Cu10/Si3N4              | model                 | True         | small Ag reduction, nitride architecture                               |
-| N2    | Si3N4/Ag80Cu20/Si3N4              | model                 | True         | moderate Ag reduction, nitride architecture                            |
-| N3    | Si3N4/Ag70Cu30/Si3N4              | model                 | True         | the brief's priority composition, nitride architecture                 |
-| N3e   | Si3N4/Ag70Cu30/Si3N4 (segregated) | model                 | True         | same composition under the segregated-microstructure hypothesis        |
-| N4    | Si3N4/Ag50Cu50/Si3N4              | model                 | True         | strong Ag reduction, nitride architecture                              |
-| N5    | Si3N4/Ag25Cu75/Si3N4              | model                 | True         | Cu-rich, nitride architecture                                          |
-| N6    | Si3N4/Cu/Si3N4                    | model                 | True         | PRIMARY RESULT: silver-free stack meeting the full specification       |
-| N7    | Si3N4/Cu90Zn10/Si3N4              | model                 | True         | silver-free brass variant; Zn may improve Cu oxidation resistance      |
-| N8    | Si3N4/Cu90Ag10/Si3N4              | model                 | True         | 6x silver reduction while exceeding the benchmark on transmittance     |
-| M35   | AZO/Ag60Cu40/AZO                  | model                 | True         | Ag60Cu40 in the brief's architecture; fills the gap between M3 and M4  |
-| M35e  | AZO/Ag60Cu40/AZO (segregated)     | model                 | True         | same composition under the segregated-microstructure hypothesis        |
-| N35   | Si3N4/Ag60Cu40/Si3N4              | model                 | True         | Ag60Cu40 in the nitride architecture                                   |
-| N35e  | Si3N4/Ag60Cu40/Si3N4 (segregated) | model                 | True         | Ag60Cu40 nitride, segregated microstructure                            |
-| D10   | AZO/Ag10Cu90/AZO                  | model                 | True         | dilute-Ag optimum region, brief's architecture, mixed film             |
-| D10e  | AZO/Ag10Cu90/AZO (segregated)     | model                 | True         | same, segregated film: the peak of the segregated AZO series           |
-| D15   | AZO/Ag15Cu85/AZO                  | model                 | True         | upper edge of the dilute-Ag plateau, mixed film                        |
-| D15e  | AZO/Ag15Cu85/AZO (segregated)     | model                 | True         | upper edge of the dilute-Ag plateau, segregated film                   |
-| E10   | Si3N4/Ag10Cu90/Si3N4              | model                 | True         | dilute-Ag optimum, nitride architecture, mixed film                    |
-| E10e  | Si3N4/Ag10Cu90/Si3N4 (segregated) | model                 | True         | dilute-Ag optimum, nitride architecture, segregated: highest heating s |
-| E5    | Si3N4/Ag5Cu95/Si3N4               | model                 | True         | trace silver, nitride architecture                                     |
-| E5e   | Si3N4/Ag5Cu95/Si3N4 (segregated)  | model                 | True         | trace silver, nitride architecture, segregated                         |
+```
+   id                      architecture            provenance  reportable                                                                purpose
+   M0            AZO/Ag/AZO (benchmark) literature_unverified        True           Reference. The performance to match while using less silver.
+   M6     AZO/Cu/AZO (low-cost control) literature_unverified        True Ag-free control. The brief's section 16 argues from published AZO/Cu/A
+   M1                  AZO/Ag90Cu10/AZO                 model        True         Small Ag reduction; tests whether dilute Cu is optically free.
+   M2                  AZO/Ag80Cu20/AZO                 model        True                                                                       
+   M3                  AZO/Ag70Cu30/AZO                 model        True Priority composition. Ag-Cu Low-E work reports useful environmental ro
+   M4                  AZO/Ag50Cu50/AZO                 model        True                                                                       
+   M5                  AZO/Ag25Cu75/AZO                 model        True                                                                       
+   T1               AZO/Ag70Cu29Ti1/AZO            hypothesis       False Hypothesis: dilute Ti suppresses Cu surface segregation and improves a
+   T2               AZO/Ag70Cu29Al1/AZO            hypothesis       False                      As T1, with an abundant stabiliser instead of Ti.
+   B1        AZO/Ti(0.5)/Ag/Ti(0.5)/AZO                 model        True Tests the Ti-stabilisation hypothesis in the form industry actually us
+   S8                  GZO/Ag70Cu30/GZO                 model        True                                                                       
+   S9                  FTO/Ag70Cu30/FTO                 model        True                                                                       
+  S10                  ITO/Ag70Cu30/ITO                 model        True     Performance benchmark only; excluded at stage 1 on In supply risk.
+M3ema     AZO/Ag70Cu30/AZO (segregated)                 model        True The same composition under the phase-separated hypothesis. Paired with
+   N0                    Si3N4/Ag/Si3N4                 model        True Ag reference in the nitride architecture, for direct comparison with M
+   N1              Si3N4/Ag90Cu10/Si3N4                 model        True                               small Ag reduction, nitride architecture
+   N2              Si3N4/Ag80Cu20/Si3N4                 model        True                            moderate Ag reduction, nitride architecture
+   N3              Si3N4/Ag70Cu30/Si3N4                 model        True                 the brief's priority composition, nitride architecture
+  N3e Si3N4/Ag70Cu30/Si3N4 (segregated)                 model        True        same composition under the segregated-microstructure hypothesis
+   N4              Si3N4/Ag50Cu50/Si3N4                 model        True                              strong Ag reduction, nitride architecture
+   N5              Si3N4/Ag25Cu75/Si3N4                 model        True                                          Cu-rich, nitride architecture
+   N6                    Si3N4/Cu/Si3N4                 model        True       PRIMARY RESULT: silver-free stack meeting the full specification
+   N7              Si3N4/Cu90Zn10/Si3N4                 model        True      silver-free brass variant; Zn may improve Cu oxidation resistance
+   N8              Si3N4/Cu90Ag10/Si3N4                 model        True     6x silver reduction while exceeding the benchmark on transmittance
+  M35                  AZO/Ag60Cu40/AZO                 model        True  Ag60Cu40 in the brief's architecture; fills the gap between M3 and M4
+ M35e     AZO/Ag60Cu40/AZO (segregated)                 model        True        same composition under the segregated-microstructure hypothesis
+  N35              Si3N4/Ag60Cu40/Si3N4                 model        True                                   Ag60Cu40 in the nitride architecture
+ N35e Si3N4/Ag60Cu40/Si3N4 (segregated)                 model        True                            Ag60Cu40 nitride, segregated microstructure
+  D10                  AZO/Ag10Cu90/AZO                 model        True             dilute-Ag optimum region, brief's architecture, mixed film
+ D10e     AZO/Ag10Cu90/AZO (segregated)                 model        True           same, segregated film: the peak of the segregated AZO series
+  D15                  AZO/Ag15Cu85/AZO                 model        True                        upper edge of the dilute-Ag plateau, mixed film
+ D15e     AZO/Ag15Cu85/AZO (segregated)                 model        True                   upper edge of the dilute-Ag plateau, segregated film
+  E10              Si3N4/Ag10Cu90/Si3N4                 model        True                    dilute-Ag optimum, nitride architecture, mixed film
+ E10e Si3N4/Ag10Cu90/Si3N4 (segregated)                 model        True dilute-Ag optimum, nitride architecture, segregated: highest heating s
+   E5               Si3N4/Ag5Cu95/Si3N4                 model        True                                     trace silver, nitride architecture
+  E5e  Si3N4/Ag5Cu95/Si3N4 (segregated)                 model        True                         trace silver, nitride architecture, segregated
+```
 
 Rows marked as hypotheses have no measured or calculated properties for that exact composition. Their scores are extrapolations and should not enter a thesis table as results.
 
 ## What this framework does not predict
-| property             | why_not                                                                                                                                          |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------|
-| deposition_rate      | requires sputter-yield and plasma modelling, or a rate calibration on the actual tool; see pvdlowe.doe.sputter                                   |
-| thermal_stability    | requires annealing and thermal-cycling experiments; agglomeration of thin Ag is kinetic, not thermodynamic                                       |
-| adhesion             | scratch or tape test only                                                                                                                        |
-| film_continuity      | predicted only through a calibrated percolation model; confirm by SEM/AFM and an R_s(d) series                                                   |
-| surface_roughness    | AFM                                                                                                                                              |
-| interdiffusion       | requires interface DFT plus XPS depth profiling                                                                                                  |
-| structural_stability | energy above hull from the Materials Project for known crystalline phases; sputtered metastable alloys are outside that database by construction |
-| durability           | damp-heat, salt-spray, abrasion; no model substitutes                                                                                            |
+```
+            property                                                                                                                                          why_not
+     deposition_rate                                   requires sputter-yield and plasma modelling, or a rate calibration on the actual tool; see pvdlowe.doe.sputter
+   thermal_stability                                       requires annealing and thermal-cycling experiments; agglomeration of thin Ag is kinetic, not thermodynamic
+            adhesion                                                                                                                        scratch or tape test only
+     film_continuity                                                   predicted only through a calibrated percolation model; confirm by SEM/AFM and an R_s(d) series
+   surface_roughness                                                                                                                                              AFM
+      interdiffusion                                                                                                  requires interface DFT plus XPS depth profiling
+structural_stability energy above hull from the Materials Project for known crystalline phases; sputtered metastable alloys are outside that database by construction
+          durability                                                                                            damp-heat, salt-spray, abrasion; no model substitutes
+```
 
 ## Model validation
 ```
 ==========================================================================
 MODEL VALIDATION AGAINST TRANSCRIBED BENCHMARKS
 ==========================================================================
-                  id                                       label             metric  reported  modelled  abs_error  rel_error_pct  verified
-     azo_ag_azo_10nm             AZO(30)/Ag(10)/AZO(30) on glass              T_vis     0.805    0.8699     0.0649            8.1     False
-     azo_ag_azo_13nm             AZO(30)/Ag(13)/AZO(30) on glass            R_sheet     4.360    2.8414     1.5186           34.8     False
-     azo_ag_azo_13nm             AZO(30)/Ag(13)/AZO(30) on glass far_ir_reflectance     0.960    0.9642     0.0042            0.4     False
-      azo_ag_azo_alt                  AZO/Ag/AZO (second report)              T_vis     0.854    0.8442     0.0098            1.2     False
-      azo_ag_azo_alt                  AZO/Ag/AZO (second report)            R_sheet     3.210    3.2019     0.0081            0.3     False
-      azo_ag_azo_alt                  AZO/Ag/AZO (second report) far_ir_reflectance     0.970    0.9601     0.0099            1.0     False
- azo_ag_azo_original      AZO/Ag/AZO (brief section 1 reference)              T_vis     0.787    0.8442     0.0572            7.3     False
- azo_ag_azo_original      AZO/Ag/AZO (brief section 1 reference)            R_sheet     2.700    3.2019     0.5019           18.6     False
-     azo_cu_azo_15nm                              AZO/Cu(15)/AZO            R_sheet    16.600    2.1006    14.4994           87.3     False
-     azo_cu_azo_15nm                              AZO/Cu(15)/AZO far_ir_reflectance     0.670    0.9711     0.3011           44.9     False
-azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised              T_vis     0.877    0.7484     0.1286           14.7      True
-azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised            R_sheet     9.960    2.8583     7.1017           71.3      True
-azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised         emissivity     0.055    0.0405     0.0145           26.4      True
+                  id                                       label             metric  reported  modelled  abs_error  rel_error_pct source_state
+     azo_ag_azo_10nm             AZO(30)/Ag(10)/AZO(30) on glass              T_vis     0.805    0.8699     0.0649            8.1      partial
+     azo_ag_azo_13nm             AZO(30)/Ag(13)/AZO(30) on glass            R_sheet     4.360    2.8414     1.5186           34.8      partial
+     azo_ag_azo_13nm             AZO(30)/Ag(13)/AZO(30) on glass far_ir_reflectance     0.960    0.9642     0.0042            0.4      partial
+      azo_ag_azo_alt                  AZO/Ag/AZO (second report)              T_vis     0.854    0.8442     0.0098            1.2     disputed
+      azo_ag_azo_alt                  AZO/Ag/AZO (second report)            R_sheet     3.210    3.2019     0.0081            0.3     disputed
+      azo_ag_azo_alt                  AZO/Ag/AZO (second report) far_ir_reflectance     0.970    0.9601     0.0099            1.0     disputed
+ azo_ag_azo_original      AZO/Ag/AZO (brief section 1 reference)              T_vis     0.787    0.8442     0.0572            7.3     disputed
+ azo_ag_azo_original      AZO/Ag/AZO (brief section 1 reference)            R_sheet     2.700    3.2019     0.5019           18.6     disputed
+     azo_cu_azo_15nm                              AZO/Cu(15)/AZO            R_sheet    16.600    2.1006    14.4994           87.3      partial
+     azo_cu_azo_15nm                              AZO/Cu(15)/AZO far_ir_reflectance     0.670    0.9711     0.3011           44.9      partial
+azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised              T_vis     0.877    0.7484     0.1286           14.7      partial
+azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised            R_sheet     9.960    2.8583     7.1017           71.3      partial
+azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised         emissivity     0.055    0.0405     0.0145           26.4      partial
 
 median relative error: 14.7%
 
@@ -219,5 +227,7 @@ INTERNAL CONSISTENCY OF THE REPORTED VALUES
 ==========================================================================
 VERIFICATION STATUS
 ==========================================================================
-  6 of 8 benchmarks have not been located at all; 2 located and their numbers confirmed against the published abstract, but full text unread; 0 fully verified. A 'partial' entry means the transcription is right -- it does not mean the measurement basis has been checked, which for emissivity is the whole question.
+  8 benchmarks: 0 fully verified, 6 located with numbers confirmed against the published abstract, 2 DISPUTED -- located sources do not match the quoted figures -- and 0 not located.
+  'partial' means the transcription is right and the source is identified; it does not mean the full text has been read.
+  'disputed' means do not cite: the numbers in the brief could not be matched to any located source.
 ```

@@ -1,0 +1,57 @@
+EVIDENCE GRADE BY CANDIDATE
+
+   id                      architecture            provenance  reportable                                                                purpose
+   M0            AZO/Ag/AZO (benchmark) literature_unverified        True           Reference. The performance to match while using less silver.
+   M6     AZO/Cu/AZO (low-cost control) literature_unverified        True Ag-free control. The brief's section 16 argues from published AZO/Cu/A
+   M1                  AZO/Ag90Cu10/AZO                 model        True         Small Ag reduction; tests whether dilute Cu is optically free.
+   M2                  AZO/Ag80Cu20/AZO                 model        True                                                                       
+   M3                  AZO/Ag70Cu30/AZO                 model        True Priority composition. Ag-Cu Low-E work reports useful environmental ro
+   M4                  AZO/Ag50Cu50/AZO                 model        True                                                                       
+   M5                  AZO/Ag25Cu75/AZO                 model        True                                                                       
+   T1               AZO/Ag70Cu29Ti1/AZO            hypothesis       False Hypothesis: dilute Ti suppresses Cu surface segregation and improves a
+   T2               AZO/Ag70Cu29Al1/AZO            hypothesis       False                      As T1, with an abundant stabiliser instead of Ti.
+   B1        AZO/Ti(0.5)/Ag/Ti(0.5)/AZO                 model        True Tests the Ti-stabilisation hypothesis in the form industry actually us
+   S8                  GZO/Ag70Cu30/GZO                 model        True                                                                       
+   S9                  FTO/Ag70Cu30/FTO                 model        True                                                                       
+  S10                  ITO/Ag70Cu30/ITO                 model        True     Performance benchmark only; excluded at stage 1 on In supply risk.
+M3ema     AZO/Ag70Cu30/AZO (segregated)                 model        True The same composition under the phase-separated hypothesis. Paired with
+   N0                    Si3N4/Ag/Si3N4                 model        True Ag reference in the nitride architecture, for direct comparison with M
+   N1              Si3N4/Ag90Cu10/Si3N4                 model        True                               small Ag reduction, nitride architecture
+   N2              Si3N4/Ag80Cu20/Si3N4                 model        True                            moderate Ag reduction, nitride architecture
+   N3              Si3N4/Ag70Cu30/Si3N4                 model        True                 the brief's priority composition, nitride architecture
+  N3e Si3N4/Ag70Cu30/Si3N4 (segregated)                 model        True        same composition under the segregated-microstructure hypothesis
+   N4              Si3N4/Ag50Cu50/Si3N4                 model        True                              strong Ag reduction, nitride architecture
+   N5              Si3N4/Ag25Cu75/Si3N4                 model        True                                          Cu-rich, nitride architecture
+   N6                    Si3N4/Cu/Si3N4                 model        True       PRIMARY RESULT: silver-free stack meeting the full specification
+   N7              Si3N4/Cu90Zn10/Si3N4                 model        True      silver-free brass variant; Zn may improve Cu oxidation resistance
+   N8              Si3N4/Cu90Ag10/Si3N4                 model        True     6x silver reduction while exceeding the benchmark on transmittance
+  M35                  AZO/Ag60Cu40/AZO                 model        True  Ag60Cu40 in the brief's architecture; fills the gap between M3 and M4
+ M35e     AZO/Ag60Cu40/AZO (segregated)                 model        True        same composition under the segregated-microstructure hypothesis
+  N35              Si3N4/Ag60Cu40/Si3N4                 model        True                                   Ag60Cu40 in the nitride architecture
+ N35e Si3N4/Ag60Cu40/Si3N4 (segregated)                 model        True                            Ag60Cu40 nitride, segregated microstructure
+  D10                  AZO/Ag10Cu90/AZO                 model        True             dilute-Ag optimum region, brief's architecture, mixed film
+ D10e     AZO/Ag10Cu90/AZO (segregated)                 model        True           same, segregated film: the peak of the segregated AZO series
+  D15                  AZO/Ag15Cu85/AZO                 model        True                        upper edge of the dilute-Ag plateau, mixed film
+ D15e     AZO/Ag15Cu85/AZO (segregated)                 model        True                   upper edge of the dilute-Ag plateau, segregated film
+  E10              Si3N4/Ag10Cu90/Si3N4                 model        True                    dilute-Ag optimum, nitride architecture, mixed film
+ E10e Si3N4/Ag10Cu90/Si3N4 (segregated)                 model        True dilute-Ag optimum, nitride architecture, segregated: highest heating s
+   E5               Si3N4/Ag5Cu95/Si3N4                 model        True                                     trace silver, nitride architecture
+  E5e  Si3N4/Ag5Cu95/Si3N4 (segregated)                 model        True                         trace silver, nitride architecture, segregated
+
+
+NOT PREDICTED BY THIS FRAMEWORK
+
+            property                                                                                                                                          why_not
+     deposition_rate                                   requires sputter-yield and plasma modelling, or a rate calibration on the actual tool; see pvdlowe.doe.sputter
+   thermal_stability                                       requires annealing and thermal-cycling experiments; agglomeration of thin Ag is kinetic, not thermodynamic
+            adhesion                                                                                                                        scratch or tape test only
+     film_continuity                                                   predicted only through a calibrated percolation model; confirm by SEM/AFM and an R_s(d) series
+   surface_roughness                                                                                                                                              AFM
+      interdiffusion                                                                                                  requires interface DFT plus XPS depth profiling
+structural_stability energy above hull from the Materials Project for known crystalline phases; sputtered metastable alloys are outside that database by construction
+          durability                                                                                            damp-heat, salt-spray, abrasion; no model substitutes
+
+
+8 benchmarks: 0 fully verified, 6 located with numbers confirmed against the published abstract, 2 DISPUTED -- located sources do not match the quoted figures -- and 0 not located.
+  'partial' means the transcription is right and the source is identified; it does not mean the full text has been read.
+  'disputed' means do not cite: the numbers in the brief could not be matched to any located source.

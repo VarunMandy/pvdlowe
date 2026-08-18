@@ -22,8 +22,10 @@ benchmarks:
     label: "AZO(30)/Ag(10)/AZO(30) on glass"
     brief_section: 3
     source_hint: "PolyU Scholars Hub record, IR reflective properties of AZO/Ag/AZO trilayers"
-    citation: "unverified; brief cites research.polyu.edu.hk record"
-    verified: false
+    citation: >
+      Infrared reflective properties of AZO/Ag/AZO trilayers prepared by RF
+      magnetron sputtering. Ceramics International (2014), PII S0272884214006944.
+    verified: partial
     architecture:
       metal: {Ag: 1.0}
       metal_thickness_nm: 10.0
@@ -31,13 +33,23 @@ benchmarks:
       tco_thickness_nm: 30.0
     reported:
       T_vis: 0.805
+    verified_note: >
+      LOCATED, numbers confirmed from the abstract. Two corrections to the
+      brief: (a) deposition was RF magnetron sputtering, not DC as the brief's
+      section 3 implies; (b) far-IR reflectance was measured by FTIR
+      spectroscopy and sheet resistance by four-point probe -- so this is a
+      spectroscopic reflectance, directly comparable with the framework, NOT an
+      emissometer band value. Ag continuity at 10 nm is confirmed independently
+      by XRD (200 and 220 Ag peaks), which is the anchor the percolation model
+      is calibrated to. Full text unread.
 
   - id: azo_ag_azo_13nm
     label: "AZO(30)/Ag(13)/AZO(30) on glass"
     brief_section: 3
     source_hint: "same trilayer study, thicker Ag"
-    citation: "unverified; brief cites research.polyu.edu.hk record"
-    verified: false
+    citation: >
+      Same source: Ceramics International (2014), PII S0272884214006944.
+    verified: partial
     architecture:
       metal: {Ag: 1.0}
       metal_thickness_nm: 13.0
@@ -46,13 +58,22 @@ benchmarks:
     reported:
       R_sheet: 4.36
       far_ir_reflectance: 0.96
+    verified_note: >
+      LOCATED. 4.36 ohm/sq and 96% FIR reflection both attributed to the
+      AZO(30)/Ag(13)/AZO(30) structure. FTIR + four-point probe, so the
+      measurement basis matches the framework's own convention. This is the
+      benchmark the model reproduces best (0.4% on FIR reflectance), which is
+      consistent with it being a like-for-like comparison. Full text unread.
 
   - id: azo_ag_azo_alt
     label: "AZO/Ag/AZO (second report)"
     brief_section: 3
     source_hint: "characterisation of AZO and Ag based films by RF magnetron sputtering"
-    citation: "unverified; brief cites research.polyu.edu.hk record"
-    verified: false
+    citation: >
+      Likely the companion PET-substrate study: Highly transparent and infrared
+      reflective AZO/Ag/AZO multilayer film prepared on PET substrate by RF
+      magnetron sputtering, Vacuum (2014), PII S0042207X14000736.
+    verified: disputed
     architecture:
       metal: {Ag: 1.0}
       metal_thickness_nm: 12.0
@@ -62,12 +83,20 @@ benchmarks:
       T_vis: 0.854
       R_sheet: 3.21
       far_ir_reflectance: 0.97
+    verified_note: >
+      PROBABLE MISATTRIBUTION IN THE BRIEF. The companion paper reports 78.5%
+      visible transmittance with 91% FIR at 10 nm Ag, and 96% FIR at 15 nm --
+      and it is on PET, not glass. The brief's 85.4% / 3.21 ohm/sq / 97% figures
+      match neither this paper's abstract nor the glass-substrate one. Treat as
+      unverified and do not cite until the source of these three numbers is
+      established.
 
   - id: azo_ag_azo_original
     label: "AZO/Ag/AZO (brief section 1 reference)"
     brief_section: 1
-    citation: "unverified; brief cites a ScienceDirect article"
-    verified: false
+    citation: >
+      Possibly the PET-substrate study above (78.5% T_vis reported there).
+    verified: disputed
     architecture:
       metal: {Ag: 1.0}
       metal_thickness_nm: 12.0
@@ -76,12 +105,17 @@ benchmarks:
     reported:
       T_vis: 0.787
       R_sheet: 2.7
+    verified_note: >
+      The brief's 78.7% is close to the PET paper's 78.5% but not equal, and the
+      PET paper is on a different substrate. Attribution unresolved.
 
   - id: azo_cu_azo_15nm
     label: "AZO/Cu(15)/AZO"
     brief_section: 8
-    citation: "unverified; brief cites research.polyu.edu.hk record"
-    verified: false
+    citation: >
+      Transparent conductive and infrared reflective AZO/Cu/AZO multilayer film
+      prepared by RF magnetron sputtering (2014).
+    verified: partial
     architecture:
       metal: {Cu: 1.0}
       metal_thickness_nm: 15.0
@@ -91,6 +125,11 @@ benchmarks:
       R_sheet: 16.6
       far_ir_reflectance: 0.67
       continuity_thickness_nm: 11.0
+    verified_note: >
+      LOCATED by title; abstract not retrieved, numbers not yet confirmed.
+      Note this is RF sputtering, whereas the section 16 AZO/Cu/AZO paper
+      (ApSS 2022) is DC -- they are different studies from different groups and
+      should not be pooled.
 
   - id: azo_cu_azo_optimised
     label: "AZO(40)/Cu/AZO(40), DC magnetron, optimised"
@@ -126,8 +165,12 @@ benchmarks:
   - id: azo_standalone
     label: "AZO single layer"
     brief_section: 2
-    citation: "unverified; brief cites a PMC article"
-    verified: false
+    citation: >
+      A Comprehensive Investigation of the Mechanical and Tribological Properties
+      of AZO Transparent Conducting Oxide Thin Films Deposited by Medium
+      Frequency Magnetron Sputtering. Materials 17(1), 81 (2024).
+      DOI 10.3390/ma17010081.
+    verified: partial
     architecture:
       metal: null
       tco: AZO
@@ -139,6 +182,12 @@ benchmarks:
       band_gap_ev: 3.12
       hardness_gpa: 11.4
       youngs_modulus_gpa: 98.0
+    verified_note: >
+      LOCATED. Resistivity 2.6e-3 ohm.cm, hardness 11.4 GPa and reduced modulus
+      98 GPa all confirmed. CORRECTION: the paper reports average visible
+      transmittance of 81.4%, not the 82.4% in the brief -- a transcription slip.
+      Deposition is MEDIUM-FREQUENCY magnetron sputtering, not RF or DC. The
+      band gap of 3.12 eV was not visible in the abstract and remains unchecked.
 
   - id: agcu_thin_film_resistivity
     label: "~10 nm Ag, Ag-Cu and Cu films"

@@ -192,3 +192,21 @@ def test_double_metal_beats_the_single_metal_lsg_ceiling():
     double = I.light_to_solar_gain(
         dmdmd("Ag", 12.0, tco("Si3N4"), 15.0, 60.0).stack())
     assert double > best_single, (double, best_single)
+
+
+def test_band_emissivity_exceeds_full_band_for_a_metal_stack():
+    """Restricting to 8-14 um reads HIGHER, not lower.
+
+    Pins the result that falsified the band-emissometer explanation for the
+    literature emissivity discrepancy. A Drude metal's reflectance is nearly
+    flat across 5-14 um and the 283 K Planck weight already peaks near 10 um,
+    so the restricted band drops the 5-8 um tail where these stacks reflect
+    slightly worse.
+    """
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optimize.thickness import build
+    for metal, d in (("Cu", 12.0), ("Ag", 10.0)):
+        st = build(metal, d, 40.0, 40.0, tco("AZO")).stack()
+        full = I.normal_emissivity(st)
+        band = I.band_emissivity(st, (8.0, 14.0))
+        assert 1.02 < band / full < 1.15, (metal, d, band / full)

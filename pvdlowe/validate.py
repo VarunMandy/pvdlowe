@@ -151,7 +151,12 @@ def validate_model(path: Path | None = None) -> pd.DataFrame:
                 "abs_error": None if m is None else round(abs(m - value), 4),
                 "rel_error_pct": None if m is None or value == 0
                 else round(100 * abs(m - value) / abs(value), 1),
-                "verified": bool(bm.get("verified", False)),
+                # the flag is tri-state (True / "partial" / "disputed" /
+                # False); bool() would report every non-empty string as
+                # verified, which is exactly the conflation this system exists
+                # to prevent
+                "source_state": (bm.get("verified") if bm.get("verified")
+                                 else "not located"),
             })
     return pd.DataFrame(rows)
 
@@ -251,21 +256,25 @@ def verification_status(path: Path | None = None) -> dict:
     bms = load_benchmarks(path)
     verified = [b for b in bms if b.get("verified") is True]
     partial = [b for b in bms if b.get("verified") == "partial"]
-    unread = len(bms) - len(verified) - len(partial)
+    disputed = [b for b in bms if b.get("verified") == "disputed"]
+    unread = len(bms) - len(verified) - len(partial) - len(disputed)
     return {
         "total": len(bms),
         "verified": len(verified),
         "partial": len(partial),
+        "disputed": len(disputed),
         "unverified": unread,
         "fraction_verified": round(len(verified) / max(len(bms), 1), 3),
         "provenance": Provenance.LITERATURE_UNVERIFIED,
         "message": (
-            f"{unread} of {len(bms)} benchmarks have not been located at all; "
-            f"{len(partial)} located and their numbers confirmed against the "
-            f"published abstract, but full text unread; {len(verified)} fully "
-            "verified. A 'partial' entry means the transcription is right -- it "
-            "does not mean the measurement basis has been checked, which for "
-            "emissivity is the whole question."),
+            f"{len(bms)} benchmarks: {len(verified)} fully verified, "
+            f"{len(partial)} located with numbers confirmed against the "
+            f"published abstract, {len(disputed)} DISPUTED -- located sources "
+            f"do not match the quoted figures -- and {unread} not located.\n"
+            "  'partial' means the transcription is right and the source is "
+            "identified; it does not mean the full text has been read.\n"
+            "  'disputed' means do not cite: the numbers in the brief could "
+            "not be matched to any located source."),
     }
 
 

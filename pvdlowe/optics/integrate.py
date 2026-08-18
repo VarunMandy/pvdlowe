@@ -158,6 +158,35 @@ def normal_emissivity(stack, weighting: Weighting | None = None,
 EN673_COEFFICIENTS = (1.1887, -0.4967, 0.2452)
 
 
+def band_emissivity(stack, band_um=(8.0, 14.0), temperature_k: float = 293.0,
+                    angle_deg: float = 0.0) -> float:
+    """Emissivity averaged over a restricted spectral band.
+
+    EN 12898 weights 1 - R across the whole thermal spectrum by a 283 K Planck
+    radiance. Much of the infrared-stealth and low-emissivity literature
+    instead reports a band-emissometer value -- the IR-2 and similar
+    instruments read the 8-14 um atmospheric window, because that is the band
+    a thermal imager sees.
+
+    These are different quantities. A metal's reflectance rises with
+    wavelength, so restricting the average to 8-14 um and dropping the 5-8 um
+    region, where reflectance is lower, returns a systematically smaller
+    number. Comparing a band-emissometer value with a standards-grade
+    emissivity, or with a sheet-resistance impedance limit, compares unlike
+    things.
+
+    Provided so a literature value can be recomputed on its own terms before
+    being called inconsistent.
+    """
+    from ..constants import planck_spectral_radiance_wavelength
+    lo, hi = float(band_um[0]) * 1000.0, float(band_um[1]) * 1000.0
+    lam = np.linspace(lo, hi, 400)
+    res = _as_stack(stack).evaluate(lam, angle_deg)
+    weight = planck_spectral_radiance_wavelength(lam, temperature_k)
+    return float(np.trapezoid((1.0 - res.R) * weight, lam)
+                 / np.trapezoid(weight, lam))
+
+
 def hemispherical_emissivity(normal_eps: float) -> float:
     """EN 673 correction, eps = 1.1887 e_n - 0.4967 e_n^2 + 0.2452 e_n^3."""
     e = float(normal_eps)
@@ -369,7 +398,7 @@ def performance_summary(coating, glass_thickness_mm: float = 4.0,
 __all__ = [
     "visible_transmittance", "visible_reflectance", "visible_absorptance",
     "solar_transmittance", "solar_reflectance", "solar_absorptance",
-    "selectivity", "g_value", "light_to_solar_gain",
+    "selectivity", "g_value", "light_to_solar_gain", "band_emissivity",
     "INWARD_FRACTION_SINGLE", "INWARD_FRACTION_IGU_SURFACE2",
     "normal_emissivity", "hemispherical_emissivity",
     "hemispherical_emissivity_direct", "emissivity_diagnostics",

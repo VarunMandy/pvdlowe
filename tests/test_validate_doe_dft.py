@@ -59,7 +59,7 @@ def test_verification_flags_require_a_citation():
         state = bm.get("verified", False)
         if state is False:
             continue
-        assert state in (True, "partial"), (bm["id"], state)
+        assert state in (True, "partial", "disputed"), (bm["id"], state)
         assert bm.get("citation", "").strip(), f"{bm['id']} claims verification with no citation"
         assert bm.get("verified_note", "").strip(), f"{bm['id']} must record what was NOT checked"
 
@@ -67,7 +67,8 @@ def test_verification_flags_require_a_citation():
 def test_full_verification_is_not_claimed_without_reading_the_paper():
     """No entry should be `verified: true` while the basis is unchecked."""
     status = verification_status()
-    assert status["verified"] + status["partial"] + status["unverified"] == status["total"]
+    assert (status["verified"] + status["partial"] + status["disputed"]
+            + status["unverified"]) == status["total"]
     assert status["verified"] == 0, (
         "an entry claims full verification -- confirm the full text was read, "
         "including the measurement basis, before allowing this")
@@ -172,3 +173,16 @@ def test_mixing_energy_sign_convention():
     assert q.value > 0                      # above the weighted average
     q2 = mixing_energy(-3.2, {"Ag": -2.7, "Cu": -3.5}, {"Ag": 0.5, "Cu": 0.5})
     assert q2.value < 0
+
+
+def test_validation_table_reports_the_true_source_state():
+    """A tri-state flag must not be collapsed to a boolean.
+
+    'partial' and 'disputed' are truthy strings; reporting them as verified
+    would defeat the point of grading the evidence at all.
+    """
+    df = validate_model()
+    states = set(df["source_state"])
+    assert states <= {True, "partial", "disputed", "not located"}, states
+    assert True not in states, "nothing is fully verified yet"
+    assert "disputed" in states, "the two unmatched entries must show as disputed"

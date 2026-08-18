@@ -112,8 +112,13 @@ because the brief's citations were LLM-surfaced (every URL carries
 
 ## Documentation
 
-- `docs/METHODOLOGY.md` — the physics, the approximations, and where they break
-- `docs/FINDINGS.md` — what the framework found in the brief's own numbers
+Read in this order:
+
+1. **`docs/SUMMARY.md`** — executive summary: the recommendation, six findings,
+   and what must happen before any of it counts as a result
+2. **`docs/FINDINGS.md`** — full findings, organised by conclusion: evidence
+   audit, method audit, design-space results, limitations, corrections
+3. `docs/METHODOLOGY.md` — the physics, the approximations, and where they break
 - `docs/ROADMAP.md` — the experimental programme this is meant to feed
 - `docs/PROVENANCE.md` — the evidence-grading system
 - `docs/REFERENCES.md` — citations with verification status
