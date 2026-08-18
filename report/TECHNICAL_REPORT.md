@@ -536,7 +536,7 @@ which §5.1's dilute-silver optimum is strongest.
 | Ag–O | 18 | 11 | Ag₂O, AgO, Ag₃O |
 | Ag–Cu–O | 7 | 4 | CuAgO₂, Cu₂Ag₂O₃ |
 
-**This adds a mechanism to the dilute-stabiliser finding in §5.6.** Both Cu–Ti
+**This adds a mechanism to the dilute-stabiliser finding in §5.7.** Both Cu–Ti
 and Al–Cu are richly intermetallic — eight and ten near-hull phases
 respectively. A dilute Ti or Al addition to a Cu-bearing film therefore has
 stable compounds available to form, so on annealing it is more likely to
@@ -554,7 +554,85 @@ thin-film optical constants at 10 nm, or interface energies against an amorphous
 oxide. The framework records this limitation per query rather than leaving it
 implicit.
 
-### 5.6 The dilute-titanium ternary is predicted to underperform
+### 5.6 Ranked candidates
+
+All 36 architectures were scored under both climate profiles. **The two top-ten
+lists share no candidates.** This is the practical form of §5.3: the climate is
+not a refinement to the ranking, it selects a different design space.
+
+Columns: geometry as bottom/metal/top in nm; g is the EN 410 solar heat gain
+coefficient; LSG = T_vis/g; "spec" is T_vis ≥ 0.80, R_s ≤ 5 Ω/sq, ε_h ≤ 0.10.
+
+#### Heating-dominated (Northern Europe) — `data/targets.yaml`
+
+| # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | $/m² | Score | Spec |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | E10e | Si₃N₄/Ag₁₀Cu₉₀/Si₃N₄ (segregated) | 59/10/48 | 0.878 | 0.0456 | 3.13 | 0.760 | 1.16 | 0.015 | 0.12 | **89.3** | yes |
+| 2 | E5e | Si₃N₄/Ag₅Cu₉₅/Si₃N₄ (segregated) | 59/11/48 | 0.864 | 0.0428 | 2.98 | 0.732 | 1.18 | 0.008 | 0.07 | **89.3** | yes |
+| 3 | N6 | Si₃N₄/Cu/Si₃N₄ | 60/11/50 | 0.859 | 0.0478 | 3.41 | 0.731 | 1.18 | 0.000 | 0.01 | **88.9** | yes |
+| 4 | E5 | Si₃N₄/Ag₅Cu₉₅/Si₃N₄ | 59/11/48 | 0.862 | 0.0540 | 3.99 | 0.729 | 1.18 | 0.008 | 0.07 | **86.8** | yes |
+| 5 | N7 | Si₃N₄/Cu₉₀Zn₁₀/Si₃N₄ | 60/11/50 | 0.851 | 0.0616 | 4.66 | 0.727 | 1.17 | 0.000 | 0.01 | **85.0** | yes |
+| 6 | E10 | Si₃N₄/Ag₁₀Cu₉₀/Si₃N₄ | 59/11/48 | 0.865 | 0.0594 | 4.50 | 0.730 | 1.19 | 0.016 | 0.14 | **84.8** | yes |
+| 7 | N8 | Si₃N₄/Cu₉₀Ag₁₀/Si₃N₄ | 60/11/50 | 0.865 | 0.0594 | 4.50 | 0.732 | 1.18 | 0.016 | 0.14 | **84.7** | yes |
+| 8 | N35e | Si₃N₄/Ag₆₀Cu₄₀/Si₃N₄ (segregated) | 45/9/40 | 0.904 | 0.0445 | 3.04 | 0.794 | 1.14 | 0.065 | 0.53 | **81.7** | yes |
+| 9 | N5 | Si₃N₄/Ag₂₅Cu₇₅/Si₃N₄ | 60/11/50 | 0.874 | 0.0714 | 5.67 | 0.735 | 1.19 | 0.038 | 0.31 | **79.7** | **no** |
+| 10 | N3e | Si₃N₄/Ag₇₀Cu₃₀/Si₃N₄ (segregated) | 25/9/35 | 0.900 | 0.0453 | 3.16 | 0.770 | 1.17 | 0.073 | 0.59 | **79.2** | yes |
+| — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 0.85 | 65.0 | yes |
+
+**Every entry uses silicon nitride.** Nine of ten meet the full specification;
+eight of ten use less than 0.05 g/m² of silver against the benchmark's 0.105.
+The leading candidate beats the benchmark on transmittance, emissivity *and*
+sheet resistance simultaneously while using **one seventh of the silver**.
+
+#### Cooling-dominated (India) — `data/targets_cooling.yaml`
+
+| # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | $/m² | Score | Spec |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | M6 | AZO/Cu/AZO | 35/12/35 | 0.738 | 0.0463 | 2.87 | 0.558 | 1.32 | 0.000 | 0.01 | **65.4** | **no** |
+| 2 | D10e | AZO/Ag₁₀Cu₉₀/AZO (segregated) | 15/9/37 | 0.789 | 0.0585 | 3.52 | 0.641 | 1.23 | 0.013 | 0.11 | **59.3** | **no** |
+| 3 | D15e | AZO/Ag₁₅Cu₈₅/AZO (segregated) | 15/9/37 | 0.794 | 0.0564 | 3.31 | 0.643 | 1.23 | 0.019 | 0.16 | **59.3** | **no** |
+| 4 | S10 | ITO/Ag₇₀Cu₃₀/ITO | 35/10/35 | 0.852 | 0.0688 | 5.48 | 0.620 | 1.37 | 0.081 | 0.66 | **58.3** | **no** |
+| 5 | M5 | AZO/Ag₂₅Cu₇₅/AZO | 35/10/35 | 0.784 | 0.0780 | 5.92 | 0.612 | 1.28 | 0.034 | 0.28 | **58.2** | **no** |
+| 6 | M3ema | AZO/Ag₇₀Cu₃₀/AZO (segregated) | 35/10/35 | 0.840 | 0.0462 | 2.63 | 0.635 | 1.32 | 0.081 | 0.66 | **57.9** | yes |
+| 7 | M35e | AZO/Ag₆₀Cu₄₀/AZO (segregated) | 15/9/35 | 0.843 | 0.0514 | 2.95 | 0.659 | 1.28 | 0.065 | 0.53 | **57.4** | yes |
+| 8 | D10 | AZO/Ag₁₀Cu₉₀/AZO | 15/9/37 | 0.786 | 0.0784 | 5.66 | 0.638 | 1.23 | 0.013 | 0.11 | **57.1** | **no** |
+| 9 | D15 | AZO/Ag₁₅Cu₈₅/AZO | 15/9/37 | 0.790 | 0.0828 | 6.15 | 0.639 | 1.24 | 0.019 | 0.16 | **56.3** | **no** |
+| 10 | M4 | AZO/Ag₅₀Cu₅₀/AZO | 35/10/35 | 0.809 | 0.0844 | 6.68 | 0.621 | 1.30 | 0.062 | 0.51 | **55.7** | **no** |
+| — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 0.85 | 53.0 | yes |
+
+**Every entry uses a conductive oxide** (AZO or ITO), for the reason in §5.3 —
+the free carriers reject solar near-infrared, which a passive nitride cannot.
+But only **two of ten meet the full specification**, and both of those use
+substantial silver. The rest fail on visible transmittance.
+
+**This is the honest state of the cooling-climate answer: the framework is
+ranking near-misses.** No single-metal architecture in the set clears
+T_vis ≥ 0.80 at acceptable solar gain, which is the finding that motivated the
+multi-layer work in §5.4. The double-copper Si₃N₄ stack scores 68.9 on this
+profile — higher than anything in the table above — but at T_vis 0.716 it too
+falls short.
+
+#### How to read these tables
+
+1. **They share no candidates.** A recommendation is only meaningful with its
+   climate profile named. Circulating one table without the other would be
+   misleading.
+2. **The benchmark appears in neither top ten**, which is the correct answer to
+   the brief's question: pure silver is the incumbent to beat, and on a
+   sustainability-weighted objective it is beaten.
+3. **Four of ten in each list are "segregated" variants** — the same
+   composition under the alternative microstructure hypothesis. Until the
+   Phase 2 measurement (§8.3) is made, those four entries are conditional. §5.5
+   provides thermodynamic support for segregation but not proof of the
+   as-deposited state.
+4. **All copper-bearing entries are contingent on §6.** The framework
+   under-predicts sputtered copper sheet resistance by roughly eightfold; if
+   that gap is real film quality rather than model error, most of both tables is
+   affected.
+5. **Scores are not comparable between the two tables**, being computed under
+   different weightings. Compare within a column only.
+
+### 5.7 The dilute-titanium ternary is predicted to underperform
 
 Ag₇₀Cu₂₉Ti₁, proposed in the brief on the hypothesis that dilute Ti stabilises
 the metal layer, ranks 13th of 14 in the original candidate set. Titanium's bulk
