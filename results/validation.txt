@@ -1,0 +1,42 @@
+==========================================================================
+MODEL VALIDATION AGAINST TRANSCRIBED BENCHMARKS
+==========================================================================
+                  id                                       label             metric  reported  modelled  abs_error  rel_error_pct  verified
+     azo_ag_azo_10nm             AZO(30)/Ag(10)/AZO(30) on glass              T_vis     0.805    0.8699     0.0649            8.1     False
+     azo_ag_azo_13nm             AZO(30)/Ag(13)/AZO(30) on glass            R_sheet     4.360    2.8414     1.5186           34.8     False
+     azo_ag_azo_13nm             AZO(30)/Ag(13)/AZO(30) on glass far_ir_reflectance     0.960    0.9642     0.0042            0.4     False
+      azo_ag_azo_alt                  AZO/Ag/AZO (second report)              T_vis     0.854    0.8442     0.0098            1.2     False
+      azo_ag_azo_alt                  AZO/Ag/AZO (second report)            R_sheet     3.210    3.2019     0.0081            0.3     False
+      azo_ag_azo_alt                  AZO/Ag/AZO (second report) far_ir_reflectance     0.970    0.9601     0.0099            1.0     False
+ azo_ag_azo_original      AZO/Ag/AZO (brief section 1 reference)              T_vis     0.787    0.8442     0.0572            7.3     False
+ azo_ag_azo_original      AZO/Ag/AZO (brief section 1 reference)            R_sheet     2.700    3.2019     0.5019           18.6     False
+     azo_cu_azo_15nm                              AZO/Cu(15)/AZO            R_sheet    16.600    2.1006    14.4994           87.3     False
+     azo_cu_azo_15nm                              AZO/Cu(15)/AZO far_ir_reflectance     0.670    0.9711     0.3011           44.9     False
+azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised              T_vis     0.877    0.7484     0.1286           14.7      True
+azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised            R_sheet     9.960    2.8583     7.1017           71.3      True
+azo_cu_azo_optimised AZO(40)/Cu/AZO(40), DC magnetron, optimised         emissivity     0.055    0.0405     0.0145           26.4      True
+
+median relative error: 14.7%
+
+==========================================================================
+INTERNAL CONSISTENCY OF THE REPORTED VALUES
+==========================================================================
+[MEDIUM] AZO/Cu(15)/AZO
+         check : emissivity vs sheet-resistance impedance limit
+         detail: reported emissivity 0.330 at 16.6 ohm/sq is well above the limit 0.150; consistent with a discontinuous or heavily damped film, or with extra far-IR absorption in the oxide layers
+         action: expected if the metal is near percolation; otherwise check for oxide absorption
+
+[HIGH  ] AZO(40)/Cu/AZO(40), DC magnetron, optimised
+         check : emissivity vs sheet-resistance impedance limit
+         detail: reported emissivity 0.055 at 9.96 ohm/sq is below the thin-sheet limit 0.096 for that sheet resistance; 0.055 would require about 5.5 ohm/sq
+         action: confirm both were measured on the same sample, and whether the emissivity is normal or hemispherical
+
+[HIGH  ] ~10 nm Ag, Ag-Cu and Cu films
+         check : Ag thin-film resistivity vs bulk
+         detail: 1.59 uohm.cm quoted for a 10 nm film is 1.00x bulk (1.587 uohm.cm). A film this thin cannot reach bulk resistivity: the electron mean free path is 53 nm, so surface and grain-boundary scattering alone force a ratio above about 2
+         action: check whether the bulk value was tabulated alongside measured values for the other films
+
+==========================================================================
+VERIFICATION STATUS
+==========================================================================
+  6 of 8 benchmarks have not been located at all; 2 located and their numbers confirmed against the published abstract, but full text unread; 0 fully verified. A 'partial' entry means the transcription is right -- it does not mean the measurement basis has been checked, which for emissivity is the whole question.

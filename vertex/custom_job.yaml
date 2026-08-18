@@ -1,0 +1,24 @@
+# Vertex AI Custom Job spec for a full pvdlowe analysis run.
+#
+#   gcloud ai custom-jobs create \
+#     --region=us-central1 \
+#     --display-name=pvdlowe-full \
+#     --config=vertex/custom_job.yaml
+#
+# Substitute PROJECT_ID and BUCKET before submitting.
+workerPoolSpecs:
+  - machineSpec:
+      # 8 vCPUs is the sweet spot: the silver curve parallelises over 7
+      # compositions and nothing else in the package is parallel, so more
+      # cores buy nothing. No accelerator -- this is scipy, not a model.
+      machineType: n2-standard-8
+    replicaCount: 1
+    diskSpec:
+      bootDiskType: pd-balanced
+      bootDiskSizeGb: 100
+    containerSpec:
+      imageUri: us-central1-docker.pkg.dev/PROJECT_ID/pvdlowe/pvdlowe:0.1.0
+      args:
+        - --output=gs://BUCKET/pvdlowe/runs/latest
+        - --task=all
+        - --workers=7

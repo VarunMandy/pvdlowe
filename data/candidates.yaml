@@ -1,0 +1,419 @@
+# Candidate coating architectures.
+#
+# Drawn from the brief's section 6 composition matrix (M0-M6), section 13
+# sample matrix (S1-S10) and section 15 top-five shortlist. Thicknesses are
+# starting points, not optima -- run `pvdlowe optimise` to place them.
+#
+# provenance:
+#   benchmark   published architecture used as the control
+#   candidate   plausible variation, properties predicted by this framework
+#   hypothesis  composition with no calculated or measured properties at all;
+#               the framework will refuse to put these in a headline table
+#               without an explicit opt-in
+
+defaults:
+  bottom_tco: AZO
+  top_tco: AZO
+  bottom_thickness_nm: 35.0
+  top_thickness_nm: 35.0
+  metal_thickness_nm: 10.0
+  mixing_model: solid_solution
+
+candidates:
+
+  # --- controls and benchmarks -----------------------------------------
+  - id: M0
+    label: "AZO/Ag/AZO (benchmark)"
+    metal: {Ag: 1.0}
+    metal_thickness_nm: 10.0
+    provenance: benchmark
+    purpose: "Reference. The performance to match while using less silver."
+
+  - id: M6
+    label: "AZO/Cu/AZO (low-cost control)"
+    metal: {Cu: 1.0}
+    metal_thickness_nm: 12.0
+    provenance: benchmark
+    purpose: >
+      Ag-free control. The brief's section 16 argues from published
+      AZO/Cu/AZO results that this may already meet the emissivity target,
+      which would make it the more interesting baseline than pure Ag.
+
+  # --- the Ag-Cu composition series (brief section 6) -------------------
+  - id: M1
+    label: "AZO/Ag90Cu10/AZO"
+    metal: {Ag: 0.90, Cu: 0.10}
+    provenance: candidate
+    purpose: "Small Ag reduction; tests whether dilute Cu is optically free."
+
+  - id: M2
+    label: "AZO/Ag80Cu20/AZO"
+    metal: {Ag: 0.80, Cu: 0.20}
+    provenance: candidate
+
+  - id: M3
+    label: "AZO/Ag70Cu30/AZO"
+    metal: {Ag: 0.70, Cu: 0.30}
+    provenance: candidate
+    purpose: >
+      Priority composition. Ag-Cu Low-E work reports useful environmental
+      robustness near 30 at.% Cu -- but that is a durability result, not
+      evidence that 30% is optically or electrically optimal here.
+
+  - id: M4
+    label: "AZO/Ag50Cu50/AZO"
+    metal: {Ag: 0.50, Cu: 0.50}
+    provenance: candidate
+
+  - id: M5
+    label: "AZO/Ag25Cu75/AZO"
+    metal: {Ag: 0.25, Cu: 0.75}
+    provenance: candidate
+
+  # --- dilute ternary stabilisers (brief section 13) --------------------
+  - id: T1
+    label: "AZO/Ag70Cu29Ti1/AZO"
+    metal: {Ag: 0.70, Cu: 0.29, Ti: 0.01}
+    provenance: hypothesis
+    purpose: >
+      Hypothesis: dilute Ti suppresses Cu surface segregation and improves
+      adhesion and thermal stability. Requires mixing-energy and
+      interface-energy calculations before any property claim.
+
+  - id: T2
+    label: "AZO/Ag70Cu29Al1/AZO"
+    metal: {Ag: 0.70, Cu: 0.29, Al: 0.01}
+    provenance: hypothesis
+    purpose: "As T1, with an abundant stabiliser instead of Ti."
+
+  # --- barrier-layer variant --------------------------------------------
+  - id: B1
+    label: "AZO/Ti(0.5)/Ag/Ti(0.5)/AZO"
+    metal: {Ag: 1.0}
+    metal_thickness_nm: 10.0
+    barrier_metal: Ti
+    barrier_thickness_nm: 0.5
+    provenance: candidate
+    purpose: >
+      Tests the Ti-stabilisation hypothesis in the form industry actually
+      uses -- a discrete sacrificial barrier rather than an alloy addition.
+      Cheaper to fabricate than T1 and it isolates the interface effect from
+      the bulk alloying effect.
+
+  # --- TCO comparison (brief section 13, S8-S10) ------------------------
+  - id: S8
+    label: "GZO/Ag70Cu30/GZO"
+    metal: {Ag: 0.70, Cu: 0.30}
+    bottom_tco: GZO
+    top_tco: GZO
+    provenance: candidate
+
+  - id: S9
+    label: "FTO/Ag70Cu30/FTO"
+    metal: {Ag: 0.70, Cu: 0.30}
+    bottom_tco: FTO
+    top_tco: FTO
+    provenance: candidate
+
+  - id: S10
+    label: "ITO/Ag70Cu30/ITO"
+    metal: {Ag: 0.70, Cu: 0.30}
+    bottom_tco: ITO
+    top_tco: ITO
+    provenance: candidate
+    purpose: "Performance benchmark only; excluded at stage 1 on In supply risk."
+
+  # --- microstructure discrimination ------------------------------------
+  - id: M3ema
+    label: "AZO/Ag70Cu30/AZO (segregated)"
+    metal: {Ag: 0.70, Cu: 0.30}
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      The same composition under the phase-separated hypothesis. Paired with
+      M3 it turns the brief's section 5 question about Ag-Cu miscibility into
+      a measurable prediction rather than a discussion.
+
+  # --- Si3N4 dielectric family (framework discovery, see FINDINGS s10) ---
+  # Geometry optimised per candidate: comparing Cu-rich and Ag-rich metals
+  # at a common thickness is not like-for-like, because Cu needs to be
+  # thicker to reach the same sheet resistance.
+
+  - id: N0
+    label: "Si3N4/Ag/Si3N4"
+    metal: {Ag: 1.0}
+    metal_thickness_nm: 10.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 20.0
+    top_tco: Si3N4
+    top_thickness_nm: 20.0
+    provenance: candidate
+    purpose: >
+      Ag reference in the nitride architecture, for direct comparison with M0
+
+  - id: N1
+    label: "Si3N4/Ag90Cu10/Si3N4"
+    metal: {Ag: 0.9, Cu: 0.1}
+    metal_thickness_nm: 9.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 15.0
+    top_tco: Si3N4
+    top_thickness_nm: 25.0
+    provenance: candidate
+    purpose: >
+      small Ag reduction, nitride architecture
+
+  - id: N2
+    label: "Si3N4/Ag80Cu20/Si3N4"
+    metal: {Ag: 0.8, Cu: 0.2}
+    metal_thickness_nm: 10.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 20.0
+    top_tco: Si3N4
+    top_thickness_nm: 30.0
+    provenance: candidate
+    purpose: >
+      moderate Ag reduction, nitride architecture
+
+  - id: N3
+    label: "Si3N4/Ag70Cu30/Si3N4"
+    metal: {Ag: 0.7, Cu: 0.3}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 40.0
+    top_tco: Si3N4
+    top_thickness_nm: 40.0
+    provenance: candidate
+    purpose: >
+      the brief's priority composition, nitride architecture
+
+  - id: N3e
+    label: "Si3N4/Ag70Cu30/Si3N4 (segregated)"
+    metal: {Ag: 0.7, Cu: 0.3}
+    metal_thickness_nm: 9.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 25.0
+    top_tco: Si3N4
+    top_thickness_nm: 35.0
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      same composition under the segregated-microstructure hypothesis
+
+  - id: N4
+    label: "Si3N4/Ag50Cu50/Si3N4"
+    metal: {Ag: 0.5, Cu: 0.5}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 60.0
+    top_tco: Si3N4
+    top_thickness_nm: 45.0
+    provenance: candidate
+    purpose: >
+      strong Ag reduction, nitride architecture
+
+  - id: N5
+    label: "Si3N4/Ag25Cu75/Si3N4"
+    metal: {Ag: 0.25, Cu: 0.75}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 60.0
+    top_tco: Si3N4
+    top_thickness_nm: 50.0
+    provenance: candidate
+    purpose: >
+      Cu-rich, nitride architecture
+
+  - id: N6
+    label: "Si3N4/Cu/Si3N4"
+    metal: {Cu: 1.0}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 60.0
+    top_tco: Si3N4
+    top_thickness_nm: 50.0
+    provenance: candidate
+    purpose: >
+      PRIMARY RESULT: silver-free stack meeting the full specification
+
+  - id: N7
+    label: "Si3N4/Cu90Zn10/Si3N4"
+    metal: {Cu: 0.9, Zn: 0.1}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 60.0
+    top_tco: Si3N4
+    top_thickness_nm: 50.0
+    provenance: candidate
+    purpose: >
+      silver-free brass variant; Zn may improve Cu oxidation resistance
+
+  - id: N8
+    label: "Si3N4/Cu90Ag10/Si3N4"
+    metal: {Cu: 0.9, Ag: 0.1}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 60.0
+    top_tco: Si3N4
+    top_thickness_nm: 50.0
+    provenance: candidate
+    purpose: >
+      6x silver reduction while exceeding the benchmark on transmittance
+
+  # --- Ag60Cu40, both architectures and both microstructure models ---
+
+  - id: M35
+    label: "AZO/Ag60Cu40/AZO"
+    metal: {Ag: 0.6, Cu: 0.4}
+    metal_thickness_nm: 9.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 55.0
+    top_tco: AZO
+    top_thickness_nm: 45.0
+    provenance: candidate
+    purpose: >
+      Ag60Cu40 in the brief's architecture; fills the gap between M3 and M4
+
+  - id: M35e
+    label: "AZO/Ag60Cu40/AZO (segregated)"
+    metal: {Ag: 0.6, Cu: 0.4}
+    metal_thickness_nm: 9.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 15.0
+    top_tco: AZO
+    top_thickness_nm: 35.0
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      same composition under the segregated-microstructure hypothesis
+
+  - id: N35
+    label: "Si3N4/Ag60Cu40/Si3N4"
+    metal: {Ag: 0.6, Cu: 0.4}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 50.0
+    top_tco: Si3N4
+    top_thickness_nm: 45.0
+    provenance: candidate
+    purpose: >
+      Ag60Cu40 in the nitride architecture
+
+  - id: N35e
+    label: "Si3N4/Ag60Cu40/Si3N4 (segregated)"
+    metal: {Ag: 0.6, Cu: 0.4}
+    metal_thickness_nm: 9.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 45.0
+    top_tco: Si3N4
+    top_thickness_nm: 40.0
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      Ag60Cu40 nitride, segregated microstructure
+
+  # --- dilute-silver compositions: the region the fine composition
+  # series identifies as optimal (FINDINGS s12). Geometry from
+  # `pvdlowe series`, which re-optimises at every composition.
+  # These supersede the brief's Ag70Cu30 priority under both
+  # microstructure hypotheses.
+
+  - id: D10
+    label: "AZO/Ag10Cu90/AZO"
+    metal: {Ag: 0.1, Cu: 0.9}
+    metal_thickness_nm: 9.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 15.0
+    top_tco: AZO
+    top_thickness_nm: 37.0
+    provenance: candidate
+    purpose: >
+      dilute-Ag optimum region, brief's architecture, mixed film
+
+  - id: D10e
+    label: "AZO/Ag10Cu90/AZO (segregated)"
+    metal: {Ag: 0.1, Cu: 0.9}
+    metal_thickness_nm: 9.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 15.0
+    top_tco: AZO
+    top_thickness_nm: 37.0
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      same, segregated film: the peak of the segregated AZO series
+
+  - id: D15
+    label: "AZO/Ag15Cu85/AZO"
+    metal: {Ag: 0.15, Cu: 0.85}
+    metal_thickness_nm: 9.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 15.0
+    top_tco: AZO
+    top_thickness_nm: 37.0
+    provenance: candidate
+    purpose: >
+      upper edge of the dilute-Ag plateau, mixed film
+
+  - id: D15e
+    label: "AZO/Ag15Cu85/AZO (segregated)"
+    metal: {Ag: 0.15, Cu: 0.85}
+    metal_thickness_nm: 9.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 15.0
+    top_tco: AZO
+    top_thickness_nm: 37.0
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      upper edge of the dilute-Ag plateau, segregated film
+
+  - id: E10
+    label: "Si3N4/Ag10Cu90/Si3N4"
+    metal: {Ag: 0.1, Cu: 0.9}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 59.0
+    top_tco: Si3N4
+    top_thickness_nm: 48.0
+    provenance: candidate
+    purpose: >
+      dilute-Ag optimum, nitride architecture, mixed film
+
+  - id: E10e
+    label: "Si3N4/Ag10Cu90/Si3N4 (segregated)"
+    metal: {Ag: 0.1, Cu: 0.9}
+    metal_thickness_nm: 10.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 59.0
+    top_tco: Si3N4
+    top_thickness_nm: 48.0
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      dilute-Ag optimum, nitride architecture, segregated: highest heating score found
+
+  - id: E5
+    label: "Si3N4/Ag5Cu95/Si3N4"
+    metal: {Ag: 0.05, Cu: 0.95}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 59.0
+    top_tco: Si3N4
+    top_thickness_nm: 48.0
+    provenance: candidate
+    purpose: >
+      trace silver, nitride architecture
+
+  - id: E5e
+    label: "Si3N4/Ag5Cu95/Si3N4 (segregated)"
+    metal: {Ag: 0.05, Cu: 0.95}
+    metal_thickness_nm: 11.0
+    bottom_tco: Si3N4
+    bottom_thickness_nm: 59.0
+    top_tco: Si3N4
+    top_thickness_nm: 48.0
+    mixing_model: ema
+    provenance: candidate
+    purpose: >
+      trace silver, nitride architecture, segregated

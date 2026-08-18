@@ -1,0 +1,6 @@
+composition,ag_fraction,T_vis_solid_solution,Rs_solid_solution,eps_solid_solution,T_vis_ema,Rs_ema,eps_ema,dT_vis,dRs,distinguishable
+Ag90Cu10,0.9,0.8599,5.18,0.0698,0.8648,3.18,0.0511,0.0049,-2.0,True
+Ag80Cu20,0.8,0.8456,5.89,0.0766,0.8525,2.81,0.0477,0.0069,-3.08,True
+Ag70Cu30,0.7,0.8324,6.36,0.0811,0.8402,2.63,0.0462,0.0078,-3.73,True
+Ag50Cu50,0.5,0.8089,6.68,0.0844,0.8169,2.5,0.0455,0.008,-4.18,True
+Cu75Ag25,0.25,0.7843,5.92,0.078,0.7903,2.63,0.0472,0.006,-3.29,True

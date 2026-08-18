@@ -1,0 +1,171 @@
+# Literature benchmarks transcribed from the project brief.
+#
+# EVERY entry here is provenance LITERATURE_UNVERIFIED. They were quoted in
+# the brief, and the brief's citation URLs all carry a `utm_source=chatgpt.com`
+# query parameter, meaning they were surfaced by an LLM rather than read from
+# the publisher. That does not make them wrong. It does mean none of them has
+# been checked against the primary source, and none should enter a thesis,
+# a proposal or a results table until it has.
+#
+# `pvdlowe validate` compares each of these against the framework's own model
+# and reports the disagreements. Disagreement is not proof that the literature
+# is wrong -- the model is approximate too -- but a benchmark the model cannot
+# come near, or one that is internally inconsistent, is a benchmark to check
+# first.
+#
+# verified: false -> primary source not yet opened
+# Set to true and record the DOI once you have the paper in front of you.
+
+benchmarks:
+
+  - id: azo_ag_azo_10nm
+    label: "AZO(30)/Ag(10)/AZO(30) on glass"
+    brief_section: 3
+    source_hint: "PolyU Scholars Hub record, IR reflective properties of AZO/Ag/AZO trilayers"
+    citation: "unverified; brief cites research.polyu.edu.hk record"
+    verified: false
+    architecture:
+      metal: {Ag: 1.0}
+      metal_thickness_nm: 10.0
+      tco: AZO
+      tco_thickness_nm: 30.0
+    reported:
+      T_vis: 0.805
+
+  - id: azo_ag_azo_13nm
+    label: "AZO(30)/Ag(13)/AZO(30) on glass"
+    brief_section: 3
+    source_hint: "same trilayer study, thicker Ag"
+    citation: "unverified; brief cites research.polyu.edu.hk record"
+    verified: false
+    architecture:
+      metal: {Ag: 1.0}
+      metal_thickness_nm: 13.0
+      tco: AZO
+      tco_thickness_nm: 30.0
+    reported:
+      R_sheet: 4.36
+      far_ir_reflectance: 0.96
+
+  - id: azo_ag_azo_alt
+    label: "AZO/Ag/AZO (second report)"
+    brief_section: 3
+    source_hint: "characterisation of AZO and Ag based films by RF magnetron sputtering"
+    citation: "unverified; brief cites research.polyu.edu.hk record"
+    verified: false
+    architecture:
+      metal: {Ag: 1.0}
+      metal_thickness_nm: 12.0
+      tco: AZO
+      tco_thickness_nm: 30.0
+    reported:
+      T_vis: 0.854
+      R_sheet: 3.21
+      far_ir_reflectance: 0.97
+
+  - id: azo_ag_azo_original
+    label: "AZO/Ag/AZO (brief section 1 reference)"
+    brief_section: 1
+    citation: "unverified; brief cites a ScienceDirect article"
+    verified: false
+    architecture:
+      metal: {Ag: 1.0}
+      metal_thickness_nm: 12.0
+      tco: AZO
+      tco_thickness_nm: 30.0
+    reported:
+      T_vis: 0.787
+      R_sheet: 2.7
+
+  - id: azo_cu_azo_15nm
+    label: "AZO/Cu(15)/AZO"
+    brief_section: 8
+    citation: "unverified; brief cites research.polyu.edu.hk record"
+    verified: false
+    architecture:
+      metal: {Cu: 1.0}
+      metal_thickness_nm: 15.0
+      tco: AZO
+      tco_thickness_nm: 30.0
+    reported:
+      R_sheet: 16.6
+      far_ir_reflectance: 0.67
+      continuity_thickness_nm: 11.0
+
+  - id: azo_cu_azo_optimised
+    label: "AZO(40)/Cu/AZO(40), DC magnetron, optimised"
+    brief_section: 16
+    citation: >
+      Preparation of AZO/Cu/AZO films with low infrared emissivity, high
+      conductivity and high transmittance by adjusting the AZO layer.
+      Applied Surface Science 578 (2022) 152051. PII S0169433221030865.
+      ADS 2022ApSS..57852051S. Xi'an University of Architecture and Technology.
+    verified: partial
+    verified_note: >
+      Numbers confirmed correctly transcribed from the published abstract, and
+      confirmed to come from THE SAME SAMPLE (the 40 nm AZO variant) -- which
+      rules out the "different samples" explanation for the impedance
+      discrepancy. Full text not read: the measurement basis (normal vs
+      hemispherical, and the instrument band) is still unknown, and that is now
+      the only remaining explanation. Requires institutional access.
+    architecture:
+      metal: {Cu: 1.0}
+      metal_thickness_nm: 12.0
+      tco: AZO
+      tco_thickness_nm: 40.0
+    reported:
+      T_vis: 0.877
+      R_sheet: 9.96
+      emissivity: 0.055
+    note: >
+      This is the brief's pivotal result -- section 16 concludes from it that
+      an Ag-free stack may already meet the emissivity target. It is therefore
+      the single most important entry to verify against the primary source
+      before building a research programme on it.
+
+  - id: azo_standalone
+    label: "AZO single layer"
+    brief_section: 2
+    citation: "unverified; brief cites a PMC article"
+    verified: false
+    architecture:
+      metal: null
+      tco: AZO
+      tco_thickness_nm: 380.0
+    reported:
+      T_vis: 0.824
+      resistivity_ohm_cm: 2.6e-3
+      R_sheet: 68.0
+      band_gap_ev: 3.12
+      hardness_gpa: 11.4
+      youngs_modulus_gpa: 98.0
+
+  - id: agcu_thin_film_resistivity
+    label: "~10 nm Ag, Ag-Cu and Cu films"
+    brief_section: 7
+    citation: >
+      Ag-Cu amorphous alloy thin-films with unusually high electrical
+      conductivity. PII S2589152925001930 (2025). Related patents US 10,822,692
+      and US 11,840,756, University of North Texas.
+    verified: partial
+    verified_note: >
+      Numbers confirmed correctly transcribed. IMPORTANT: the framework's
+      original consistency flag proposed that 1.59 uohm.cm was a bulk reference
+      tabulated alongside measurements. THAT HYPOTHESIS IS WRONG. The abstract
+      states the pure Ag and Cu films were "deposited under identical
+      conditions for comparison" at the same ~10 nm thickness, so 1.59 is
+      claimed as a measurement. The physical objection therefore stands and
+      strengthens: films are 10 +/- 2.5 nm on thermal oxide, and even the
+      thickest end of that range gives 1.25x bulk against an FS-MS floor near
+      3x. Their own Cu at 12.2x bulk is consistent with size effects; their Ag
+      at 1.00x is not, under identical deposition.
+    architecture: null
+    reported:
+      resistivity_ag_uohm_cm: 1.59
+      resistivity_agcu_uohm_cm: 2.97
+      resistivity_cu_uohm_cm: 20.5
+      thickness_nm: 10.0
+    note: >
+      Used in the brief to argue that amorphous Ag-Cu retains unusually good
+      conductivity. Check the thickness attribution carefully: 1.59 uohm.cm is
+      the bulk resistivity of silver to three figures.

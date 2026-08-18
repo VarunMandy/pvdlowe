@@ -1,0 +1,135 @@
+# Target specification and weighting for the multi-objective figure of merit.
+#
+# Values are taken from the project brief, sections 16 and 17 and the
+# "quantitative screening framework" table. Edit this file rather than the
+# code: the weighting is an engineering judgement about the application, not
+# a physical constant, and architectural glazing, automotive and display
+# electrodes all want different numbers here.
+#
+# direction:  higher | lower | target
+# floor:      value at which desirability reaches 0 (unacceptable)
+# target:     value at which desirability reaches 1 (fully satisfied)
+# exponent:   curvature. 1 = linear. >1 penalises near-miss values harder,
+#             <1 is more forgiving.
+
+criteria:
+
+  T_vis:
+    label: Visible transmittance
+    direction: higher
+    floor: 0.65
+    target: 0.90
+    exponent: 1.0
+    unit: ""
+    source: "brief section 17: >= 80% initial target"
+
+  emissivity_hemispherical:
+    label: Hemispherical emissivity
+    direction: lower
+    floor: 0.20
+    target: 0.02
+    exponent: 1.0
+    unit: ""
+    source: "brief section 17: <= 0.15; quantitative framework: <= 0.10, preferably <= 0.05"
+
+  R_sheet:
+    label: Sheet resistance
+    direction: lower
+    floor: 15.0
+    target: 5.0
+    exponent: 1.0
+    unit: ohm/sq
+    source: "brief section 17: <= 5 ohm/sq"
+
+  Ag_g_per_m2:
+    label: Silver consumption
+    direction: lower
+    floor: 0.16
+    target: 0.0
+    exponent: 1.0
+    unit: g/m2
+    source: "brief section 20: minimise critical-material content. Floor is the
+             areal mass of a 11 nm pure Ag layer, i.e. a conventional single-
+             silver Low-E; scoring 0 there means 'no better than the incumbent'."
+
+  cost_usd_per_m2:
+    label: Metal cost
+    direction: lower
+    floor: 3.0
+    target: 0.5
+    exponent: 1.0
+    unit: USD/m2
+    source: "brief section 17: significantly below conventional benchmark"
+
+  supply_risk:
+    label: Supply risk
+    direction: lower
+    floor: 9.5
+    target: 4.0
+    exponent: 1.0
+    unit: ""
+    source: "brief section 9 stage 1; composition-weighted element supply risk"
+
+  thermal_stability_c:
+    label: Thermal stability
+    direction: higher
+    floor: 200.0
+    target: 500.0
+    exponent: 1.0
+    unit: degC
+    source: "brief section 17: 300-500 C test window. NOT PREDICTED by this
+             framework -- supply a measured value or leave it out of the score."
+
+  deposition_efficiency:
+    label: Deposition efficiency
+    direction: higher
+    floor: 0.2
+    target: 1.0
+    exponent: 1.0
+    unit: ""
+    source: "brief section 15: performance per unit deposition energy, not
+             raw deposition rate"
+
+# Weighting from the brief's section 14. Weights are renormalised over
+# whichever criteria are actually available for a given candidate, so a
+# candidate missing a measured thermal-stability number is scored on the rest
+# rather than silently penalised.
+# CORRECTED from the brief's section 14. Two deliberate departures, both
+# documented in docs/FINDINGS.md:
+#
+# 1. Ag_g_per_m2 gets 0.15. The brief's section 14 table has no silver-
+#    consumption line, even though sections 17 and 20 both name minimising Ag
+#    as an objective. Encoding section 14 literally left the project's central
+#    goal at zero weight, and the thickness optimiser duly returned a design
+#    using MORE silver than the benchmark while scoring 100/100.
+#
+# 2. R_sheet drops from 0.15 to 0.0. It correlates with
+#    emissivity_hemispherical at r = 0.996 across the candidate set -- both are
+#    the free-carrier response of the same layer -- so scoring both put 0.40 of
+#    the weight on one physical property. Sheet resistance is still computed
+#    and reported; it is a constraint to check, not an independent objective.
+#    Restore it (and cut emissivity to 0.15) if the coating must also serve as
+#    a transparent electrode, where R_s matters in its own right.
+weights:
+  T_vis: 0.20
+  emissivity_hemispherical: 0.25
+  Ag_g_per_m2: 0.15
+  R_sheet: 0.0
+  structural_stability: 0.15
+  thermal_stability_c: 0.10
+  cost_usd_per_m2: 0.05
+  supply_risk: 0.05
+  deposition_efficiency: 0.05
+
+# WARNING, and the reason the aggregation defaults to a geometric mean:
+#
+# In a metal-based Low-E stack, emissivity and sheet resistance are not
+# independent objectives. Both are set by the free-carrier response of the
+# same metal layer; the framework's own correlation check typically returns
+# r < -0.95 between them across a thickness sweep. Weighting them separately
+# at 0.25 and 0.15 therefore places 0.40 of the total weight on one physical
+# property. That is a defensible choice if you intend the coating to be a
+# transparent electrode as well as a Low-E, and a distortion if you do not.
+# Run `pvdlowe check-weights` to see the realised correlation for your own
+# candidate set before defending this table in a review.
+aggregation: geometric

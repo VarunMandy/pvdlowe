@@ -1,0 +1,8 @@
+composition,ag_fraction,meets_spec,metal_nm,bottom_nm,top_nm,T_vis,R_sheet,emissivity,Ag_g_per_m2,note,ag_saving_pct
+Ag,1.0,True,10.05,20.3,35.5,0.8802,4.2,0.0604,0.1054,,0.0
+Ag90Cu10,0.9,True,10.3,27.2,37.5,0.8615,5.0,0.0682,0.1004,,4.7
+Ag80Cu20,0.8,True,11.27,38.6,41.6,0.8385,4.99,0.0676,0.1008,,4.4
+Ag70Cu30,0.7,True,11.98,41.0,42.9,0.8177,4.99,0.0672,0.097,,8.0
+Ag50Cu50,0.5,False,12.48,,,0.7888,4.99,0.0672,0.0775,conducts at 12.5 nm but T_vis 0.789 < 0.80,26.5
+Cu75Ag25,0.25,False,11.21,,,0.783,4.99,0.0695,0.0383,conducts at 11.2 nm but T_vis 0.783 < 0.80,63.7
+Cu,0.0,False,11.01,,,0.769,3.19,0.0542,0.0,conducts at 11.0 nm but T_vis 0.769 < 0.80,100.0
