@@ -148,6 +148,65 @@ def cmd_series(args):
         print(f"\n  written to {args.output}")
 
 
+def cmd_calibrate(args):
+    """Fit the transport model to a measured thickness series."""
+    import pandas as pd
+    from .electrical.calibrate import diagnose, load_series
+
+    if args.runsheet:
+        from .electrical.calibrate import PERCOLATION  # noqa: F401
+        print(f"CALIBRATION RUN SHEET -> {args.runsheet}\n")
+        rows = []
+        for sym, thicknesses in (("Cu", [8, 10, 12, 14, 16, 18, 20]),
+                                 ("Ag", [10])):
+            for t_nm in thicknesses:
+                rows.append({"metal": sym, "thickness_nm": t_nm,
+                             "target_power_W": "", "pressure_mTorr": "",
+                             "R_sheet_ohm_sq": "", "measured_thickness_nm": "",
+                             "notes": ""})
+        df = pd.DataFrame(rows)
+        # randomise deposition order so tool drift does not alias onto thickness
+        df = df.sample(frac=1.0, random_state=args.seed).reset_index(drop=True)
+        df.insert(0, "run", range(1, len(df) + 1))
+        df.to_csv(args.runsheet, index=False)
+        _print(df)
+        print("\nProtocol:")
+        print("  - Randomised order: target erosion drifts over a campaign, and")
+        print("    in standard order that drift aliases directly onto thickness.")
+        print("  - Measure film thickness independently (profilometry or XRR);")
+        print("    rho = R_s * t, so a 20% thickness error is a 20% rho error.")
+        print("  - Four-point probe at 5 points per film; record the spread,")
+        print("    not just the mean.")
+        print("  - The Ag control at 10 nm anchors the tool against a film")
+        print("    whose behaviour is already well characterised. If Ag comes")
+        print("    out wrong, the Cu series cannot be interpreted.")
+        print("  - Deposit on the same underlayer the real stack will use.")
+        print("    Percolation depends on what the metal wets.")
+        print("\nFill in R_sheet_ohm_sq and re-run:")
+        print(f"  pvdlowe calibrate -i {args.runsheet}")
+        return
+
+    if not args.input:
+        print("error: pass -i RUNSHEET.csv with measurements, or "
+              "--runsheet OUT.csv to generate a blank one", file=sys.stderr)
+        raise SystemExit(2)
+
+    for sym, g in load_series(args.input).items():
+        print("=" * 66)
+        d = diagnose(g["thickness_nm"], g["R_sheet_ohm_sq"], sym)
+        fit = d["fit_with_excess"]
+        print(fit.summary())
+        print()
+        _print(fit.data)
+        print("\nDIAGNOSIS\n")
+        for f in d["findings"]:
+            print(f"  [{f['verdict']}]")
+            print(f"    evidence : {f['evidence']}")
+            print(f"    means    : {f['means']}")
+            print(f"    next     : {f['next']}")
+            print(f"    project  : {f['for_the_project']}\n")
+
+
 def cmd_doe(args):
     from .doe.design import alias_structure, recommended_screening
     design = recommended_screening()
@@ -252,6 +311,13 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--targets", help="weighting file to optimise against")
     s.add_argument("-o", "--output")
     s.set_defaults(func=cmd_series)
+
+    s = sub.add_parser("calibrate",
+                       help="fit transport parameters to a measured R_s series")
+    s.add_argument("-i", "--input", help="run sheet with R_sheet_ohm_sq filled in")
+    s.add_argument("--runsheet", help="generate a blank run sheet at this path")
+    s.add_argument("--seed", type=int, default=0)
+    s.set_defaults(func=cmd_calibrate)
 
     s = sub.add_parser("doe", help="generate a sputter run sheet")
     s.add_argument("--seed", type=int, default=0)

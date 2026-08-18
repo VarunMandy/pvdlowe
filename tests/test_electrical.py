@@ -66,3 +66,57 @@ def test_thin_film_penalised_in_both_optics_and_transport():
     assert thin.sheet_resistance() > thick.sheet_resistance()
     assert normal_emissivity(thin.stack()) > normal_emissivity(thick.stack())
     assert not thin.is_continuous and thick.is_continuous
+
+
+def _synthetic(p, r, dc, excess, thicknesses=(8., 10., 12., 14., 16., 18., 20.)):
+    from pvdlowe.electrical.calibrate import _model_with
+    m = _model_with("Cu", p, r, dc, excess)
+    d = np.array(thicknesses)
+    return d, np.array([m.sheet_resistance(t) for t in d])
+
+
+def test_calibration_recovers_the_percolation_threshold():
+    """d_c is the identifiable parameter, and the one that matters most:
+    it sets the minimum usable thickness and therefore every silver number."""
+    from pvdlowe.electrical.calibrate import fit_series
+    for true_dc in (11.0, 13.0, 15.0):
+        d, rs = _synthetic(0.5, 0.25, true_dc, 0.0)
+        fit = fit_series(d, rs, "Cu")
+        assert abs(fit.critical_thickness_nm - true_dc) < 1.0, (true_dc, fit)
+
+
+def test_calibration_separates_impurity_excess_from_size_effect():
+    """The diagnosis that decides whether the Cu route is recoverable."""
+    from pvdlowe.electrical.calibrate import diagnose
+    d, rs = _synthetic(0.5, 0.25, 11.0, 12.0)
+    verdicts = [f["verdict"] for f in diagnose(d, rs, "Cu")["findings"]]
+    assert any("excess" in v for v in verdicts), verdicts
+
+    d, rs = _synthetic(0.35, 0.30, 11.0, 0.0)
+    verdicts = [f["verdict"] for f in diagnose(d, rs, "Cu")["findings"]]
+    assert any("size effect" in v for v in verdicts), verdicts
+
+
+def test_calibration_fits_the_data_even_where_parameters_are_degenerate():
+    """p and R are not separately identifiable; predictions still are.
+
+    Guards the honest claim: the fitted model predicts sheet resistance to a
+    few per cent, but the individual scattering parameters are not
+    measurements and must not be quoted as such.
+    """
+    from pvdlowe.electrical.calibrate import fit_series
+    d, rs = _synthetic(0.35, 0.30, 11.0, 0.0)
+    fit = fit_series(d, rs, "Cu")
+    assert fit.relative_rms < 0.05
+    assert fit.identifiable is False
+
+
+def test_open_circuit_films_bound_percolation_without_breaking_the_fit():
+    """A sub-percolation film reads open. It is evidence about d_c, not a
+    point the size-effect model can fit, and it must not crash the fit."""
+    from pvdlowe.electrical.calibrate import fit_series
+    d, rs = _synthetic(0.5, 0.25, 13.0, 0.0)
+    assert not np.all(np.isfinite(rs)), "expected an open-circuit film"
+    fit = fit_series(d, rs, "Cu")
+    assert np.isfinite(fit.critical_thickness_nm)
+    assert fit.critical_thickness_nm >= d[~np.isfinite(rs)].max() / 0.75 - 1e-6
