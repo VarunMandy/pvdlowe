@@ -56,7 +56,7 @@ retaining visible transmittance, sheet resistance and far-infrared reflectance.
 
 | Deliverable | Status |
 |---|---|
-| Computational framework implementing the brief's §21 workflow | Complete — 12,000 lines, 86 tests |
+| Computational framework implementing the brief's §21 workflow | Complete — 12,000 lines, 92 tests |
 | Element and compound screening | Complete |
 | Optical multilayer model (transfer matrix, EN 410 / 673 / 12898) | Complete, validated |
 | Thin-film transport model coupled to optics | Complete, **uncalibrated — requires §6 experiment** |
@@ -64,7 +64,7 @@ retaining visible transmittance, sheet resistance and far-infrared reflectance.
 | Design of experiments generator | Complete |
 | DFT input generation (VASP) | Complete, **not executed — requires VASP licence and HPC allocation** |
 | Materials Project integration | **Complete and executed** — 15/15 systems retrieved |
-| Candidate ranking, 36 architectures | Complete, **model outputs only** |
+| Candidate ranking, 38 architectures | Complete, **model outputs only** |
 | Experimental protocol with pre-registered analysis | Complete, **not executed — requires tool access** |
 | Illuminant sensitivity quantified | Complete (§7.3) |
 | Manufacturability constraints | Complete |
@@ -386,7 +386,7 @@ evidence rather than an inference from a resistivity discontinuity.
 
 ## 5. Design-space results
 
-Thirty-six candidate architectures were evaluated; 58 metal systems screened; a
+Thirty-eight candidate architectures were evaluated; 58 metal systems screened; a
 168-point composition series run across two microstructure models, two
 dielectrics and two climate profiles.
 
@@ -552,7 +552,7 @@ circulated without its weighting profile attached.
 
 ### 5.4 Single-metal architectures cannot achieve solar control
 
-The best light-to-solar-gain ratio across all 36 candidates is **1.37**, against
+The best light-to-solar-gain ratio across all 38 candidates is **1.37**, against
 approximately 2.0 for commercial solar-control glazing. Under the cooling
 profile, no single-metal stack met the transmittance target.
 
@@ -667,9 +667,19 @@ implicit.
 
 ### 5.6 Ranked candidates
 
-All 36 architectures were scored under both climate profiles. **The two top-ten
-lists share no candidates.** This is the practical form of §5.3: the climate is
-not a refinement to the ranking, it selects a different design space.
+All 38 architectures were scored under both climate profiles. **The two
+top-ten lists share exactly one candidate.** This is the practical form of
+§5.3: the climate is not a refinement to the ranking, it selects a different
+design space.
+
+The single exception is instructive. **H2, the AZO/Cu/Si₃N₄ hybrid, appears in
+both** — 9th on the heating profile and 2nd on cooling. It is the only
+architecture in the set that combines a conductive-oxide underlayer (for
+solar-NIR rejection, which the cooling profile rewards) with a nitride
+overlayer (for transmittance and durability, which the heating profile
+rewards). Before the §5.2 nucleation correction, no candidate did both, and
+the lists were fully disjoint. That a hybrid is the only design robust to the
+climate question is a result in its own right.
 
 Columns: geometry as bottom/metal/top in nm; g is the EN 410 solar heat gain
 coefficient; LSG = T_vis/g; "spec" is T_vis ≥ 0.80, R_s ≤ 5 Ω/sq, ε_h ≤ 0.10.
@@ -678,43 +688,56 @@ coefficient; LSG = T_vis/g; "spec" is T_vis ≥ 0.80, R_s ≤ 5 Ω/sq, ε_h ≤ 
 
 | # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | $/m² | Score | Spec |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | E10e | Si₃N₄/Ag₁₀Cu₉₀/Si₃N₄ (segregated) | 59/10/48 | 0.878 | 0.0456 | 3.13 | 0.760 | 1.16 | 0.015 | 0.12 | **89.3** | yes |
-| 2 | E5e | Si₃N₄/Ag₅Cu₉₅/Si₃N₄ (segregated) | 59/11/48 | 0.864 | 0.0428 | 2.98 | 0.732 | 1.18 | 0.008 | 0.07 | **89.3** | yes |
-| 3 | N6 | Si₃N₄/Cu/Si₃N₄ | 60/11/50 | 0.859 | 0.0478 | 3.41 | 0.731 | 1.18 | 0.000 | 0.01 | **88.9** | yes |
-| 4 | E5 | Si₃N₄/Ag₅Cu₉₅/Si₃N₄ | 59/11/48 | 0.862 | 0.0540 | 3.99 | 0.729 | 1.18 | 0.008 | 0.07 | **86.8** | yes |
-| 5 | N7 | Si₃N₄/Cu₉₀Zn₁₀/Si₃N₄ | 60/11/50 | 0.851 | 0.0616 | 4.66 | 0.727 | 1.17 | 0.000 | 0.01 | **85.0** | yes |
-| 6 | E10 | Si₃N₄/Ag₁₀Cu₉₀/Si₃N₄ | 59/11/48 | 0.865 | 0.0594 | 4.50 | 0.730 | 1.19 | 0.016 | 0.14 | **84.8** | yes |
-| 7 | N8 | Si₃N₄/Cu₉₀Ag₁₀/Si₃N₄ | 60/11/50 | 0.865 | 0.0594 | 4.50 | 0.732 | 1.18 | 0.016 | 0.14 | **84.7** | yes |
-| 8 | N35e | Si₃N₄/Ag₆₀Cu₄₀/Si₃N₄ (segregated) | 45/9/40 | 0.904 | 0.0445 | 3.04 | 0.794 | 1.14 | 0.065 | 0.53 | **81.7** | yes |
-| 9 | N5 | Si₃N₄/Ag₂₅Cu₇₅/Si₃N₄ | 60/11/50 | 0.874 | 0.0714 | 5.67 | 0.735 | 1.19 | 0.038 | 0.31 | **79.7** | **no** |
-| 10 | N3e | Si₃N₄/Ag₇₀Cu₃₀/Si₃N₄ (segregated) | 25/9/35 | 0.900 | 0.0453 | 3.16 | 0.770 | 1.17 | 0.073 | 0.59 | **79.2** | yes |
+| 1 | E5e | Si3N4/Ag5Cu95/Si3N4 (segregated) | 59/11/48 | 0.863 | 0.0481 | 2.98 | 0.731 | 1.18 | 0.008 | 0.07 | **88.1** | yes |
+| 2 | E10e | Si3N4/Ag10Cu90/Si3N4 (segregated) | 59/10/48 | 0.877 | 0.0511 | 3.13 | 0.758 | 1.16 | 0.015 | 0.12 | **88.1** | yes |
+| 3 | N6 | Si3N4/Cu/Si3N4 | 60/11/50 | 0.858 | 0.0538 | 3.41 | 0.729 | 1.18 | 0.000 | 0.01 | **87.5** | yes |
+| 4 | E5 | Si3N4/Ag5Cu95/Si3N4 | 59/11/48 | 0.861 | 0.0609 | 3.99 | 0.728 | 1.18 | 0.008 | 0.07 | **85.1** | yes |
+| 5 | N7 | Si3N4/Cu90Zn10/Si3N4 | 60/11/50 | 0.850 | 0.0695 | 4.66 | 0.725 | 1.17 | 0.000 | 0.01 | **83.0** | yes |
+| 6 | E10 | Si3N4/Ag10Cu90/Si3N4 | 59/11/48 | 0.864 | 0.0670 | 4.50 | 0.729 | 1.19 | 0.016 | 0.14 | **83.0** | yes |
+| 7 | N8 | Si3N4/Cu90Ag10/Si3N4 | 60/11/50 | 0.863 | 0.0671 | 4.50 | 0.730 | 1.18 | 0.016 | 0.14 | **82.9** | yes |
+| 8 | N35e | Si3N4/Ag60Cu40/Si3N4 (segregated) | 45/9/40 | 0.902 | 0.0498 | 3.04 | 0.793 | 1.14 | 0.065 | 0.53 | **80.7** | yes |
+| 9 | H2 | AZO/Cu/Si3N4 (hybrid, silver-free) | 40/12/40 | 0.788 | 0.0425 | 2.93 | 0.631 | 1.25 | 0.000 | 0.01 | **79.9** | **no** |
+| 10 | N3e | Si3N4/Ag70Cu30/Si3N4 (segregated) | 25/9/35 | 0.899 | 0.0508 | 3.16 | 0.769 | 1.17 | 0.073 | 0.59 | **78.1** | yes |
 | — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 0.85 | 65.0 | yes |
 
-**Every entry uses silicon nitride.** Nine of ten meet the full specification;
-eight of ten use less than 0.05 g/m² of silver against the benchmark's 0.105.
-The leading candidate beats the benchmark on transmittance, emissivity *and*
-sheet resistance simultaneously while using **one seventh of the silver**.
+**Nine of ten use silicon nitride**; the exception is the AZO/Cu/Si₃N₄ hybrid
+(H2) introduced by the §5.2 correction. 9 of ten meet the
+full specification, and 8 of ten use less
+than 0.05 g/m² of silver against the benchmark's 0.105. The leading candidate
+uses **one thirteenth of the benchmark's silver** while beating it on
+emissivity and sheet resistance.
+
+Note these figures moved when the nucleation correction of §5.2 was applied:
+emissivities rose by roughly 5–12% for the nitride stacks, since Si₃N₄ carries
+a growth-factor penalty of 1.16 against AZO's 1.00. The ordering within the
+nitride family was not disturbed, but the margin over AZO narrowed.
 
 #### Cooling-dominated (India) — `data/targets_cooling.yaml`
 
 | # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | $/m² | Score | Spec |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | M6 | AZO/Cu/AZO | 35/12/35 | 0.738 | 0.0463 | 2.87 | 0.558 | 1.32 | 0.000 | 0.01 | **65.4** | **no** |
-| 2 | D10e | AZO/Ag₁₀Cu₉₀/AZO (segregated) | 15/9/37 | 0.789 | 0.0585 | 3.52 | 0.641 | 1.23 | 0.013 | 0.11 | **59.3** | **no** |
-| 3 | D15e | AZO/Ag₁₅Cu₈₅/AZO (segregated) | 15/9/37 | 0.794 | 0.0564 | 3.31 | 0.643 | 1.23 | 0.019 | 0.16 | **59.3** | **no** |
-| 4 | S10 | ITO/Ag₇₀Cu₃₀/ITO | 35/10/35 | 0.852 | 0.0688 | 5.48 | 0.620 | 1.37 | 0.081 | 0.66 | **58.3** | **no** |
-| 5 | M5 | AZO/Ag₂₅Cu₇₅/AZO | 35/10/35 | 0.784 | 0.0780 | 5.92 | 0.612 | 1.28 | 0.034 | 0.28 | **58.2** | **no** |
-| 6 | M3ema | AZO/Ag₇₀Cu₃₀/AZO (segregated) | 35/10/35 | 0.840 | 0.0462 | 2.63 | 0.635 | 1.32 | 0.081 | 0.66 | **57.9** | yes |
-| 7 | M35e | AZO/Ag₆₀Cu₄₀/AZO (segregated) | 15/9/35 | 0.843 | 0.0514 | 2.95 | 0.659 | 1.28 | 0.065 | 0.53 | **57.4** | yes |
-| 8 | D10 | AZO/Ag₁₀Cu₉₀/AZO | 15/9/37 | 0.786 | 0.0784 | 5.66 | 0.638 | 1.23 | 0.013 | 0.11 | **57.1** | **no** |
-| 9 | D15 | AZO/Ag₁₅Cu₈₅/AZO | 15/9/37 | 0.790 | 0.0828 | 6.15 | 0.639 | 1.24 | 0.019 | 0.16 | **56.3** | **no** |
-| 10 | M4 | AZO/Ag₅₀Cu₅₀/AZO | 35/10/35 | 0.809 | 0.0844 | 6.68 | 0.621 | 1.30 | 0.062 | 0.51 | **55.7** | **no** |
+| 1 | M6 | AZO/Cu/AZO (low-cost control) | 35/12/35 | 0.738 | 0.0463 | 2.87 | 0.558 | 1.32 | 0.000 | 0.01 | **65.4** | **no** |
+| 2 | H2 | AZO/Cu/Si3N4 (hybrid, silver-free) | 40/12/40 | 0.788 | 0.0425 | 2.93 | 0.631 | 1.25 | 0.000 | 0.01 | **63.4** | **no** |
+| 3 | D10e | AZO/Ag10Cu90/AZO (segregated) | 15/9/37 | 0.789 | 0.0585 | 3.52 | 0.641 | 1.23 | 0.013 | 0.11 | **59.3** | **no** |
+| 4 | D15e | AZO/Ag15Cu85/AZO (segregated) | 15/9/37 | 0.794 | 0.0564 | 3.31 | 0.643 | 1.23 | 0.019 | 0.16 | **59.3** | **no** |
+| 5 | M5 | AZO/Ag25Cu75/AZO | 35/10/35 | 0.784 | 0.0780 | 5.92 | 0.612 | 1.28 | 0.034 | 0.28 | **58.2** | **no** |
+| 6 | M3ema | AZO/Ag70Cu30/AZO (segregated) | 35/10/35 | 0.840 | 0.0462 | 2.63 | 0.635 | 1.32 | 0.081 | 0.66 | **57.9** | yes |
+| 7 | M35e | AZO/Ag60Cu40/AZO (segregated) | 15/9/35 | 0.843 | 0.0514 | 2.95 | 0.659 | 1.28 | 0.065 | 0.53 | **57.4** | yes |
+| 8 | S10 | ITO/Ag70Cu30/ITO | 35/10/35 | 0.848 | 0.0764 | 5.48 | 0.619 | 1.37 | 0.081 | 0.66 | **57.3** | **no** |
+| 9 | D10 | AZO/Ag10Cu90/AZO | 15/9/37 | 0.786 | 0.0784 | 5.66 | 0.638 | 1.23 | 0.013 | 0.11 | **57.1** | **no** |
+| 10 | D15 | AZO/Ag15Cu85/AZO | 15/9/37 | 0.790 | 0.0828 | 6.15 | 0.639 | 1.24 | 0.019 | 0.16 | **56.3** | **no** |
 | — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 0.85 | 53.0 | yes |
 
-**Every entry uses a conductive oxide** (AZO or ITO), for the reason in §5.3 —
-the free carriers reject solar near-infrared, which a passive nitride cannot.
-But only **two of ten meet the full specification**, and both of those use
-substantial silver. The rest fail on visible transmittance.
+**Every entry uses a conductive oxide as the underlayer** (AZO or ITO), for the
+reason in §5.3 — the free carriers reject solar near-infrared, which a passive
+nitride cannot. Only **2 of ten meet the full
+specification**, and those use substantial silver. The rest fail on visible
+transmittance.
+
+The AZO/Cu/Si₃N₄ hybrid (H2) now ranks **second** on this profile, which was
+not the case before the §5.2 correction: it keeps AZO's solar-NIR rejection
+underneath while gaining five points of transmittance from the nitride
+overlayer, and remains silver-free.
 
 **This is the honest state of the cooling-climate answer: the framework is
 ranking near-misses.** No single-metal architecture in the set clears
@@ -725,9 +748,9 @@ falls short.
 
 #### How to read these tables
 
-1. **They share no candidates.** A recommendation is only meaningful with its
-   climate profile named. Circulating one table without the other would be
-   misleading.
+1. **They share one candidate out of ten.** A recommendation is only meaningful
+   with its climate profile named. Circulating one table without the other
+   would be misleading — except for H2, which is defensible under either.
 2. **The benchmark appears in neither top ten**, which is the correct answer to
    the brief's question: pure silver is the incumbent to beat, and on a
    sustainability-weighted objective it is beaten.
@@ -1058,9 +1081,9 @@ question and the silver-free premise simultaneously.
 | Blank run sheet | `experiments/cu_series_runsheet.csv` |
 | Worked example output | `experiments/EXAMPLE_filled_runsheet.csv` |
 
-Installation is `pip install -e .`; the test suite (86 tests, no external
+Installation is `pip install -e .`; the test suite (92 tests, no external
 dependencies beyond numpy/scipy/pandas/pyyaml) runs with
-`python tests/run_tests.py` and should be run after any environment change, as
+`python tests/run_tests.py` (92 tests) and should be run after any environment change, as
 it validates the physics rather than only the interfaces.
 
 ---

@@ -39,6 +39,6 @@ INTERNAL CONSISTENCY OF THE REPORTED VALUES
 ==========================================================================
 VERIFICATION STATUS
 ==========================================================================
-  8 benchmarks: 0 fully verified, 6 located with numbers confirmed against the published abstract, 2 DISPUTED -- located sources do not match the quoted figures -- and 0 not located.
+  8 benchmarks: 1 fully verified, 5 located with numbers confirmed against the published abstract, 2 DISPUTED -- located sources do not match the quoted figures -- and 0 not located.
   'partial' means the transcription is right and the source is identified; it does not mean the full text has been read.
   'disputed' means do not cite: the numbers in the brief could not be matched to any located source.
