@@ -121,21 +121,6 @@ class MPClient:
         return payload
 
     # -- queries ---------------------------------------------------------
-    def _summary_via_mp_api(self, fields, criteria):
-        """Prefer the official client when it is installed.
-
-        The hand-rolled REST path below was written without access to the live
-        API and returns HTTP 403 against the current endpoint -- the parameter
-        conventions have moved since. `mp_api` tracks those changes, so it is
-        tried first; REST is retained only because it is what the on-disk cache
-        was built around, and for environments where mp_api is unavailable.
-        """
-        from mp_api.client import MPRester
-        with MPRester(self.api_key) as m:
-            docs = m.materials.summary.search(fields=list(fields), **criteria)
-        return [d.model_dump() if hasattr(d, "model_dump") else dict(d)
-                for d in docs]
-
     def summary(self, fields: list | None = None, **criteria) -> list:
         """Query the summary endpoint.
 
@@ -144,15 +129,8 @@ class MPClient:
         >>> client.summary(chemsys="Ag-Cu")                    # doctest: +SKIP
         >>> client.summary(elements="Zn,O", band_gap_min=3.0)  # doctest: +SKIP
         """
-        clean = {k: v for k, v in criteria.items() if v is not None}
-        want = fields or list(SUMMARY_FIELDS)
-        if not self.offline and self.api_key:
-            try:
-                return self._summary_via_mp_api(want, clean)
-            except ImportError:
-                pass                      # mp_api absent; fall through to REST
-        params = dict(clean)
-        params["_fields"] = ",".join(want)
+        params = {k: v for k, v in criteria.items() if v is not None}
+        params["_fields"] = ",".join(fields or list(SUMMARY_FIELDS))
         params.setdefault("_limit", 200)
         payload = self._request("materials/summary/", params)
         return payload.get("data", payload if isinstance(payload, list) else [])
