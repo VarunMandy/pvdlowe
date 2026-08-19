@@ -57,12 +57,43 @@ is operating.
 
 ---
 
+## Amendment, before any data was taken
+
+A literature review of published Fuchs-Sondheimer and Mayadas-Shatzkes
+parameters for copper (`docs/LITERATURE_CALIBRATION.md`) was carried out after
+these rules were written and before any deposition. It changes two things, and
+both are recorded here rather than in the interpretation afterwards.
+
+**Rule A is eliminated.** Four independent published fits give p between 0.48
+and 0.80 and R between 0.16 and 0.43; the framework's assumed p = 0.50,
+R = 0.25 sits inside that range. All of them predict 2.2-2.7 ohm/sq for
+AZO/Cu(15)/AZO against a literature value of 16.6, and an exhaustive scan over
+p in [0,1] and R in [0,0.6] reaches only 4.42. No scattering parameters explain
+the discrepancy.
+
+**A fifth mechanism is added: nanocrystalline grain structure.** The models take
+grain size as an input, and the framework assumes lateral grains three times the
+film thickness. Grains at roughly half the thickness give 14.1 ohm/sq, which
+does reproduce the literature. That is now the leading hypothesis, displacing
+oxygen contamination.
+
+**Consequence for this experiment.** Grain size becomes a measured quantity, not
+an assumption, and `grain_size_ratio` joins p, R and d_c as a calibration
+target. Measure it by XRD on at least three films, using Scherrer broadening of
+the Cu(111) reflection. If XRD access is easier to obtain than sputter time,
+**one scan on a single 12-15 nm film is now the cheapest decisive measurement**
+and should be done first.
+
+---
+
 ## Pre-registered decision rules
 
 Written before the data exists, so the interpretation is not chosen to suit the
-result.
+result. Rule A was subsequently eliminated by literature review, as recorded
+above; it is retained here unaltered so the amendment is auditable.
 
 ### A. Classical size effect — fitted excess < 1 µΩ·cm, ρ(100 nm)/ρ_bulk < 1.5
+**[ELIMINATED by literature review — see amendment above]**
 
 The model form was right and only its parameters were wrong.
 
@@ -97,6 +128,23 @@ in its own right rather than a copper-adjacent one.
 
 This is the outcome that would invalidate the most, and it must be reported if
 it occurs.
+
+---
+
+### E. Nanocrystalline grain structure — XRD grain size ≲ 0.6 × film thickness
+
+Added by the amendment above and now the leading hypothesis.
+
+**Then:** the model's grain-size assumption is wrong rather than its scattering
+parameters. Set `grain_size_ratio` from the measured value and re-run
+`pvdlowe evaluate`. The fix is thermal or morphological — a seed layer, an
+elevated substrate temperature, or a brief post-deposition anneal to promote
+grain growth — rather than the vacuum-hygiene measures implied by rule B.
+
+Distinguishing E from B is the reason grain size must be measured rather than
+inferred: both produce an elevated resistivity that a thickness series alone
+cannot separate, because a small-grain film and a contaminated film give
+similar R_s(d) curves.
 
 ---
 
