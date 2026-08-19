@@ -216,15 +216,24 @@ had no effect rather than that the result was robust.
 
 ## 4. Evidence audit
 
-Eight literature benchmarks were transcribed from the brief. All eight sources
-have now been located; none has been read in full text.
+Eight literature benchmarks were transcribed from the brief. **All eight
+sources have been located. One has been read in full text**; the remainder are
+paywalled and confirmed only against their published abstracts.
 
 | State | Count |
 |---|---|
-| Fully verified (full text read, measurement basis confirmed) | 0 |
-| Partial (source identified, figures confirmed against abstract) | 6 |
-| **Disputed (located sources do not contain the quoted figures)** | **2** |
+| **Fully verified** (full text read, measurement basis confirmed) | **1** |
+| Partial (source identified, figures confirmed against abstract) | 5 |
+| **Disputed** (located sources do not contain the quoted figures) | **2** |
 | Not located | 0 |
+
+Two further sources outside the brief's citation list have also been read in
+full: Cueva & Carretero (*Coatings* **13**, 1709, 2023), which corrected the
+dielectric model in §5.2, and the four Cu scattering-parameter studies
+underpinning §6.1. Both are open access.
+
+Run `pvdlowe provenance` for the live state; the counts above are generated
+from `data/benchmarks.yaml` and will change as verification proceeds.
 
 ### 4.1 Two citations could not be supported
 
@@ -326,11 +335,42 @@ stronger form.
   trilayers used RF magnetron sputtering (§3 implies DC); the AZO single-layer
   study used medium-frequency sputtering. Film density and resistivity do not
   transfer between techniques and these sources should not be pooled.
-- **The AZO visible transmittance is 81.4%, not 82.4%.** Resistivity
-  2.6 × 10⁻³ Ω·cm, hardness 11.4 GPa and reduced modulus 98 GPa are confirmed.
+- ~~The AZO visible transmittance is 81.4%, not 82.4%.~~ **Retracted — see
+  §4.5.** The paper reports both figures in different sections; the brief
+  quoted the Results value and was right to.
 - **§7's resistivity table mixes measurement conventions**, per §4.3 above.
 
-### 4.5 What verification confirmed
+### 4.5 The one fully verified source, and a retraction
+
+Mazur et al., *Materials* **17**(1), 81 (2024), DOI 10.3390/ma17010081 — the
+AZO single-layer benchmark — is open access and has been read in full.
+
+**Confirmed:** resistivity 2.6 × 10⁻³ Ω·cm; optical band gap 3.12 eV by Tauc
+for allowed indirect transitions; hardness 11.4 GPa; reduced modulus 98 GPa;
+sheet resistance 68 Ω/sq. The band gap had been unchecked until now.
+
+**A correction is retracted.** §4.4 of an earlier version of this report
+recorded that the brief's 82.4% visible transmittance was a transcription error
+for 81.4%. **That was wrong.** The paper reports both: §3.1 gives the average
+transparency over 360–760 nm as 82.4%, while the abstract and conclusions give
+81.4%. The source is internally inconsistent, and the brief quoted the Results
+figure — which is defensible. The error was introduced by checking only the
+abstract, which is precisely the shortcut the `partial` grade exists to flag.
+
+**Two facts established that are not in the brief.** The film thickness is
+380 ± 5 nm by optical profilometry, which independently confirms the
+framework's inference from ρ/R_s and means this resistivity is not transferable
+to the 30–40 nm layers used inside a multilayer. And the crystallite sizes by
+Scherrer are 14.0 nm (ZnO 002), 17.7 nm (Al₂O₃ 023) and 16.2 nm (Al₂ZnO₄ 220) —
+roughly 0.04 × the film thickness, with the authors attributing the unusually
+high hardness to that nanocrystalline structure via Hall–Petch. **Strongly
+nanocrystalline growth is therefore normal for magnetron-sputtered oxide
+films**, which supports the grain-size hypothesis in §6.1.
+
+Deposition was medium-frequency pulsed magnetron sputtering, on fused silica
+and Corning glass — not soda-lime float glass.
+
+### 4.6 What verification confirmed elsewhere
 
 The *Ceramics International* study states that far-infrared reflectance was
 measured by FTIR spectroscopy and sheet resistance by four-point probe — a
