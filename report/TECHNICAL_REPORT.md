@@ -35,7 +35,11 @@ framework's own validation identifies its largest error — an approximately
 eightfold under-prediction of sputtered copper sheet resistance — in the
 material on which most leading candidates depend. A specified experiment
 resolving this, with pre-registered decision rules and an automated analysis
-path, is delivered with the framework.
+path, is delivered with the framework. A subsequent literature review narrowed
+the cause without deposition: no published surface- or grain-boundary-scattering
+parameters account for the discrepancy, whereas a nanocrystalline grain
+structure does — reducing the decisive measurement from an eight-film series to
+a single X-ray diffraction scan.
 
 ---
 
@@ -263,6 +267,7 @@ Four candidate explanations were tested and eliminated:
 | Transcription error | Confirmed against published abstract |
 | Far-IR glass index assumption | Limit is 0.091–0.097 across n = 1.5 to 4.0 |
 | Band-limited emissometer (8–14 µm) | **Reads 5–8% higher, not lower — moves it the wrong way** |
+| The framework's own convention | **An industrial formula in use since 2000 gives the same answer** |
 
 The band-emissometer hypothesis was the most plausible and was tested by
 implementing band-limited emissivity in the framework. For a Drude metal,
@@ -274,6 +279,16 @@ stacks reflect slightly less well. Correcting for measurement basis therefore
 The same group reports ε = 0.045 at 8.10 Ω/sq and ε = 0.050 at comparable sheet
 resistance. Three measurements at a consistent 0.57–0.63 of the electrodynamic
 limit indicates a systematic effect rather than an isolated error.
+
+**Independent corroboration.** Cueva & Carretero compute emissivity from sheet
+resistance as ε_n = 0.0106·R□, citing Gläser, *Large Area Glass Coating* (Von
+Ardenne, 2000) — a reference in industrial use for two decades. That relation
+and the impedance limit derived here agree within 10% across 2–17 Ω/sq. At
+9.96 Ω/sq the industrial formula gives **0.106**, against this framework's
+0.096 and the reported 0.055 — a ratio of **0.52**. The objection that the
+discrepancy might be an artifact of the framework's convention is therefore
+answered: two independent methods, one derived from first principles and one in
+commercial use, agree.
 
 **Untested:** hemispherical versus normal basis (which would also raise the
 reading), instrument calibration, or the two quantities being measured on
@@ -367,7 +382,63 @@ At Ag₇₀Cu₃₀ the two hypotheses differ by 9–14 points; at Ag₅Cu₉₅
 at 5–15 at.% Ag makes the programme robust to a question that is currently
 unsettled, rather than dependent on it.
 
-### 5.2 Silicon nitride outperforms AZO on visible transmittance
+### 5.2 The dielectric choice matters, through metal nucleation rather than optics
+
+**This section was revised after experimental comparison.** An earlier version
+concluded that silicon nitride outperforms AZO on optical grounds. That
+conclusion is contradicted by measurement, the model has been corrected, and
+the correction is recorded here rather than applied silently.
+
+**The measurement.** Cueva & Carretero (*Coatings* **13**, 1709, 2023, open
+access, full text read) deposited five dielectrics under identical conditions
+on a semi-industrial inline sputtering system with 10 nm Ag:
+
+| Dielectric | Measured ε | n(550 nm) |
+|---|---|---|
+| SnO₂ | 0.083 | 2.00 |
+| ZnO | 0.064 | 2.019 |
+| **AZO** | **0.058** | 1.85 |
+| SiAlNx | 0.067 | 2.09 |
+
+AZO gives the lowest emissivity *and* the better visible transmission (86.8%
+against 81.9% for SnO₂), despite having the **lowest** refractive index of the
+set. The authors attribute this to silver growth being more efficient on AZO.
+
+**The framework's error.** It modelled the dielectric purely as an interference
+layer — index and thickness — and therefore preferred the higher-index nitride.
+The optical inputs were sound; their measured indices match the framework's
+closely. What was missing is that the underlayer determines the *quality of the
+metal grown on it*.
+
+**The correction.** A `metal_growth_factor` per dielectric now applies a
+resistivity penalty, calibrated to that series and normalised to AZO = 1.00:
+ZnO 1.10, SiAlNx 1.16, ITO 1.20, TiO₂ 1.25, SnO₂ 1.43. The model now reproduces
+the measured ordering and the magnitudes to within 4–8%.
+
+**What this implies more broadly.** This is the same class of omission as the
+copper sheet-resistance discrepancy in §6: the framework models ideal metal
+layers, while the dominant effect in practice is underlayer-dependent metal
+microstructure. Two independent findings now converge on that gap, and any
+successor should treat nucleation quality as a first-class parameter.
+
+**The productive outcome: a hybrid stack.** AZO beneath for nucleation, nitride
+above for durability through tempering — which is what industry does, and which
+the same authors measured as giving *better* emissivity than two AZO layers,
+because nitride deposited over the Ti barrier converts part of it to TiNx. Two
+candidates were added on this basis:
+
+| ID | Stack | T_vis | ε_h | R_s | Heating score |
+|---|---|---|---|---|---|
+| **H1** | AZO/Ag/Si₃N₄ | **0.918** | 0.057 | 4.30 | 67.4 |
+| M0 | AZO/Ag/AZO (benchmark) | 0.876 | 0.060 | 4.18 | 65.0 |
+| **H2** | AZO/Cu/Si₃N₄ (silver-free) | 0.788 | **0.042** | 2.93 | 79.9 |
+| M6 | AZO/Cu/AZO | 0.738 | 0.046 | 2.87 | 69.6 |
+
+H1 beats the benchmark on transmittance and emissivity simultaneously. H2 gains
+five points of transmittance over the pure-AZO copper stack at lower
+emissivity, and remains silver-free.
+
+### 5.2b Superseded analysis: index matching
 
 An initial screen of 58 metal systems at fixed AZO thickness found that **only
 pure silver met the full specification**; copper failed on transmittance alone
@@ -676,6 +747,52 @@ electronic structure.
 
 **It also gates six of the leading candidates** in both climate profiles.
 
+**A literature review has since narrowed the cause without any deposition.**
+Fuchs–Sondheimer specularity and Mayadas–Shatzkes grain-boundary reflection are
+well characterised for copper because interconnect scaling depends on them. Four
+independent published fits give p between 0.48 and 0.80 and R between 0.16 and
+0.43; the framework's assumed p = 0.50, R = 0.25 sits inside that range.
+
+| p | R | Source | Predicted R_s, AZO/Cu(15)/AZO |
+|---|---|---|---|
+| 0.52 | 0.43 | Chawla & Gall, *Phys. Rev. B* **81**, 155454 (2010) | 2.69 |
+| 0.48 | 0.27 | twin-boundary study, nanocrystalline Cu | 2.23 |
+| 0.80 | 0.38 | *Thin Solid Films* (2006) | 2.17 |
+| ≈0 | 0.17 | *AIP Advances* **9**, 025015 (2019) | 2.71 |
+| 0.50 | 0.25 | framework default | 2.16 |
+
+All cluster near 2.2–2.7 Ω/sq against the 16.6 to be explained. An exhaustive
+scan over the entire admissible range — p ∈ [0, 1], R ∈ [0, 0.6] — reaches only
+**4.42 Ω/sq**, short by a factor of 3.8.
+
+**No scattering parameters anywhere in the literature range explain the
+discrepancy.** Decision rule A below is eliminated on that basis.
+
+**What does explain it is grain size.** Both models take grain size as an input,
+and the framework assumes lateral grains three times the film thickness,
+appropriate to a coalesced film. Grains at roughly *half* the thickness give
+14.1 Ω/sq:
+
+| Grain size | R_s(15 nm) |
+|---|---|
+| 3.0 × thickness (assumed) | 4.42 |
+| 1.0 × thickness | 8.31 |
+| **0.5 × thickness** | **14.13** |
+| 0.25 × thickness | 25.77 |
+
+That is a nanocrystalline structure — grains of order 5–8 nm in a 15 nm film —
+which is plausible for copper sputtered at room temperature onto an oxide it
+wets poorly. It is now the leading hypothesis, displacing oxygen contamination.
+
+**Caveat on transferability.** The published values are for copper on Ta or SiO₂
+at 25–158 nm, deposited for interconnects. This work concerns copper on AZO at
+10–15 nm, where nucleation differs and the thickness lies below anything in the
+cited studies. The transferable conclusion is therefore the *negative* one — that
+p and R cannot account for the gap — rather than a positive calibration. Grain
+size for copper on AZO at these thicknesses was not found in the literature
+searched, and is the missing number. Full analysis in
+`docs/LITERATURE_CALIBRATION.md`.
+
 ### 6.2 The experiment
 
 Specified in `experiments/BENCH_cu_series.md` with pre-registered decision rules
@@ -706,6 +823,22 @@ a 20% resistivity error and would be misattributed to a scattering parameter.
 4–5 Ω/sq. If it does not, the tool requires diagnosis before the copper series
 can be interpreted.
 
+**A cheaper measurement now comes first.** Because the leading hypothesis is
+grain structure, a **single XRD scan on one 12–15 nm copper film on AZO** gives
+the grain size directly by Scherrer broadening of the Cu(111) reflection, and
+discriminates between the remaining hypotheses:
+
+- Grain size ≲ 0.6 × film thickness → nanocrystalline structure confirmed; the
+  model's grain assumption is wrong and the remedy is thermal or morphological
+  (seed layer, elevated substrate temperature, brief anneal).
+- Grain size ≳ film thickness → grain structure is not the cause, and attention
+  returns to impurity scattering.
+
+One sample rather than eight, and XRD is more widely available than a dedicated
+sputter session. **If only one measurement can be obtained, this is now the one
+to take.** The thickness series remains the better experiment where both are
+possible, since it also calibrates the model.
+
 **Analysis.** One command:
 
 ```bash
@@ -719,11 +852,18 @@ mechanisms is operating.
 ### 6.3 Pre-registered decision rules
 
 Written before any data exists, so that interpretation is not selected to suit
-the outcome.
+the outcome. Rule A was subsequently eliminated and rule E added by the
+literature review in §6.1, which was also completed before any deposition; both
+changes are recorded rather than applied silently.
+
+**Distinguishing E from B requires measuring grain size**, not inferring it: a
+small-grain film and a contaminated film produce similar R_s(d) curves, so a
+thickness series alone cannot separate them.
 
 | Rule | Criterion | Interpretation | Consequence |
 |---|---|---|---|
-| **A** | Excess < 1 µΩ·cm, ρ(100 nm)/ρ_bulk < 1.5 | Classical size effect; model form correct, parameters wrong | Adopt fitted parameters; copper recommendations stand with revised figures |
+| **A** | Excess < 1 µΩ·cm, ρ(100 nm)/ρ_bulk < 1.5 | Classical size effect; model form correct, parameters wrong | **Eliminated by literature review** (§6.1). Retained here unaltered so the amendment is auditable |
+| **E** | XRD grain size ≲ 0.6 × film thickness | **Nanocrystalline grain structure — now the leading hypothesis** | Set `grain_size_ratio` from the measured value and re-run the ranking. Remedy is thermal or morphological, not vacuum hygiene |
 | **B** | Excess > 50% of bulk, improving fit by > 20% | Impurity scattering, most likely oxygen | **Favourable**: film quality, not physics. Follow with base-pressure study and XPS depth profile |
 | **C** | Fitted d_c differs from 11 nm by > 1.5 nm | Dewetting on this underlayer | Minimum usable thickness changes, and with it every silver-consumption figure. Trial a seed layer |
 | **D** | R_s at 15 nm near 16.6 Ω/sq | Literature is correct; model optics optimistic by ~8× | **Six leading candidates fall.** Programme reverts to silver reduction, with §5.1's dilute-silver optimum as the recommendation in its own right |
@@ -817,10 +957,17 @@ weighting file attached and the unverified elements identified.
 
 ### 8.2 First experimental priority
 
-**Execute the copper thickness series** (§6). Half a day of tool time. It
-confirms or refutes six leading candidates and is the single highest-leverage
-measurement available. The protocol is written for handover and requires no
-further specification.
+**One XRD scan on a single 12–15 nm copper film on AZO.** An afternoon, one
+sample. Following the literature review in §6.1, grain structure is the leading
+explanation for the model's largest error, and Scherrer broadening measures it
+directly. This is now the highest information-per-hour measurement available.
+
+**Then the copper thickness series** (§6.2). Half a day of tool time. It
+confirms or refutes six leading candidates and calibrates the transport model.
+The protocol is written for handover and requires no further specification.
+
+If both can be obtained, run both — the XRD identifies the mechanism, the series
+calibrates the model. If only one, take the XRD.
 
 ### 8.3 Second experimental priority
 

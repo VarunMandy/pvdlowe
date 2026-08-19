@@ -64,14 +64,30 @@ def test_verification_flags_require_a_citation():
         assert bm.get("verified_note", "").strip(), f"{bm['id']} must record what was NOT checked"
 
 
-def test_full_verification_is_not_claimed_without_reading_the_paper():
-    """No entry should be `verified: true` while the basis is unchecked."""
+def test_verification_states_partition_the_benchmarks():
+    """Every benchmark sits in exactly one state.
+
+    Replaces an earlier test asserting nothing was fully verified. One entry
+    (azo_standalone, Materials 17(1) 81) is now `true`: its full text was read
+    via the open-access version and the measurement basis confirmed. The guard
+    that remains useful is the partition, not a zero count.
+    """
     status = verification_status()
     assert (status["verified"] + status["partial"] + status["disputed"]
             + status["unverified"]) == status["total"]
-    assert status["verified"] == 0, (
-        "an entry claims full verification -- confirm the full text was read, "
-        "including the measurement basis, before allowing this")
+    assert status["verified"] >= 1, "expected at least one fully verified entry"
+
+
+def test_full_verification_requires_more_than_an_abstract():
+    """A `true` flag must record what was read, not merely that it was found."""
+    from pvdlowe.validate import load_benchmarks
+    for bm in load_benchmarks():
+        if bm.get("verified") is not True:
+            continue
+        note = bm.get("verified_note", "")
+        assert "full text" in note.lower(), (
+            f"{bm['id']} claims full verification without recording that the "
+            "full text was read")
 
 
 def test_full_factorial_size():
@@ -184,5 +200,5 @@ def test_validation_table_reports_the_true_source_state():
     df = validate_model()
     states = set(df["source_state"])
     assert states <= {True, "partial", "disputed", "not located"}, states
-    assert True not in states, "nothing is fully verified yet"
+    assert True in states, "expected at least one fully verified source"
     assert "disputed" in states, "the two unmatched entries must show as disputed"

@@ -96,7 +96,16 @@ Every benign explanation has been tested and eliminated:
 | Transcription error | ruled out — confirmed against the abstract |
 | Far-IR glass index assumption | ruled out — limit is 0.091–0.097 for n = 1.5–4.0 |
 | Band-limited emissometer | **ruled out — moves it the wrong way** (§5.3) |
+| Framework's own convention | **ruled out — an industrial formula agrees** (below) |
 | Single outlier | ruled out — three reports at 0.57–0.63 of the limit |
+
+**Independent corroboration.** Cueva & Carretero compute emissivity from sheet
+resistance as ε_n = 0.0106·R□, citing Gläser, *Large Area Glass Coating* (2000)
+— in industrial use for two decades. That formula and this framework's
+impedance limit agree within 10% across 2–17 Ω/sq. At 9.96 Ω/sq the industrial
+formula gives **0.106** against the framework's 0.096 and the reported 0.055.
+Reported/industry = **0.52**. The discrepancy is not an artifact of the
+framework's convention.
 
 The same group reports ε = 0.045 at 8.10 Ω/sq and ε = 0.050 at similar sheet
 resistance. A *consistent* factor of ~0.6 across three measurements indicates a
@@ -267,7 +276,56 @@ Ag₇₀Cu₃₀ the two hypotheses differ by 9–14 points; at Ag₅Cu₉₅ by
 at 5–15% Ag makes the project *robust* to an unresolved question rather than
 hostage to it — worth more than the two points of score.
 
-## 3.2 Silicon nitride beats AZO on transmittance
+## 3.2 The dielectric matters — but not for the reason first concluded
+
+> **AMENDED.** The original conclusion of this section — that silicon nitride
+> outperforms AZO — is **contradicted by measurement** and has been corrected.
+> The model has been changed as a result. See `docs/CARRETERO_COMPARISON.md`.
+
+**What was wrong.** The framework treated the dielectric as purely an
+interference layer: index, thickness, nothing else. On that basis Si₃N₄
+(n = 2.02) beat AZO (n = 1.90) by up to nine points of transmittance.
+
+**What the measurement says.** Cueva & Carretero (*Coatings* 13, 1709, 2023)
+deposited five dielectrics under identical conditions with 10 nm Ag. Measured
+emissivity: **AZO 0.058 < ZnO 0.064 < SiAlNx 0.067 < SnO₂ 0.083.** AZO also
+gave the better visible transmission. AZO wins on both axes, and the reason
+they give is that silver growth is more efficient on AZO.
+
+**That is a nucleation effect the model did not contain.** The underlayer
+changes the *quality of the metal grown on it*, not just the interference
+stack. The optical inputs were fine — their measured indices (AZO 1.85,
+SiNx 2.023) match the framework's closely.
+
+**The model now contains it.** `TCOPreset.metal_growth_factor` applies a
+resistivity penalty per underlayer, calibrated to that series and normalised to
+AZO = 1.00: ZnO 1.10, SiAlNx 1.16, ITO 1.20, TiO₂ 1.25, SnO₂ 1.43. With it, the
+model reproduces both the measured ordering and the magnitudes to 4–8%:
+
+| Dielectric | measured ε | model ε_h |
+|---|---|---|
+| AZO | 0.058 | 0.060 |
+| ZnO | 0.064 | 0.061 |
+| Si₃N₄ | 0.067 | 0.065 |
+| SnO₂ | 0.083 | 0.077 |
+
+**What survives.** The brief's framing did exclude nitrides, and that
+observation stands. Two qualifications from the same paper keep them relevant:
+in double-metal structures their SiAlNx sample had the highest spectral
+transmittance of any across the whole visible range; and nitride is the
+industrial choice for durability through tempering.
+
+**The best answer is a hybrid**, and it is what industry already does: AZO
+underneath for silver nucleation, nitride on top for protection. Their sample
+S6 measured *better* emissivity than two AZO layers. Added here as candidate
+**H1 — AZO/Ag/Si₃N₄, which now outscores both pure stacks** (T_vis 0.918,
+ε_h 0.057 against the AZO benchmark's 0.876 / 0.060), and **H2 — AZO/Cu/Si₃N₄**,
+the silver-free version, which gains five points of transmittance over
+AZO/Cu/AZO at lower emissivity.
+
+## 3.2b Original analysis: silicon nitride and index matching
+
+*Retained for the record; superseded above.*
 
 58 metal systems were screened at fixed AZO 35/35 — every pure metal with
 available optical constants plus ten binary families at five compositions,

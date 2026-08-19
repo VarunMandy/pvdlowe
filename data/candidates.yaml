@@ -417,3 +417,35 @@ candidates:
     provenance: candidate
     purpose: >
       trace silver, nitride architecture, segregated
+
+  # --- hybrid dielectric, from Cueva & Carretero sample S6 -------------------
+  # AZO first (best silver nucleation), SiAlNx last (mechanical and thermal
+  # protection, survives tempering). They measured BETTER emissivity than two
+  # AZO layers, because SiAlNx deposited over the Ti barrier converts part of
+  # it to TiNx. Better than either pure stack.
+
+  - id: H1
+    label: "AZO/Ag/Si3N4 (hybrid, industrial practice)"
+    metal: {Ag: 1.0}
+    metal_thickness_nm: 10.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 35.0
+    top_tco: Si3N4
+    top_thickness_nm: 35.0
+    provenance: candidate
+    purpose: >
+      AZO underlayer for silver growth, nitride overlayer for durability;
+      the configuration Cueva & Carretero found best overall
+
+  - id: H2
+    label: "AZO/Cu/Si3N4 (hybrid, silver-free)"
+    metal: {Cu: 1.0}
+    metal_thickness_nm: 12.0
+    bottom_tco: AZO
+    bottom_thickness_nm: 40.0
+    top_tco: Si3N4
+    top_thickness_nm: 40.0
+    provenance: candidate
+    purpose: >
+      same hybrid applied to the silver-free route: AZO for nucleation and
+      solar-NIR rejection, nitride to block oxygen ingress into the Cu

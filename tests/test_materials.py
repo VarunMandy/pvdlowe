@@ -129,3 +129,37 @@ def test_phonon_penalty_is_small_behind_a_good_mirror():
     off = hemispherical_emissivity(normal_emissivity(
         build("Cu", 12.0, 55.0, 45.0, dataclasses.replace(p, far_ir_phonons=())).stack()))
     assert 0.0 <= on - off < 0.005, (on, off)
+
+
+def test_dielectric_ordering_matches_measurement():
+    """The model must reproduce the measured dielectric ranking.
+
+    Cueva & Carretero, Coatings 13, 1709 (2023), 10 nm Ag, identical
+    deposition and dielectric thickness across five materials. Measured
+    emissivity: AZO 0.058 < ZnO 0.064 < SiAlNx 0.067 < SnO2 0.083.
+
+    The first version of this framework got this ORDER WRONG, preferring
+    nitrides on index-matching grounds, because it had no representation of
+    how the underlayer affects metal nucleation. `metal_growth_factor` is
+    that representation, calibrated to this data.
+    """
+    from pvdlowe.optics.integrate import hemispherical_emissivity, normal_emissivity
+    from pvdlowe.optimize.thickness import build
+    eps = {}
+    for key in ("AZO", "ZnO", "Si3N4", "SnO2"):
+        st = build("Ag", 10.0, 35.0, 35.0, tco(key)).stack()
+        eps[key] = hemispherical_emissivity(normal_emissivity(st))
+    assert eps["AZO"] < eps["ZnO"] < eps["Si3N4"] < eps["SnO2"], eps
+    # and within 15% of the measured values, not merely ordered correctly
+    for key, measured in (("AZO", 0.058), ("ZnO", 0.064),
+                          ("Si3N4", 0.067), ("SnO2", 0.083)):
+        assert abs(eps[key] - measured) / measured < 0.15, (key, eps[key], measured)
+
+
+def test_growth_factor_defaults_to_unity_and_penalises_never_helps():
+    """A growth factor below 1 would claim a dielectric improves the metal
+    beyond its own bulk behaviour, which nothing in the data supports."""
+    from pvdlowe.materials.tco import TCOS
+    for key, preset in TCOS.items():
+        assert preset.metal_growth_factor >= 1.0, (key, preset.metal_growth_factor)
+    assert tco("AZO").metal_growth_factor == 1.0, "AZO is the reference"

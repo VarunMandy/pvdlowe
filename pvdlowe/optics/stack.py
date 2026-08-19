@@ -189,10 +189,26 @@ class LowECoating:
         return float(min(self.transport.ratio(self.metal_thickness_nm), 50.0))
 
     @property
+    def growth_factor(self) -> float:
+        """Resistivity penalty from nucleation on this underlayer.
+
+        The metal grows on the BOTTOM dielectric, so that is the one that
+        matters. Taken from `TCOPreset.metal_growth_factor`, calibrated to
+        measurement (see docs/CARRETERO_COMPARISON.md).
+        """
+        return float(getattr(self.bottom_tco, "metal_growth_factor", 1.0))
+
+    @property
     def film_resistivity_uohm_cm(self) -> float:
-        """Resistivity of the metal layer as deposited, uohm.cm."""
+        """Resistivity of the metal layer as deposited, uohm.cm.
+
+        Three multiplicative contributions: bulk resistivity, the classical
+        size effect, and a nucleation penalty set by the underlayer. The third
+        was absent from the first version of this framework and its omission
+        produced a wrong ranking of dielectrics.
+        """
         return float(self.metal_alloy.bulk_resistivity_uohm_cm
-                     * self.size_effect_ratio)
+                     * self.size_effect_ratio * self.growth_factor)
 
     @property
     def is_continuous(self) -> bool:

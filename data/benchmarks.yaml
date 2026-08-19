@@ -170,7 +170,7 @@ benchmarks:
       of AZO Transparent Conducting Oxide Thin Films Deposited by Medium
       Frequency Magnetron Sputtering. Materials 17(1), 81 (2024).
       DOI 10.3390/ma17010081.
-    verified: partial
+    verified: true
     architecture:
       metal: null
       tco: AZO
@@ -183,11 +183,41 @@ benchmarks:
       hardness_gpa: 11.4
       youngs_modulus_gpa: 98.0
     verified_note: >
-      LOCATED. Resistivity 2.6e-3 ohm.cm, hardness 11.4 GPa and reduced modulus
-      98 GPa all confirmed. CORRECTION: the paper reports average visible
-      transmittance of 81.4%, not the 82.4% in the brief -- a transcription slip.
-      Deposition is MEDIUM-FREQUENCY magnetron sputtering, not RF or DC. The
-      band gap of 3.12 eV was not visible in the abstract and remains unchecked.
+      FULLY VERIFIED. Full text read via the open-access version
+      (CC BY, MDPI). Mazur, Kiliszkiewicz, Posadowski, Domaradzki,
+      Malachowska, Sokolowski, Materials 17(1), 81 (2024),
+      DOI 10.3390/ma17010081.
+
+      CONFIRMED: resistivity 2.6e-3 ohm.cm; band gap 3.12 eV by Tauc for
+      allowed indirect transitions; hardness 11.4 GPa; reduced modulus 98 GPa;
+      sheet resistance 68 ohm/sq (rho/t with t = 380 nm gives 68.4).
+
+      RETRACTION OF AN EARLIER CORRECTION. This entry previously recorded that
+      the brief's 82.4% visible transmittance was a transcription error for
+      81.4%. That was wrong, and the error was mine. The paper reports BOTH:
+      section 3.1 states "the average transparency in the visible range (from
+      360 to 760 nm) is 82.4%", while the abstract and conclusions state 81.4%.
+      The source is internally inconsistent. The brief quoted the Results
+      figure, which is defensible; the abstract-only check that produced the
+      "correction" was not.
+
+      NEWLY ESTABLISHED, and not in the brief: film thickness 380 +/- 5 nm,
+      measured by optical profilometry. This independently confirms the
+      framework's earlier inference from rho/R_s that the entry implied a film
+      of about 380 nm -- far thicker than the 30-40 nm layers used inside the
+      multilayer stacks, so its resistivity is not directly transferable.
+
+      ALSO ESTABLISHED: crystallite sizes by Scherrer are 14.0 nm (ZnO 002),
+      17.7 nm (Al2O3 023) and 16.2 nm (Al2ZnO4 220) in a 380 nm film -- about
+      0.04x the thickness. The authors attribute the unusually high hardness to
+      this nanocrystalline structure via Hall-Petch. Directly relevant to the
+      grain-size hypothesis in docs/LITERATURE_CALIBRATION.md: strongly
+      nanocrystalline growth is normal for magnetron-sputtered oxide films.
+
+      Deposition: medium-frequency pulsed magnetron (100 kHz, 100 W, 35 min),
+      98 wt% ZnO / 2 wt% Al2O3 target, off-axis geometry, 3.2 wt% Al in the
+      film. Substrate fused silica for XRD, Corning glass for nanoindentation
+      -- NOT soda-lime float glass.
 
   - id: agcu_thin_film_resistivity
     label: "~10 nm Ag, Ag-Cu and Cu films"

@@ -82,6 +82,22 @@ class TCOPreset:
     #: the emissivity of a stack built on them. AZO's phonons are weaker and
     #: further out, which is why the conductive oxides can ignore them.
     far_ir_phonons: tuple = ()
+    #: Multiplier on the metal layer's resistivity, representing how well the
+    #: metal nucleates and coalesces on THIS underlayer. 1.0 is the reference.
+    #:
+    #: The framework originally had no such term: it treated the dielectric as
+    #: purely an interference layer, with index and thickness and nothing else.
+    #: That is wrong, and it produced a wrong conclusion -- the model preferred
+    #: nitrides on index-matching grounds, while the measurement
+    #: (Cueva & Carretero, Coatings 13, 1709, 2023) shows AZO winning on both
+    #: emissivity and transmittance because silver grows more efficiently on it.
+    #:
+    #: Values below are calibrated to that paper's 10 nm Ag series, taking the
+    #: sheet resistance implied by their reported emissivity and normalising to
+    #: AZO. They are measured for SILVER; whether copper orders the same way is
+    #: untested, which is why cu_growth_factor is separate and defaults to the
+    #: same value with a wider caveat.
+    metal_growth_factor: float = 1.0
 
     @property
     def resistivity_ohm_cm(self) -> float:
@@ -157,6 +173,7 @@ ZNO = TCOPreset(
     key="ZnO", name="ZnO (undoped)",
     carrier_density_cm3=1e17, mobility_cm2_vs=30.0, effective_mass=0.28,
     eps_inf=2.50, gap_ev=3.37, n_visible=1.95, density_g_cm3=5.61,
+    metal_growth_factor=1.10,
     provenance=Provenance.LITERATURE,
     citation="ZnO wurtzite reference; MP entry mp-2133",
     note="reference material, not a usable TCO on its own")
@@ -184,6 +201,7 @@ GZO = TCOPreset(
     key="GZO", name="GZO (Ga-doped ZnO)",
     carrier_density_cm3=6.0e20, mobility_cm2_vs=22.0, effective_mass=0.28,
     eps_inf=2.50, gap_ev=3.37, n_visible=1.92, density_g_cm3=5.65,
+    metal_growth_factor=1.05,
     provenance=Provenance.ESTIMATE,
     citation="brief section 11; Ga solubility higher than Al but Ga is costlier")
 
@@ -191,6 +209,7 @@ ITO = TCOPreset(
     key="ITO", name="ITO (Sn-doped In2O3)",
     carrier_density_cm3=1.0e21, mobility_cm2_vs=35.0, effective_mass=0.35,
     eps_inf=3.20, gap_ev=3.75, n_visible=1.85, density_g_cm3=7.14,
+    metal_growth_factor=1.20,
     provenance=Provenance.ESTIMATE,
     citation="performance benchmark only; In supply risk rules it out per brief")
 
@@ -198,6 +217,7 @@ FTO = TCOPreset(
     key="FTO", name="FTO (F-doped SnO2)",
     carrier_density_cm3=4.0e20, mobility_cm2_vs=25.0, effective_mass=0.30,
     eps_inf=3.20, gap_ev=3.60, n_visible=1.90, density_g_cm3=6.95,
+    metal_growth_factor=1.30,
     provenance=Provenance.ESTIMATE,
     citation="brief section 5; pyrolytic FTO is the incumbent hard-coat route")
 
@@ -227,6 +247,7 @@ TIO2 = TCOPreset(
     far_ir_phonons=((0.0180, 0.0035, 0.0325),
                     (0.0090, 0.0040, 0.0539),
                     (0.0060, 0.0050, 0.0855)),
+    metal_growth_factor=1.25,
     provenance=Provenance.ESTIMATE,
     citation="n(550 nm) ~ 2.4-2.6 depending on phase and density; "
              "phonon parameters are order-of-magnitude estimates",
@@ -243,6 +264,7 @@ SI3N4 = TCOPreset(
     # which is the accepted split for amorphous silicon nitride.
     far_ir_phonons=((0.0390, 0.0130, 0.1060),
                     (0.0050, 0.0090, 0.0590)),
+    metal_growth_factor=1.16,
     provenance=Provenance.ESTIMATE,
     citation="n(550 nm) ~ 2.0 for reactively sputtered silicon nitride; "
              "phonon parameters estimated from the Si-N stretch position",
@@ -253,6 +275,7 @@ SNO2 = TCOPreset(
     key="SnO2", name="SnO2 (undoped)",
     carrier_density_cm3=1e18, mobility_cm2_vs=10.0, effective_mass=0.30,
     eps_inf=3.20, gap_ev=3.60, n_visible=2.00, density_g_cm3=6.95,
+    metal_growth_factor=1.43,
     provenance=Provenance.ESTIMATE,
     citation="harder and more chemically durable than ZnO")
 
