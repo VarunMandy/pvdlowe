@@ -1,8 +1,7 @@
+apply_multimetal.py
+*.egg-info/
 __pycache__/
 *.py[cod]
-*.egg-info/
-results/*.xlsx
+report/BRIEFING_SCRIPT.md
 results/*.log
-apply_multimetal.py
-report/BRIEFING_SCRIPT.md
-report/BRIEFING_SCRIPT.md
+results/*.xlsx
