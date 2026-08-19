@@ -4,3 +4,4 @@ __pycache__/
 results/*.xlsx
 results/*.log
 apply_multimetal.py
+report/BRIEFING_SCRIPT.md
