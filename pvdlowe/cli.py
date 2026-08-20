@@ -220,53 +220,54 @@ def cmd_calibrate(args):
 
 
 def cmd_surrogate(args):
-    """Machine-learned interatomic potential as a DFT surrogate."""
-    from .dft.surrogate import (available_models, install_hint,
-                                mixing_energy_series, screen_ternaries,
-                                validate_against_hull, SurrogateUnavailable)
-    avail = available_models()
-    installed = [k for k, v in avail.items() if v["installed"]]
-    print("SURROGATE MODELS\n")
-    for k, v in avail.items():
-        mark = "installed" if v["installed"] else f"pip install {v['package']}"
-        print(f"  {k:10s} {mark:28s} {v['description']}")
-    if not installed:
-        print("\nNone installed.\n")
-        print(install_hint())
+    """Mixing energies from an ML interatomic potential."""
+    from .surrogate import (BACKENDS, Surrogate, available_backends,
+                            cross_check, interpret, mixing_energy_series,
+                            what_a_surrogate_cannot_answer)
+    avail = available_backends()
+    if not avail:
+        print("No ML interatomic potential installed. Install one:\n")
+        for _, label, cmd in BACKENDS:
+            print(f"  {cmd:28s}  # {label}")
+        print("\nThese are graph neural networks trained on Materials Project")
+        print("DFT data -- not language models. They predict energy and forces")
+        print("in milliseconds against the core-hours of the DFT they mimic.")
+        raise SystemExit(2)
+    print("available:", ", ".join(l for _, l, _ in avail), "\n")
+
+    if args.cross_check:
+        res = cross_check(n_configs=args.configs)
+        for k, v in res.items():
+            if k == "frames":
+                continue
+            print(f"=== {k} ===")
+            for kk, vv in v.items():
+                print(f"  {kk}: {vv}")
+            print()
+        for label, df in res.get("frames", {}).items():
+            print(f"--- {label} ---")
+            _print(df)
         return
-    print()
-    try:
-        if args.validate:
-            v = validate_against_hull(model=args.model)
-            print(f"VALIDATION against the Materials Project hull "
-                  f"({v['model']})\n")
-            for k, d in v["detail"].items():
-                print(f"  {k:8s} MP {d['mp']:+.4f}   surrogate "
-                      f"{d['surrogate']:+.4f}   error {d['error']:+.4f} eV/atom")
-            print(f"\n  {'PASSED' if v['passed'] else 'FAILED'} at "
-                  f"{v['tolerance_ev']:.3f} eV/atom tolerance")
-            print(f"  {v['note']}")
-            return
-        if args.ternaries:
-            r = screen_ternaries(model=args.model)
-            print(f"DILUTE TERNARY SCREEN — {r['model']}\n")
-            print(f"  binary Ag70Cu30 dE_mix = {r['binary_dE_mix_ev']:+.4f} eV/atom\n")
-            for el, d in r["ternaries"].items():
-                print(f"  +1 at.% {el}: dE_mix {d['dE_mix_ev']:+.4f}  "
-                      f"(delta {d['delta_vs_binary_ev']:+.4f})")
-                print(f"     {d['verdict']}")
-            print(f"\n  {list(r['ternaries'].values())[0]['caveat']}")
-            return
-        res = mixing_energy_series(model=args.model, supercell=(2, 2, 2))
-        print(res.summary())
-        if args.output:
-            import pandas as pd
-            pd.DataFrame({"ag_fraction": res.fractions,
-                          "dE_mix_eV_per_atom": res.mixing_energies_ev}
-                         ).to_csv(args.output, index=False)
-            print(f"\n  written to {args.output}")
-    except SurrogateUnavailable as exc:
-        print(f"error: {exc}")
+
+    s = Surrogate.load(prefer=args.model)
+    print(f"model: {s.label}\n")
+    df = mixing_energy_series(s, n_configs=args.configs, relax=not args.no_relax)
+    _print(df)
+    print(f"\n{df.attrs['note']}\n")
+    for k, v in interpret(df, args.temperature).items():
+        print(f"  {k}: {v}")
+    if args.output:
+        df.to_csv(args.output, index=False)
+        print(f"\nwritten to {args.output}")
+    if args.limits:
+        print()
+        for k, v in what_a_surrogate_cannot_answer().items():
+            print(f"{k}:")
+            if isinstance(v, list):
+                for item in v:
+                    print(f"  - {item}")
+            else:
+                print(f"  {v}")
 
 
 def cmd_doe(args):
@@ -394,6 +395,21 @@ def build_parser() -> argparse.ArgumentParser:
                    help="check the model against known Materials Project values")
     s.add_argument("--ternaries", action="store_true",
                    help="screen the brief's dilute Ti and Al additions")
+    s.add_argument("-o", "--output")
+    s.set_defaults(func=cmd_surrogate)
+
+    s = sub.add_parser("surrogate",
+                       help="mixing energies from an ML interatomic potential")
+    s.add_argument("--model", help="chgnet | mace | matgl")
+    s.add_argument("--configs", type=int, default=4,
+                   help="random decorations averaged per composition")
+    s.add_argument("--temperature", type=float, default=300.0)
+    s.add_argument("--no-relax", action="store_true",
+                   help="skip geometry relaxation (faster, and wrong for Ag-Cu)")
+    s.add_argument("--cross-check", action="store_true",
+                   help="run two potentials and compare")
+    s.add_argument("--limits", action="store_true",
+                   help="print what a surrogate cannot answer")
     s.add_argument("-o", "--output")
     s.set_defaults(func=cmd_surrogate)
 

@@ -1,8 +1,14 @@
 # Code review — pvdlowe v0.1.0
 
 **Repository:** https://github.com/VarunMandy/pvdlowe (private)
-**Reviewed at:** commit [`a9c4b31`](https://github.com/VarunMandy/pvdlowe/commit/a9c4b31)
-**Scope:** 7,771 lines across 20 modules; 89 tests passing.
+**Reviewed at:** commit [`a9c4b31`](https://github.com/VarunMandy/pvdlowe/commit/a9c4b31),
+re-audited after the nucleation correction and the `ml/` subpackage.
+**Scope:** 9,124 lines across 22 modules; 97 tests passing.
+
+**Re-audit delta.** M1, M2 and M3 are all unchanged — none has been fixed, and
+none has worsened. Two items are added below: N1 covers the new `ml/`
+subpackage, and `adhesion_energy` joins the over-long function list at 101
+lines. The five items under "Worth preserving" have gained a sixth.
 
 Permalinks below are pinned to `a9c4b31` so they remain valid as the code moves.
 Because the repository is private, they resolve only for collaborators.
@@ -24,8 +30,9 @@ whoever inherits the code.
 | [`pvdlowe/doe/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/pvdlowe/doe) | 637 | factorial designs, sputter rate model |
 | [`pvdlowe/dft/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/pvdlowe/dft) | 461 | VASP input generation |
 | [`pvdlowe/mp/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/pvdlowe/mp) | ~350 | Materials Project client and screening |
+| `pvdlowe/ml/` | 436 | ML interatomic potential surrogate (see N1) |
 | [`pvdlowe/validate.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/validate.py) | 310 | model-vs-literature, consistency checks |
-| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 89 tests, physics-level assertions |
+| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 97 tests, physics-level assertions |
 
 **Where to start reading:**
 [`optics/stack.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/stack.py)
@@ -142,6 +149,36 @@ composition series calls `stack()` tens of thousands of times.
 
 ---
 
+## N1 — The `ml/` subpackage ships untested against a real backend
+
+**Evidence.** `pvdlowe/ml/surrogate.py` is 436 lines and no line of it that
+touches an actual interatomic potential has ever executed. The development
+environment had no network, so `mace-torch`, `chgnet` and `matgl` could not be
+installed and the model weights could not be downloaded. The two tests that
+exist —`test_mlip_surrogate_refuses_rather_than_falls_back` and
+`test_mlip_boundary_excludes_optical_properties` — verify the *absence* path
+and the documented boundary. Neither verifies a calculation.
+
+**Why it is nonetheless shipped.** The alternative was to omit the capability
+entirely. The module fails loudly with installation instructions when no
+backend is present, and the entry-point example gates every prediction behind
+reproducing two known Materials Project hull distances, so a silently wrong
+result is unlikely. But the honest status is *written, syntax-checked,
+never run*.
+
+**Specific risks that first execution will probably surface:** the slab
+construction in `adhesion_energy` assumes `SlabGenerator` returns at least one
+slab for every proxy and takes the first without inspecting termination; the
+metal-film tiling uses a nearest-integer repeat that could leave several per
+cent lattice mismatch unreported as an error; and `_e()` uses a needlessly
+convoluted call form that should simply branch.
+
+**Recommended.** Run `examples/09_mlip_adhesion.py` once on a machine with a
+backend installed, then either fix what breaks or mark the module
+experimental in `docs/README.md`. Do not cite any number from it until then.
+
+---
+
 ## L1 — The top-level package exports almost nothing
 
 [`pvdlowe/__init__.py#L12`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/__init__.py#L12)
@@ -168,6 +205,8 @@ with: `dmd`, `dmdmd`, `LowECoating`, `MultiMetalCoating`, `performance_summary`,
 | 89 | `solve` | [tmm.py#L73-L162](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/tmm.py#L73-L162) |
 | 81 | `composition_series` | [sweep.py#L112-L193](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optimize/sweep.py#L112-L193) |
 | 78 | `build_parser` | [cli.py#L279-L357](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/cli.py#L279-L357) |
+| 101 | `adhesion_energy` | `ml/surrogate.py` — slab build, tiling, three energies and result assembly in one function; the clearest split candidate in the codebase |
+| 87 | `check_consistency` | `validate.py` — three independent checks that could be three functions |
 | 76 | `fit_series` | [calibrate.py#L216-L292](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/electrical/calibrate.py#L216-L292) |
 | 72 | `diagnose` | [calibrate.py#L295-L367](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/electrical/calibrate.py#L295-L367) |
 | 68 | `cmd_calibrate` | [cli.py#L151-L219](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/cli.py#L151-L219) |
@@ -229,6 +268,13 @@ raises when uncalibrated instead of returning a plausible number;
 `MPClient` raises when offline with a cold cache. Both were tempting to make
 "helpful". Both would have produced fabricated data.
 
+**P6 — The empirical parameter that carries its own provenance.**
+`TCOPreset.metal_growth_factor` was added after measurement contradicted a
+model prediction. Its docstring states what the model got wrong, which paper
+corrected it, and that the values are calibrated for silver with copper
+untested. That is the right shape for an empirical fudge factor: not hidden,
+not defended, and explicit about the domain it was fitted on.
+
 **P5 — Docstrings that record why, not what.** Several encode reasoning that
 would otherwise be lost — the Rakić damping re-anchoring, the p/R
 non-identifiability, the trilayer de-embedding non-linearity. These are the
@@ -238,13 +284,15 @@ highest-value comments in the codebase.
 
 ## Recommended order of work
 
-1. **M1** — extract the shared record builder. Half an hour, prevents a silent
+1. **N1** — run the `ml/` subpackage once against a real backend. It is the
+   only part of the codebase with no execution evidence at all.
+2. **M1** — extract the shared record builder. Half an hour, prevents a silent
    correctness failure the moment the stability criteria are populated.
-2. **M3** — delete or implement `_cache`. Deleting is ten minutes; implementing
+3. **M3** — delete or implement `_cache`. Deleting is ten minutes; implementing
    would measurably speed the sweeps.
-3. **M2** — narrow the exception handling and report the failure count.
-4. **L1** — top-level re-exports, for whoever picks this up.
-5. L2–L4 as opportunity allows.
+4. **M2** — narrow the exception handling and report the failure count.
+5. **L1** — top-level re-exports, for whoever picks this up.
+6. L2–L4 as opportunity allows.
 
 None of these blocks handover. M1 is the only one that will cause a wrong
 number, and only after someone populates a criterion that is currently `None`.

@@ -154,3 +154,18 @@ def test_mlip_boundary_excludes_optical_properties():
     assert any("30 mev" in u.lower() for u in d["unreliable"]), \
         "the accuracy floor must be stated, since it is comparable with the " \
         "hull distances this project measures"
+
+
+def test_adhesion_rejects_strained_interfaces():
+    """A mismatched interface must raise, not return a strain measurement.
+
+    The first run of this function produced 9.6 J/m2 for Ag/Si3N4 at 14%
+    lattice mismatch and -0.16 for Ag/TiO2 -- one three times any physical
+    metal/oxide adhesion, the other impossible. Both were the elastic energy
+    of a badly strained film. The guard exists so that failure recurs as an
+    exception rather than as a plausible-looking number.
+    """
+    from pvdlowe.ml import MAX_LATTICE_MISMATCH
+    assert MAX_LATTICE_MISMATCH <= 0.05, (
+        "above a few per cent the stored strain is comparable with the "
+        "adhesion being measured")

@@ -257,3 +257,83 @@ is stamped, logged, and its outputs land in an immutable timestamped GCS
 prefix. Given that the framework's whole design principle is tracking where
 numbers came from, having the compute leave an audit trail is consistent with
 the rest of it.
+
+---
+
+# Part 6 — ML interatomic potentials on Workbench
+
+The CPU-only guidance above does not apply to `pvdlowe.ml`. MACE and CHGNet are
+PyTorch models: they want a GPU, and PyTorch alone is about 3 GB on disk, which
+is why Cloud Shell's 5 GB home cannot hold them.
+
+## 6.1 An instance sized for it
+
+```bash
+export PROJECT_ID="sg-llamole" REGION="us-central1"
+
+gcloud workbench instances create pvdlowe-mlip \
+    --location="${REGION}-a" \
+    --machine-type=n1-standard-8 \
+    --accelerator-type=NVIDIA_TESLA_T4 --accelerator-core-count=1 \
+    --install-gpu-driver \
+    --boot-disk-size=100 \
+    --metadata=idle-shutdown-seconds=1800
+```
+
+A T4 is enough — these are small graph networks, not language models. If GPU
+quota is unavailable, `n2-standard-16` on CPU works and is roughly 10x slower,
+which for a handful of interfaces is tolerable.
+
+**Set the idle shutdown.** A T4 instance is about $0.55/hr against
+`n2-standard-8`'s $0.39, and unlike the CPU work in Part 1 this is not a
+few-minutes job.
+
+## 6.2 Setup
+
+```bash
+gcloud storage cp gs://sg-llamole-pvdlowe/pvdlowe/source/pvdlowe.tar.gz .
+tar -xzf pvdlowe.tar.gz && cd lowe
+pip install -e . --quiet
+pip install mace-torch ase pymatgen mp-api --quiet
+python -c "import torch; print('cuda:', torch.cuda.is_available())"
+```
+
+Store the Materials Project key in the environment, never in the repo:
+
+```bash
+read -s -p "MP API key: " MP_API_KEY && export MP_API_KEY && echo
+```
+
+## 6.3 Run
+
+```bash
+python examples/08_mlip_validate.py     # gate, then Ag-Cu mixing energies
+python examples/09_mlip_adhesion.py     # the adhesion comparison
+```
+
+`08` stops if the surrogate cannot reproduce two known Materials Project hull
+distances. That gate is not a formality: MLIP accuracy is 30-50 meV/atom and
+the hull distances are 86-90, so the margin is about a factor of two.
+
+## 6.4 Which question is worth the compute
+
+**The adhesion comparison, not the mixing energies.**
+
+The mixing energies restate something already known — the Materials Project
+convex hull says Ag-Cu has no stable ordered compound, at DFT level, for free.
+A surrogate would refine a number whose sign and rough magnitude are settled,
+at a precision barely better than the quantity being measured.
+
+The adhesion comparison asks something genuinely open. `metal_growth_factor`
+is currently an empirical fit to one measured series with no mechanism behind
+it. Work of adhesion is that mechanism, and the comparison is between
+dielectrics computed identically — so the *ordering* is far more robust to
+model error than any absolute value would be.
+
+## 6.5 Shut it down
+
+```bash
+gcloud workbench instances stop pvdlowe-mlip --location="${REGION}-a"
+# and when finished with it entirely:
+gcloud workbench instances delete pvdlowe-mlip --location="${REGION}-a"
+```

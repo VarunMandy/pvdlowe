@@ -510,6 +510,51 @@ just a mixture of Ag2O and CuO.
 
 ---
 
+# 3.8 Mixing energies confirm the dilute corner is thermodynamically favoured
+
+MACE-MP-0 on 32-site fcc supercells, gated against two Materials Project DFT
+results (errors 19-34 meV/atom, both under-predicting). Full account in
+`docs/MLIP_MIXING_ENERGY.md`.
+
+The Ag-Cu mixing energy is positive across the whole range and fits a
+regular-solution form to +/-6 meV/atom:
+
+    dE_mix = 0.287 * x * (1 - x)   eV/atom
+
+**This extends section 3.7 from ordered compounds to the disordered solid
+solution** a sputtered film might actually be. It also self-checks: at Ag 25%
+the surrogate puts the disordered solution 13 meV/atom BELOW the ordered Cu3Ag
+compound, so there is no ordering tendency -- which is what an empty convex
+hull implies, reached independently.
+
+**The finding that matters:** in the dilute-silver corner the driving force to
+separate falls below thermal energy at deposition.
+
+| Ag at.% | dE_mix | x kT (550 K) |
+|---|---|---|
+| 70 (brief's priority) | 0.0602 | 1.27 |
+| 50 | 0.0717 | 1.51 |
+| 15 | 0.0366 | 0.77 |
+| 10 | 0.0258 | 0.54 |
+| 5 | 0.0136 | 0.29 |
+
+Section 3.1 found the two microstructure hypotheses converge at 5-15% Ag --
+2.5 score points apart against 9-14 at Ag70Cu30 -- and treated that as
+robustness. **The thermodynamics now supply the reason:** there is barely any
+driving force to segregate there, so the film is far more likely to stay as
+deposited.
+
+The dilute-silver optimum is therefore favoured on three independent grounds:
+lowest silver consumption, best score under the corrected weighting, and the
+weakest tendency to phase-separate.
+
+Note also that even at the 50:50 peak the driving force is only ~1.5 kT at
+550 K. That is modest enough that a quenched sputtered film could plausibly
+trap a metastable solution, so **both microstructure hypotheses remain
+viable** -- which retrospectively justifies modelling both.
+
+---
+
 # 4. Limitations
 
 ## 4.1 What the framework does not predict

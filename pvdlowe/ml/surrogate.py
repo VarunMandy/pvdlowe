@@ -245,35 +245,196 @@ def mixing_energy_series(surrogate: MLIPSurrogate, fractions=None,
     return df
 
 
+#: Crystalline stand-ins for the sputtered dielectrics. Every one of these is
+#: an approximation to a real film, and the approximation differs in kind:
+#: AZO is modelled as wurtzite ZnO because the 2 at.% Al is a dopant on a ZnO
+#: lattice; Si3N4 as beta phase, though sputtered nitride is largely amorphous.
+#: The amorphous case is the weaker analogy and its result should be read as
+#: an upper bound on adhesion, since a disordered surface generally binds a
+#: metal less strongly than an ideal terminated crystal.
+DIELECTRIC_PROXY = {
+    "AZO":   {"mp_id": "mp-2133", "formula": "ZnO",
+              "miller": (0, 0, 1), "note": "wurtzite ZnO(0001), Zn-terminated"},
+    "ZnO":   {"mp_id": "mp-2133", "formula": "ZnO",
+              "miller": (0, 0, 1), "note": "wurtzite ZnO(0001), Zn-terminated"},
+    "Si3N4": {"mp_id": "mp-988", "formula": "Si3N4",
+              "miller": (0, 0, 1), "note": "beta-Si3N4(0001); the real film is "
+                                           "amorphous, so treat as an upper bound"},
+    "SnO2":  {"mp_id": "mp-856", "formula": "SnO2",
+              "miller": (1, 1, 0), "note": "rutile SnO2(110), the stable facet"},
+    "TiO2":  {"mp_id": "mp-2657", "formula": "TiO2",
+              "miller": (1, 1, 0), "note": "rutile TiO2(110)"},
+}
+
+
+#: Largest lattice mismatch that can be strained away without the result
+#: becoming a strain measurement. Beyond a few per cent the elastic energy
+#: stored in the film is comparable with the adhesion being measured:
+#: silver at 14% mismatch stores about 0.8 J/m2, and at 21% about 1.8 J/m2,
+#: against a physical work of adhesion of order 0.5-3 J/m2.
+#:
+#: The first version of this function had no such limit. It returned 9.6 J/m2
+#: for Ag/Si3N4 at 14% mismatch and -0.16 for Ag/TiO2 -- one unphysically
+#: large, one impossible -- and the ordering it produced was strain, not
+#: binding. Numbers from that run must not be used.
+MAX_LATTICE_MISMATCH = 0.04
+
+
 def adhesion_energy(surrogate: MLIPSurrogate, metal: str = "Ag",
-                    dielectric: str = "AZO", n_metal_layers: int = 4,
-                    vacuum: float = 12.0) -> dict:
+                    dielectric: str = "AZO", metal_layers: int = 4,
+                    oxide_layers: int = 6, vacuum: float = 14.0,
+                    max_area: float = 400.0, gap: float = 2.2,
+                    max_mismatch: float = MAX_LATTICE_MISMATCH,
+                    relax: bool = True) -> dict:
     """Work of adhesion for a metal film on a dielectric, J/m^2.
 
         W_adh = (E_metal_slab + E_oxide_slab - E_interface) / A
 
     Positive and larger means the metal binds more strongly and, other things
-    equal, wets and coalesces better rather than islanding.
+    equal, wets and coalesces rather than islanding.
 
     **This is the quantity behind the nucleation finding.** Cueva & Carretero
     measured that silver performs better on AZO than on a nitride because it
-    grows better there, and the framework now carries an empirical
-    `metal_growth_factor` calibrated to that measurement. If a surrogate
-    predicts a higher work of adhesion for Ag on AZO than on Si3N4, that
-    supplies the mechanism the empirical factor currently lacks.
+    grows better there, and `TCOPreset.metal_growth_factor` is currently an
+    empirical number calibrated to that measurement with no mechanism attached.
+    If a surrogate predicts higher adhesion for Ag on AZO than on Si3N4, it
+    supplies the mechanism.
 
-    **Treat the absolute value with suspicion.** MLIP training sets are
-    dominated by bulk crystals; interfaces between a metal and an amorphous or
-    defective oxide are far from that distribution, and the sputtered oxide in
-    question is not the ordered crystal modelled here. The *ordering* between
-    two dielectrics is more likely to survive than either number.
+    **A lattice-mismatch guard is enforced.** If the metal film cannot be tiled
+    onto the oxide footprint within `max_mismatch`, this raises rather than
+    straining the film to fit. Without that guard the function returns the
+    elastic energy of a badly strained film dressed up as an adhesion energy.
+
+    **Read the ordering, not the magnitude.** MLIP training sets are dominated
+    by bulk crystals. A metal/oxide interface is far from that distribution,
+    and the sputtered oxide in question is not the ordered crystal modelled
+    here. Comparisons between two dielectrics computed identically are far more
+    likely to survive than either absolute number.
+
+    **Termination is a modelling choice, and it is reported.** ZnO(0001) is
+    polar and has Zn- and O-terminated faces with substantially different
+    adhesion. This function takes the first termination the slab generator
+    returns and records which; a serious study would compute several.
     """
-    from ase.build import fcc111, add_adsorbate       # noqa: F401
-    raise NotImplementedError(
-        "interface construction requires a specific oxide surface termination, "
-        "which is a modelling decision rather than a default. See "
-        "examples/09_mlip_adhesion.py for a worked AZO(0001)/Ag(111) case, and "
-        "state the termination and registry in any result.")
+    import os
+    from ase.build import fcc111
+    from pymatgen.core import Structure
+    from pymatgen.core.surface import SlabGenerator
+    from pymatgen.io.ase import AseAtomsAdaptor
+    from mp_api.client import MPRester
+
+    if dielectric not in DIELECTRIC_PROXY:
+        raise KeyError(f"no crystalline proxy defined for {dielectric!r}; "
+                       f"available: {sorted(DIELECTRIC_PROXY)}")
+    spec = DIELECTRIC_PROXY[dielectric]
+
+    with MPRester(os.environ["MP_API_KEY"]) as mpr:
+        bulk_struct = mpr.get_structure_by_material_id(spec["mp_id"])
+
+    slabs = SlabGenerator(bulk_struct, spec["miller"], min_slab_size=oxide_layers,
+                          min_vacuum_size=vacuum, center_slab=True).get_slabs()
+    if not slabs:
+        raise RuntimeError(f"no slabs generated for {dielectric} {spec['miller']}")
+    oxide = AseAtomsAdaptor.get_atoms(slabs[0])
+    ox_cell = oxide.cell.lengths()[:2]
+
+    # Tile a metal (111) surface to approximately match the oxide footprint.
+    a_metal = {"Ag": 4.085, "Cu": 3.615, "Al": 4.050, "Au": 4.078}[metal]
+    unit = fcc111(metal, size=(1, 1, metal_layers), a=a_metal, vacuum=0.0)
+    m_cell = unit.cell.lengths()[:2]
+    reps = [max(1, int(round(ox_cell[i] / m_cell[i]))) for i in (0, 1)]
+    film = fcc111(metal, size=(reps[0], reps[1], metal_layers), a=a_metal,
+                  vacuum=0.0)
+    area = float(np.linalg.norm(np.cross(oxide.cell[0], oxide.cell[1])))
+    if area > max_area:
+        raise ValueError(
+            f"interface footprint is {area:.0f} A^2, above the {max_area:.0f} "
+            "limit. Lattice matching this pair needs a large supercell; raise "
+            "max_area only if you have the compute for it.")
+
+    strain = [abs(reps[i]*m_cell[i] - ox_cell[i]) / ox_cell[i] for i in (0, 1)]
+    if max(strain) > max_mismatch:
+        raise ValueError(
+            f"{metal}/{dielectric}: lattice mismatch {100*max(strain):.1f}% "
+            f"exceeds the {100*max_mismatch:.0f}% limit. Straining the film to "
+            "fit would store elastic energy comparable with the adhesion being "
+            "measured, and the result would rank strain rather than binding. "
+            "A supercell that matches these lattices coherently is needed -- "
+            "see pymatgen.analysis.interfaces.ZSLGenerator -- and it will be "
+            "much larger than the cells used here.")
+    film.set_cell([oxide.cell[0], oxide.cell[1], film.cell[2]], scale_atoms=True)
+
+    # Stack: oxide below, metal above, with a physical starting separation.
+    interface = oxide.copy()
+    top = oxide.positions[:, 2].max()
+    shifted = film.copy()
+    shifted.positions[:, 2] += top + gap - shifted.positions[:, 2].min()
+    interface += shifted
+    interface.cell[2][2] = shifted.positions[:, 2].max() + vacuum
+    interface.pbc = (True, True, True)
+
+    def _e(a):
+        return surrogate.energy(*( (a,) )) if not relax else surrogate.relax(a, cell=False)[1]
+
+    e_ox = _e(oxide)
+    free_film = shifted.copy()
+    free_film.cell = interface.cell
+    free_film.pbc = (True, True, True)
+    e_metal = _e(free_film)
+    e_int = _e(interface)
+
+    EV_A2_TO_J_M2 = 16.0218
+    w = (e_metal + e_ox - e_int) / area * EV_A2_TO_J_M2
+    return {
+        "metal": metal, "dielectric": dielectric,
+        "proxy": spec["formula"], "miller": spec["miller"],
+        "termination_note": spec["note"],
+        "W_adh_J_per_m2": round(float(w), 3),
+        "interface_area_A2": round(area, 1),
+        "n_atoms": len(interface),
+        "lattice_mismatch_pct": [round(100*x, 1) for x in strain],
+        "backend": surrogate.name,
+        "caveat": ("first termination only; ordering between dielectrics is "
+                   "more trustworthy than the absolute value"),
+    }
+
+
+def adhesion_comparison(surrogate: MLIPSurrogate, metal: str = "Ag",
+                        dielectrics=("AZO", "Si3N4"), **kwargs):
+    """The comparison that tests the nucleation finding.
+
+    Measured (Cueva & Carretero, 10 nm Ag): AZO gives lower emissivity than
+    SiAlNx because silver grows better on it. If adhesion follows the same
+    ordering, the empirical `metal_growth_factor` acquires a mechanism.
+    """
+    import pandas as pd
+    rows, failures = [], {}
+    for d in dielectrics:
+        try:
+            rows.append(adhesion_energy(surrogate, metal, d, **kwargs))
+        except Exception as exc:                          # noqa: BLE001
+            failures[d] = f"{type(exc).__name__}: {exc}"
+    df = pd.DataFrame(rows)
+    if len(df) < 2:
+        df.attrs["verdict"] = (
+            f"only {len(df)} of {len(dielectrics)} interfaces could be built "
+            "within the lattice-mismatch limit, so no ordering can be claimed. "
+            f"failures: {failures}")
+        df.attrs["failures"] = failures
+        return df
+    if len(df) > 1:
+        df = df.sort_values("W_adh_J_per_m2", ascending=False)
+        best = df.iloc[0]
+        df.attrs["verdict"] = (
+            f"{metal} binds most strongly to {best.dielectric} "
+            f"({best.W_adh_J_per_m2} J/m2). "
+            + ("Consistent with the measured growth ordering."
+               if best.dielectric in ("AZO", "ZnO") else
+               "NOT consistent with the measured ordering -- either the "
+               "crystalline proxies are too far from the sputtered films, or "
+               "adhesion is not the operative mechanism."))
+    df.attrs["failures"] = failures
+    return df
 
 
 def what_mlips_cannot_do() -> dict:
@@ -306,5 +467,6 @@ def what_mlips_cannot_do() -> dict:
 
 
 __all__ = ["MLIPSurrogate", "SurrogateUnavailable", "BACKENDS", "MP_REFERENCE",
-           "validate_against_mp", "mixing_energy_series", "adhesion_energy",
+           "DIELECTRIC_PROXY", "MAX_LATTICE_MISMATCH", "validate_against_mp",
+           "mixing_energy_series", "adhesion_energy", "adhesion_comparison",
            "what_mlips_cannot_do"]
