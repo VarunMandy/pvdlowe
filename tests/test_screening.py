@@ -169,3 +169,61 @@ def test_adhesion_rejects_strained_interfaces():
     assert MAX_LATTICE_MISMATCH <= 0.05, (
         "above a few per cent the stored strain is comparable with the "
         "adhesion being measured")
+
+
+def test_wetting_is_referenced_against_bulk_not_isolated_atoms():
+    """The adatom reference must be the metal's own bulk energy.
+
+    Isolated atoms are a poorly represented edge case for these models; bulk
+    fcc metals are the best represented thing in their training sets. Using
+    bulk as the reference cancels most of the systematic error and gives the
+    sign a direct physical meaning: negative means the atom prefers the oxide
+    to its own metal, which is the wetting criterion.
+    """
+    import inspect
+    from pvdlowe.ml import adatom_wetting
+    src = inspect.getsource(adatom_wetting)
+    assert "e_bulk" in src and "energy_per_atom" in src
+    assert "Frank-van der Merwe" in src and "Volmer-Weber" in src, \
+        "the two growth regimes must be named in the result"
+
+
+def test_wetting_verdict_excludes_corrugated_surfaces():
+    """A site spread comparable with the binding energy is disqualifying.
+
+    On cleaved beta-Si3N4(0001) the measured spread was 40-50% of the binding
+    energy, against 0-2% on the oxides: the adatom was falling into whichever
+    dangling-bond pocket it landed near. A real reactively-sputtered nitride
+    is passivated and amorphous. Letting such a row set the verdict produced
+    a "NOT consistent" conclusion driven entirely by the proxy already
+    documented as the weakest analogy.
+    """
+    import inspect
+    from pvdlowe.ml import wetting_comparison
+    src = inspect.getsource(wetting_comparison)
+    assert "reliable" in src and "site_spread_eV" in src
+    assert "0.25" in src, "the spread-to-binding threshold must be explicit"
+
+
+def test_termination_is_an_explicit_choice_not_a_default():
+    """Polar surfaces make slab index a physical decision, not a detail.
+
+    ZnO(0001) terminates on a Zn plane or an O plane, and adatom binding
+    differs between them by potentially more than the effect being measured
+    between dielectrics. The first version silently took index 0.
+    """
+    import inspect
+    from pvdlowe.ml import adatom_wetting, termination_spread
+    src = inspect.getsource(adatom_wetting)
+    assert "termination: int" in src, "termination must be a parameter"
+    assert "n_terminations" in src, "the count must be reported"
+    sweep = inspect.getsource(termination_spread)
+    assert "termination_range_eV" in sweep
+
+
+def test_gzo_and_ito_share_or_declare_their_proxies():
+    """GZO uses the same ZnO proxy as AZO; that must be stated, not hidden."""
+    from pvdlowe.ml import DIELECTRIC_PROXY
+    assert DIELECTRIC_PROXY["GZO"]["mp_id"] == DIELECTRIC_PROXY["AZO"]["mp_id"]
+    assert "outside what this can resolve" in DIELECTRIC_PROXY["GZO"]["note"]
+    assert DIELECTRIC_PROXY["ITO"]["formula"] == "In2O3"

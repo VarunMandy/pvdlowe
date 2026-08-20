@@ -553,6 +553,92 @@ Note also that even at the 50:50 peak the driving force is only ~1.5 kT at
 trap a metastable solution, so **both microstructure hypotheses remain
 viable** -- which retrospectively justifies modelling both.
 
+## 3.9 Adatom wetting cannot resolve the dielectric question
+
+> **This section replaces an earlier version that claimed the opposite.** That
+> version reported the model reproducing the measured ordering among the
+> oxides. A subsequent termination sweep showed the claim was an artifact.
+
+`dE_wet = E(slab + adatom) - E(slab) - E_bulk` decides whether an arriving atom
+prefers the oxide or its own metal. Six placements per surface.
+
+**The disqualifying result.** ZnO(0001) is polar and has two terminations. For
+a silver adatom they give:
+
+| termination | dE_wet | regime |
+|---|---|---|
+| Zn face | **+0.696** | islanding |
+| O face | **-1.399** | wetting |
+
+**A range of 2.095 eV, against 0.457 eV separating all six dielectrics tested.**
+The choice of which face to model dominates the material comparison by a factor
+of 4.6, and the first run silently took whichever slab the generator returned.
+
+The earlier claim that AZO ranked best among oxides was therefore resolving
+slab index, not material. It is withdrawn.
+
+**Why this cannot be fixed by picking the right face.** Which termination a
+real sputtered film presents depends on deposition conditions -- oxygen partial
+pressure, substrate temperature, growth rate -- and is itself an experimental
+question. There is no principled way to choose one without the measurement the
+calculation was meant to substitute for.
+
+**What survives.** One thing, and it is worth keeping: every oxide on its
+Zn-equivalent termination gives islanding, +0.70 to +1.31 eV. Silver and copper
+islanding on oxides is independently known -- it is why percolation thresholds
+exist at 10-11 nm and why section 2 needs a percolation model at all. The
+surrogate reproduces that regime without being told, which is a real if modest
+validation of the method.
+
+**What it means for `metal_growth_factor`.** The parameter stays empirical,
+calibrated against Cueva & Carretero's measured series and reproducing it to
+4-8%. Two computational attempts at a mechanism have now failed for different
+reasons -- bulk adhesion on lattice mismatch, adatom wetting on termination
+sensitivity -- and both failures are documented with the diagnostic that caught
+them. That is the honest state.
+
+**The mechanism the authors themselves propose is untestable this way.**
+Carretero attribute the AZO advantage to it crystallising uniformly and
+templating silver growth. Templating is lattice registry between layers; a
+single adatom has no registry, and a strained interface measures elastic energy.
+Neither method used here could have found it.
+
+## 3.10 The nucleation mechanism, resolved from literature
+
+Two surrogate calculations failed to find the mechanism behind
+`metal_growth_factor`. A literature search found it, with direct experimental
+evidence. Full account in `docs/NUCLEATION_MECHANISM.md`.
+
+**Guardian Industries patent US 7,632,572** compared silver deposited on
+crystalline ZnO against amorphous TiOx by TEM: grains of about 25 nm on ZnO
+against 15 nm on the amorphous layer, {111}-oriented grains two to three times
+larger on ZnO, and the film on the amorphous underlayer **clearly
+discontinuous**. That is templating, measured.
+
+**Industrial practice answers the nitride case.** Silicon nitride Low-E stacks
+use thin NiCr barrier layers specifically to increase adhesion between nitride
+and silver -- a nucleation layer is required because silver adheres poorly to
+nitride directly. The opposite of what the surrogate predicted from a
+crystalline proxy.
+
+**The framework's grain assumption was accidentally right, for AZO.**
+`grain_size_ratio` defaults to 3.0, i.e. 30 nm grains in a 10 nm film, against
+the 25 nm measured on ZnO. Within 20%.
+
+**And this is the same physics as the copper discrepancy.** Section 3.6 and
+`docs/LITERATURE_CALIBRATION.md` concluded that nanocrystalline grain structure
+explains the 8x under-prediction of sputtered Cu sheet resistance. The patent
+shows the underlayer determines metal grain size. So `metal_growth_factor` and
+the copper grain-size hypothesis are **one effect appearing twice** --
+underlayer-dependent metal microstructure -- and the framework's structural
+weakness is modelling the metal as though the layer beneath it did not shape
+its grains.
+
+**Consequence for the experiment.** One XRD scan measures both: Ag(111) or
+Cu(111) texture answers the templating question, Scherrer width gives the
+grain size for that underlayer. Section 6.2's scan should record the metal
+reflections, not only the film thickness.
+
 ---
 
 # 4. Limitations

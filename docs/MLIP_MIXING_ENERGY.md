@@ -118,13 +118,87 @@ than appearing immediately.
 - **32-site cells.** Adequate for a mixing energy; too small for anything
   involving clustering or short-range order.
 
-## 7. What the same tooling could not do
+## 7. Nucleation: two attempts, both negative, both diagnosed
 
-An attempt at metal/dielectric adhesion energies with the same surrogate
-**failed and produced no usable result** — lattice mismatches of 5–21% meant
-the calculation measured elastic strain rather than binding, returning
-9.6 J/m² for Ag/Si₃N₄ and −0.16 J/m² for Ag/TiO₂. Neither is physical. The
-module now raises above 4% mismatch rather than returning such numbers.
+### 7.1 Bulk adhesion — failed
 
-Mixing energies sit in the regime these models handle best — bulk metals,
-ordered supercells, no surfaces. Interfaces do not.
+Lattice mismatches of 5–21% meant the calculation measured elastic strain
+rather than binding, returning 9.6 J/m² for Ag/Si₃N₄ and −0.16 J/m² for
+Ag/TiO₂. Neither is physical. The module now raises above 4% mismatch.
+
+### 7.2 Adatom wetting — a better question, still not answerable
+
+Nucleation is about whether an arriving adatom prefers the oxide or its own
+metal, not about a continuous film's adhesion:
+
+    dE_wet = E(slab + adatom) - E(slab) - E_bulk_per_atom
+
+Negative is wetting, positive is islanding. A single adatom needs no lattice
+matching, so §7.1's defect is structurally absent. Six placements per surface.
+
+| Metal | Surface | dE_wet (eV) | site spread | reliable | regime |
+|---|---|---|---|---|---|
+| Ag | In₂O₃(111) → ITO | −3.575 | 1.666 | **no** | wetting |
+| Ag | β-Si₃N₄(0001) | −0.502 | 0.215 | **no** | wetting |
+| Ag | ZnO(0001) → AZO, GZO | +0.696 | 0.012 | yes | islanding |
+| Ag | TiO₂(110) | +0.851 | 0.153 | yes | islanding |
+| Ag | SnO₂(110) | +1.153 | 0.025 | yes | islanding |
+
+Two surfaces were excluded automatically: their site spread exceeded 25% of
+their binding energy, meaning the adatom was falling into dangling-bond pockets
+on an artificially reactive cleaved surface rather than sampling a
+representative one.
+
+**Then the termination sweep disqualified the rest.** ZnO(0001) is polar:
+
+| termination | dE_wet | regime |
+|---|---|---|
+| Zn face | **+0.696** | islanding |
+| O face | **−1.399** | wetting |
+
+**2.095 eV across terminations of one material, against 0.457 eV between six
+different materials.** A factor of 4.6. The dielectric ranking was resolving
+which slab the generator returned first.
+
+**This cannot be fixed by choosing the correct face.** Which termination a
+sputtered film presents depends on oxygen partial pressure, substrate
+temperature and growth rate — it is itself an experimental question, and one
+whose answer the calculation was meant to stand in for.
+
+**What survives.** Every oxide on the Zn-equivalent face gives islanding,
++0.70 to +1.31 eV. That is the Volmer–Weber regime, independently known, and
+the reason percolation thresholds exist at 10–11 nm. The surrogate reproduces
+it unprompted — a modest but real validation.
+
+### 7.3 Where this leaves the mechanism
+
+Two attempts, two different failure modes, both diagnosed:
+
+| Attempt | Failed on | Diagnostic that caught it |
+|---|---|---|
+| Bulk adhesion | 5–21% lattice mismatch; measured elastic strain | unphysical magnitudes, 9.6 and −0.16 J/m² |
+| Adatom wetting | termination sensitivity 4.6× the signal | explicit termination sweep |
+
+`metal_growth_factor` remains empirical — calibrated to a measured series,
+reproducing it to 4–8%, with its domain stated. That is a legitimate status for
+a fitted parameter.
+
+**And the mechanism its authors propose is untestable by either method.**
+Carretero attribute the AZO advantage to uniform crystallisation templating
+silver growth. Templating is lattice registry between layers: a single adatom
+has none, and a strained interface measures elastic energy. Testing it needs
+coherent epitaxial supercells and an amorphous nitride reference — a different
+and much larger piece of work.
+
+### 7.4 Cost, and what was learned per hour
+
+The wetting calculations were minutes per surface. The termination sweep that
+invalidated them took three more runs. Together perhaps an hour of compute,
+and the outcome is a clean negative with a number attached — which is worth
+more than the positive claim it replaced, because that claim was wrong.
+
+Doing the adhesion route properly, with coherent supercells and several
+terminations per surface, would be 200–500 atom cells and roughly two days of
+work and compute. Given that the cheap version has now shown termination
+sensitivity of 2 eV on a 0.5 eV signal, that investment is not recommended
+ahead of the measurements in §8.2 and §8.3 of the technical report.

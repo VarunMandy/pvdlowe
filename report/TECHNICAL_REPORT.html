@@ -1,5 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8">
-<link rel="stylesheet" href="style.css"></head><body><h1 id="computational-screening-of-sustainable-low-emissivity-pvd-coatings-on-soda-lime-float-glass">Computational screening of sustainable low-emissivity PVD coatings on soda-lime float glass</h1><p class="meta"><strong>Technical report</strong>
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head><body><h1 id="computational-screening-of-sustainable-low-emissivity-pvd-coatings-on-soda-lime-float-glass">Computational screening of sustainable low-emissivity PVD coatings on soda-lime float glass</h1><p class="meta"><strong>Technical report</strong>
 Saint-Gobain Research India
 Author: Varun Mandy, Research Intern<br>Framework: <code>pvdlowe</code> v0.1.0 — https://github.com/VarunMandy/pvdlowe</p>
 <hr />
@@ -17,7 +16,15 @@ literature citations could not be matched to any locatable source, and one
 pivotal measurement was found inconsistent with a model-independent
 electrodynamic limit. Thermodynamic screening of all fifteen nominated chemical systems confirmed that
 Ag–Cu possesses no stable ordered compound, supporting the brief's suspicion of
-phase separation with first-principles evidence. Third, the design-space search
+phase separation with first-principles evidence; a machine-learning
+interatomic potential extended this to the disordered solid solution and showed
+that in the dilute-silver range the driving force to separate falls below
+thermal energy at deposition, supplying a third independent argument for that
+composition range. A literature search subsequently identified the mechanism
+behind the dielectric effect — underlayer templating of metal grain structure,
+measured by transmission electron microscopy in the patent literature — and
+established that it is the same physical effect as the framework's largest
+known error, its under-prediction of sputtered copper sheet resistance. Third, the design-space search
 identified a material class
 and a stack architecture outside the brief's framing, both of which outperform
 the proposed candidates: silicon nitride dielectrics improve visible
@@ -100,6 +107,14 @@ retaining visible transmittance, sheet resistance and far-infrared reflectance.<
 <tr>
 <td>Triple-metal architecture search</td>
 <td>Complete — negative result (§5.4)</td>
+</tr>
+<tr>
+<td>ML surrogate: Ag–Cu mixing energies</td>
+<td><strong>Complete and executed</strong> (§5.6)</td>
+</tr>
+<tr>
+<td>ML surrogate: interface adhesion</td>
+<td>Attempted, <strong>failed</strong> — lattice mismatch (§5.6)</td>
 </tr>
 </tbody>
 </table>
@@ -971,7 +986,7 @@ which §5.1's dilute-silver optimum is strongest.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>This adds a mechanism to the dilute-stabiliser finding in §5.7.</strong> Both Cu–Ti
+<p><strong>This adds a mechanism to the dilute-stabiliser finding in §5.9.</strong> Both Cu–Ti
 and Al–Cu are richly intermetallic — eight and ten near-hull phases
 respectively. A dilute Ti or Al addition to a Cu-bearing film therefore has
 stable compounds available to form, so on annealing it is more likely to
@@ -986,7 +1001,258 @@ phases at 0 K. It cannot describe a disordered sputtered solid solution,
 thin-film optical constants at 10 nm, or interface energies against an amorphous
 oxide. The framework records this limitation per query rather than leaving it
 implicit.</p>
-<h3 id="56-ranked-candidates">5.6 Ranked candidates</h3>
+<h3 id="56-mixing-energies-the-dilute-corner-is-thermodynamically-favoured">5.6 Mixing energies: the dilute corner is thermodynamically favoured</h3>
+<p>§5.5 established from the Materials Project convex hull that Ag–Cu has no
+stable <em>ordered</em> compound. That is an equilibrium statement about ordered
+phases, and a sputtered film is neither ordered nor at equilibrium. The
+question left open was whether the <em>disordered solid solution</em> the film might
+actually be is also unstable.</p>
+<p><strong>Method.</strong> MACE-MP-0, a machine-learning interatomic potential trained on
+Materials Project DFT data, on 32-site fcc supercells with three random
+decorations per composition, cell and positions relaxed. Not DFT — a surrogate
+for it, and its error is quantified rather than assumed. Full account in
+<code>docs/MLIP_MIXING_ENERGY.md</code>.</p>
+<p><strong>Validation gate.</strong> Before any prediction the surrogate was required to
+reproduce two Materials Project results computed at DFT level:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>MP (DFT)</th>
+<th>MACE</th>
+<th>error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cu₃Ag</td>
+<td>0.0904</td>
+<td>0.0719</td>
+<td>0.0185</td>
+</tr>
+<tr>
+<td>CuAg₃</td>
+<td>0.0857</td>
+<td>0.0517</td>
+<td>0.0340</td>
+</tr>
+</tbody>
+</table>
+<p>Passed, but the margin should be read: MACE under-predicts both by 20–40%, and
+both errors point the same way, so this is a systematic bias. Every figure
+below is a lower bound.</p>
+<p><strong>Result.</strong> The mixing energy is positive across the whole composition range
+and fits a regular-solution form to within ±6 meV/atom:</p>
+<pre><code>ΔE_mix = 0.287 · x · (1 − x)   eV/atom
+</code></pre>
+<p>The spread across three random decorations is 1–4 meV/atom, an order of
+magnitude below the signal, so the configurational sampling is converged. End
+members return exactly zero.</p>
+<p><strong>A useful internal check.</strong> At Ag 25 at.% the surrogate puts the <em>disordered</em>
+solution at 0.0591 eV/atom and the <em>ordered</em> Cu₃Ag compound at 0.0719 — the
+disordered state is 13 meV/atom <strong>lower</strong>. There is no ordering tendency at
+all, which is precisely what an empty convex hull implies, reached by an
+independent route.</p>
+<p><strong>The finding that bears on the design.</strong> Comparing the driving force against
+thermal energy at deposition:</p>
+<table>
+<thead>
+<tr>
+<th>Ag at.%</th>
+<th>ΔE_mix</th>
+<th>× kT (300 K)</th>
+<th>× kT (550 K)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>70 — the brief's priority</td>
+<td>0.0602</td>
+<td>2.33</td>
+<td>1.27</td>
+</tr>
+<tr>
+<td>50</td>
+<td>0.0717</td>
+<td>2.77</td>
+<td>1.51</td>
+</tr>
+<tr>
+<td><strong>15</strong></td>
+<td>0.0366</td>
+<td>1.41</td>
+<td><strong>0.77</strong></td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td>0.0258</td>
+<td>1.00</td>
+<td><strong>0.54</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>0.0136</td>
+<td>0.53</td>
+<td><strong>0.29</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>In the dilute-silver corner the driving force to separate falls below thermal
+energy at deposition.</strong></p>
+<p>§5.1 found that the two microstructure hypotheses converge there — 2.5 score
+points apart at Ag₅Cu₉₅ against 9–14 at Ag₇₀Cu₃₀ — and treated that as a
+robustness argument for designing in that range. <strong>The thermodynamics now
+supply the mechanism:</strong> at 5–15 at.% Ag there is barely any driving force to
+segregate, so the film is far more likely to remain as deposited and it matters
+much less which hypothesis is correct.</p>
+<p>The dilute-silver optimum is therefore supported on three independent grounds:
+lowest silver consumption, highest score under the corrected weighting, and the
+weakest thermodynamic tendency to phase-separate.</p>
+<p><strong>A second observation, bearing on §8.3.</strong> Even at the 50:50 peak the driving
+force is only about 1.5 kT at 550 K. That is modest enough that a magnetron-
+sputtered film quenched from the vapour could plausibly trap a metastable solid
+solution — so <strong>both microstructure hypotheses remain physically viable</strong>,
+which retrospectively justifies the framework modelling both rather than
+selecting one. It also sharpens the annealing prediction: precipitation should
+be observable but may require elevated temperature or extended time rather than
+appearing immediately.</p>
+<p><strong>Limitations.</strong> The 20–40% systematic under-prediction above; random
+decorations rather than proper special quasi-random structures; and 0 K
+energies with no entropy term. That last point works in the conclusion's
+favour — configurational entropy at 550 K contributes roughly 33 meV/atom at
+50:50, comparable with ΔE_mix itself, so including it would push the mixing
+free energy further toward zero across the range.</p>
+<p><strong>What the same tooling could not do.</strong> An attempt at metal/dielectric adhesion
+energies with the same surrogate <strong>failed and produced no usable result</strong>:
+lattice mismatches of 5–21% meant the calculation measured elastic strain
+rather than binding, returning 9.6 J/m² for Ag/Si₃N₄ and −0.16 J/m² for
+Ag/TiO₂, neither of which is physical. The module now refuses interfaces above
+4% mismatch. Mixing energies sit in the regime these models handle best — bulk
+metals, no surfaces; interfaces do not, and the empirical
+<code>metal_growth_factor</code> of §5.2 therefore remains without a computed mechanism.</p>
+<h3 id="57-the-nucleation-mechanism-and-a-structural-weakness-it-exposes">5.7 The nucleation mechanism, and a structural weakness it exposes</h3>
+<p>§5.2 established that the choice of dielectric changes the metal's growth, and
+encoded it as an empirical <code>metal_growth_factor</code> calibrated to measurement.
+The mechanism was left open. Two machine-learning surrogate calculations were
+run to find it, and both failed:</p>
+<table>
+<thead>
+<tr>
+<th>Attempt</th>
+<th>Failure mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bulk interface adhesion</td>
+<td>5–21% lattice mismatch — the calculation measured elastic strain, not binding</td>
+</tr>
+<tr>
+<td>Adatom wetting energy</td>
+<td>ZnO(0001) termination changed the result by 2.1 eV, against 0.46 eV separating all six materials</td>
+</tr>
+</tbody>
+</table>
+<p>A literature search then resolved it in under an hour, with direct
+experimental evidence.</p>
+<p><strong>The measurement.</strong> Guardian Industries (US 7,632,572 B2) compared silver
+deposited on <strong>crystalline ZnO</strong> with silver on <strong>amorphous TiOx</strong> by
+transmission electron microscopy. Silver on the amorphous layer shows an
+abnormal microstructure with irregular grains averaging about 15 nm; on ZnO it
+shows regular grains averaging about 25 nm. In dark field on the Ag{220}
+reflections, {111}-oriented grains are two to three times larger on ZnO. On
+the amorphous underlayer the film is <strong>clearly discontinuous</strong>.</p>
+<p>That is templating, measured directly: a crystalline oxide templates Ag(111)
+growth, an amorphous underlayer does not, and the film islands instead of
+coalescing.</p>
+<p><strong>The nitride case is settled by industrial practice.</strong> Silicon nitride Low-E
+stacks use thin NiCr barrier layers specifically to increase adhesion between
+the nitride and the silver. A metallic nucleation layer is required precisely
+because silver adheres poorly to nitride directly — the opposite of what the
+surrogate predicted from a crystalline β-Si₃N₄ proxy, and an explanation of
+why that proxy misled.</p>
+<p><strong>A structural weakness in the framework follows.</strong> The default
+<code>grain_size_ratio</code> of 3.0 corresponds to 30 nm grains in a 10 nm film, within
+20% of the 25 nm the patent measured on ZnO — the assumption was correct, but
+only for the oxide underlayer it happened to be tuned against:</p>
+<table>
+<thead>
+<tr>
+<th>Underlayer</th>
+<th>Grain size</th>
+<th>Ratio</th>
+<th>ρ(10 nm Ag)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Crystalline ZnO / AZO</td>
+<td>25 nm</td>
+<td>2.5</td>
+<td>4.69 µΩ·cm</td>
+</tr>
+<tr>
+<td><strong>Framework default</strong></td>
+<td>30 nm</td>
+<td><strong>3.0</strong></td>
+<td><strong>4.44</strong></td>
+</tr>
+<tr>
+<td>Amorphous TiOx</td>
+<td>15 nm</td>
+<td>1.5</td>
+<td>5.70</td>
+</tr>
+<tr>
+<td>Amorphous nitride (inferred)</td>
+<td>~12 nm</td>
+<td>1.2</td>
+<td>6.33</td>
+</tr>
+</tbody>
+</table>
+<p><strong>And this is the same physics as the copper discrepancy of §6.</strong>
+<code>docs/LITERATURE_CALIBRATION.md</code> concluded that no published scattering
+parameters explain the eightfold under-prediction of sputtered copper sheet
+resistance, and that a nanocrystalline grain structure does. The patent shows
+that the underlayer <em>determines</em> metal grain size.</p>
+<p>So <code>metal_growth_factor</code> and the copper grain-size hypothesis are not two
+separate limitations. <strong>They are one effect appearing in two places</strong> — the
+framework models the metal layer as though the layer beneath it did not shape
+its microstructure. That is the single most consequential structural weakness
+identified in this work, and a successor should replace the empirical
+multiplier with a per-underlayer grain size, which is physically meaningful,
+directly measurable, and feeds both the optical and electrical paths through
+the existing Mayadas–Shatzkes term.</p>
+<p><strong>Consequence for the experimental programme.</strong> One X-ray diffraction scan now
+answers both open questions on the same film:</p>
+<table>
+<thead>
+<tr>
+<th>Measurement</th>
+<th>Answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ag(111) or Cu(111) peak intensity and texture</td>
+<td>whether the underlayer templates the metal</td>
+</tr>
+<tr>
+<td>Scherrer peak width → grain size</td>
+<td><code>grain_size_ratio</code> for that underlayer, and the copper discrepancy</td>
+</tr>
+</tbody>
+</table>
+<p>§8.2 already calls for this scan. It should now record the metal reflections,
+not only the film thickness.</p>
+<p><strong>Consequence for the design.</strong> If templating is the operative mechanism it
+favours crystalline oxide underlayers and disfavours amorphous nitrides. That
+is consistent with the measurement in §5.2, with industrial practice, and with
+the hybrid stack introduced there — AZO beneath for nucleation, nitride above
+for durability. That arrangement is not a compromise between two materials but
+the physically correct order.</p>
+<h3 id="58-ranked-candidates">5.8 Ranked candidates</h3>
 <p>All 38 architectures were scored under both climate profiles. <strong>The two
 top-ten lists share exactly one candidate.</strong> This is the practical form of
 §5.3: the climate is not a refinement to the ranking, it selects a different
@@ -1420,7 +1686,7 @@ falls short.</p>
 <li><strong>Scores are not comparable between the two tables</strong>, being computed under
    different weightings. Compare within a column only.</li>
 </ol>
-<h3 id="57-the-dilute-titanium-ternary-is-predicted-to-underperform">5.7 The dilute-titanium ternary is predicted to underperform</h3>
+<h3 id="59-the-dilute-titanium-ternary-is-predicted-to-underperform">5.9 The dilute-titanium ternary is predicted to underperform</h3>
 <p>Ag₇₀Cu₂₉Ti₁, proposed in the brief on the hypothesis that dilute Ti stabilises
 the metal layer, ranks 13th of 14 in the original candidate set. Titanium's bulk
 resistivity is 42 µΩ·cm, approximately 26× silver's; even at 1 at.% this raises
@@ -1725,7 +1991,17 @@ directing experimental effort, and are not results.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="73-known-weaknesses">7.3 Known weaknesses</h3>
+<h3 id="73-the-principal-structural-weakness">7.3 The principal structural weakness</h3>
+<p><strong>The framework models each metal layer as though the layer beneath it did not
+shape its microstructure.</strong> §5.7 establishes that this single omission accounts
+for both the empirical <code>metal_growth_factor</code> and the eightfold under-prediction
+of sputtered copper sheet resistance in §6. Grain size in a sputtered metal
+film is set substantially by the underlayer — 25 nm on crystalline ZnO against
+15 nm on an amorphous oxide, measured by TEM — and grain size feeds directly
+into the Mayadas–Shatzkes term that the framework already contains.</p>
+<p>A successor should carry a measured <code>grain_size_ratio</code> per underlayer rather
+than an opaque multiplier on resistivity. The XRD scan of §8.2 supplies it.</p>
+<h3 id="74-other-known-weaknesses">7.4 Other known weaknesses</h3>
 <ul>
 <li><strong>Si₃N₄ and TiO₂ optical constants are ESTIMATE grade</strong> — indices from typical
   sputtered values, phonon parameters order-of-magnitude.</li>
@@ -1749,7 +2025,7 @@ directing experimental effort, and are not results.</p>
 - <strong>Reactive Si₃N₄ deposition is more demanding than AZO</strong> — target poisoning,
   lower rate. The brief's §15 deposition-efficiency criterion would penalise it,
   and the framework cannot score this without a calibrated rate model.</p>
-<h3 id="74-scores-are-not-portable-between-weightings">7.4 Scores are not portable between weightings</h3>
+<h3 id="75-scores-are-not-portable-between-weightings">7.5 Scores are not portable between weightings</h3>
 <p>Absolute scores moved by approximately 25 points as the §3 corrections were
 applied. <strong>A score is not a property of a material.</strong> A figure of 89.3 is a
 statement about one architecture under one weighting of eight criteria, three of
@@ -1767,8 +2043,12 @@ weighting file attached and the unverified elements identified.</p>
 <li><strong>Apply the three factual corrections</strong> in §4.4.</li>
 </ol>
 <h3 id="82-first-experimental-priority">8.2 First experimental priority</h3>
-<p><strong>One XRD scan on a single 12–15 nm copper film on AZO.</strong> An afternoon, one
-sample. Following the literature review in §6.1, grain structure is the leading
+<p><strong>One XRD scan on a single 12–15 nm copper film on AZO, recording the metal
+reflections as well as the film thickness.</strong> An afternoon, one sample, and it
+now answers two questions rather than one: Scherrer width gives the grain size
+that §5.7 identifies as the common cause of both the copper discrepancy and the
+dielectric effect, while the Cu(111) intensity and texture test whether the
+underlayer templates the metal. Following the literature review in §6.1, grain structure is the leading
 explanation for the model's largest error, and Scherrer broadening measures it
 directly. This is now the highest information-per-hour measurement available.</p>
 <p><strong>Then the copper thickness series</strong> (§6.2). Half a day of tool time. It
@@ -1800,6 +2080,13 @@ question and the silver-free premise simultaneously.</p>
   g and LSG.</li>
 <li><strong>Measured n and k</strong> for in-house AZO, Si₃N₄ and metal films — the largest
   single source of visible-range error.</li>
+<li><strong>Coherent-interface adhesion energies</strong>, if the mechanism behind
+  <code>metal_growth_factor</code> is wanted. This requires lattice-matched supercells of
+  200–500 atoms (<code>pymatgen.analysis.interfaces.ZSLGenerator</code>) and several
+  surface terminations per dielectric — roughly two days of work and compute,
+  with an outcome still limited by the surrogate's accuracy on systems far from
+  its training distribution. Not recommended ahead of the measurements in §8.2
+  and §8.3.</li>
 </ul>
 <hr />
 <h2 id="9-handover">9. Handover</h2>

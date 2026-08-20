@@ -260,6 +260,16 @@ DIELECTRIC_PROXY = {
     "Si3N4": {"mp_id": "mp-988", "formula": "Si3N4",
               "miller": (0, 0, 1), "note": "beta-Si3N4(0001); the real film is "
                                            "amorphous, so treat as an upper bound"},
+    "GZO":   {"mp_id": "mp-2133", "formula": "ZnO",
+              "miller": (0, 0, 1), "note": "wurtzite ZnO(0001) again -- Ga is a "
+                                           "dilute dopant on the same lattice, "
+                                           "so GZO and AZO share a proxy and "
+                                           "any difference between them is "
+                                           "outside what this can resolve"},
+    "ITO":   {"mp_id": "mp-22598", "formula": "In2O3",
+              "miller": (1, 1, 1), "note": "bixbyite In2O3(111), the stable "
+                                           "low-energy facet; Sn is a dilute "
+                                           "dopant on that lattice"},
     "SnO2":  {"mp_id": "mp-856", "formula": "SnO2",
               "miller": (1, 1, 0), "note": "rutile SnO2(110), the stable facet"},
     "TiO2":  {"mp_id": "mp-2657", "formula": "TiO2",
@@ -434,6 +444,222 @@ def adhesion_comparison(surrogate: MLIPSurrogate, metal: str = "Ag",
                "crystalline proxies are too far from the sputtered films, or "
                "adhesion is not the operative mechanism."))
     df.attrs["failures"] = failures
+    return df
+
+
+def adatom_wetting(surrogate: MLIPSurrogate, metal: str = "Ag",
+                   dielectric: str = "AZO", oxide_layers: int = 6,
+                   vacuum: float = 14.0, height: float = 2.3,
+                   n_sites: int = 6, termination: int = 0,
+                   relax: bool = True) -> dict:
+    """Whether a single metal adatom prefers the oxide surface or its own bulk.
+
+        dE_wet = E(slab + adatom) - E(slab) - E_bulk_per_atom
+
+    Negative means an isolated atom is more stable on the oxide than joining
+    its own metal, so the film spreads: Frank-van der Merwe, layer by layer.
+    Positive means it prefers its own kind, so the film islands:
+    Volmer-Weber. The magnitude is the barrier against wetting.
+
+    **This is a better question than bulk adhesion**, and it is the reason the
+    earlier `adhesion_energy` approach was abandoned. Nucleation is not about
+    a continuous film's binding to a substrate; it is about whether arriving
+    adatoms stick and spread or cluster. A single adatom also needs no lattice
+    matching, which is what made the interface calculation invalid -- there is
+    no film whose lattice must be strained to fit.
+
+    Referencing against the metal's own bulk energy rather than an isolated
+    atom is deliberate. Isolated atoms are a poorly represented edge case for
+    these models, whereas bulk fcc metals are the best represented thing in
+    their training sets, so the reference cancels most of the systematic error.
+
+    `n_sites` random lateral placements are tried and the most stable is
+    returned; the spread across them indicates how corrugated the surface is,
+    which bears on adatom diffusion and therefore on coalescence.
+
+    **`termination` selects which slab the generator returns.** This is not a
+    detail for polar surfaces. ZnO(0001) has a Zn-terminated and an
+    O-terminated face whose adatom binding differs by more than the effect
+    being measured between dielectrics, and the earlier version of this
+    function silently took index 0. Run every termination and report the
+    spread; `termination_spread` does this.
+    """
+    import os
+    from ase.build import bulk as ase_bulk
+    from pymatgen.core.surface import SlabGenerator
+    from pymatgen.io.ase import AseAtomsAdaptor
+    from mp_api.client import MPRester
+
+    if dielectric not in DIELECTRIC_PROXY:
+        raise KeyError(f"no crystalline proxy for {dielectric!r}; "
+                       f"available: {sorted(DIELECTRIC_PROXY)}")
+    spec = DIELECTRIC_PROXY[dielectric]
+
+    with MPRester(os.environ["MP_API_KEY"]) as mpr:
+        bulk_struct = mpr.get_structure_by_material_id(spec["mp_id"])
+
+    slabs = SlabGenerator(bulk_struct, spec["miller"], min_slab_size=oxide_layers,
+                          min_vacuum_size=vacuum, center_slab=False).get_slabs()
+    if not slabs:
+        raise RuntimeError(f"no slab generated for {dielectric} {spec['miller']}")
+    n_term = len(slabs)
+    if termination >= n_term:
+        raise IndexError(f"{dielectric} {spec['miller']} has {n_term} distinct "
+                         f"termination(s); index {termination} requested")
+    slab = AseAtomsAdaptor.get_atoms(slabs[termination])
+    slab.pbc = (True, True, True)
+
+    e_slab = surrogate.relax(slab, cell=False)[1] if relax else surrogate.energy(slab)
+
+    a_metal = {"Ag": 4.085, "Cu": 3.615, "Al": 4.050, "Au": 4.078}[metal]
+    e_bulk = surrogate.energy_per_atom(
+        ase_bulk(metal, "fcc", a=a_metal, cubic=True) * (2, 2, 2))
+
+    top = slab.positions[:, 2].max()
+    rng = np.random.default_rng(0)
+    results = []
+    for _ in range(n_sites):
+        trial = slab.copy()
+        frac = rng.random(2)
+        pos = frac[0] * slab.cell[0] + frac[1] * slab.cell[1]
+        trial += __import__("ase").Atoms(metal,
+                                         positions=[[pos[0], pos[1], top + height]])
+        try:
+            e = surrogate.relax(trial, cell=False)[1] if relax else surrogate.energy(trial)
+        except Exception:                                   # noqa: BLE001
+            continue
+        results.append(e - e_slab - e_bulk)
+    if not results:
+        raise RuntimeError("every adatom placement failed to relax")
+
+    best = float(min(results))
+    return {
+        "metal": metal, "dielectric": dielectric, "proxy": spec["formula"],
+        "miller": spec["miller"], "termination_note": spec["note"],
+        "termination": termination, "n_terminations": n_term,
+        "dE_wet_eV": round(best, 4),
+        "site_spread_eV": round(float(np.std(results)), 4),
+        "n_sites_converged": len(results),
+        "n_slab_atoms": len(slab),
+        "regime": ("wetting (Frank-van der Merwe)" if best < 0 else
+                   "islanding (Volmer-Weber)"),
+        "backend": surrogate.name,
+        "caveat": ("single adatom on a crystalline proxy; compare orderings "
+                   "between dielectrics, not absolute values"),
+    }
+
+
+def termination_spread(surrogate: MLIPSurrogate, metal: str = "Ag",
+                       dielectric: str = "AZO", **kwargs):
+    """Run every distinct termination of one surface and report the spread.
+
+    **Measured outcome for ZnO(0001), Ag adatom:** the two terminations give
+    +0.696 eV (Zn face, islanding) and -1.399 eV (O face, wetting) -- a range
+    of 2.095 eV against 0.457 eV separating all six dielectrics tested. The
+    choice of termination therefore dominates the dielectric comparison by a
+    factor of about 4.6, and no ranking between dielectrics can be claimed
+    from single-termination calculations on polar surfaces.
+
+    Polar surfaces are the reason this exists. ZnO(0001) terminates on either
+    a Zn plane or an O plane, and a metal adatom sees a very different
+    chemistry in each case. If the spread across terminations exceeds the
+    differences between dielectrics, then the dielectric comparison is not
+    resolving anything and should say so rather than reporting a ranking.
+    """
+    import pandas as pd
+    rows, i = [], 0
+    while True:
+        try:
+            rows.append(adatom_wetting(surrogate, metal, dielectric,
+                                       termination=i, **kwargs))
+        except IndexError:
+            break
+        except Exception as exc:                            # noqa: BLE001
+            rows.append({"dielectric": dielectric, "termination": i,
+                         "dE_wet_eV": float("nan"), "error": str(exc)})
+        i += 1
+        if i > 8:
+            break
+    df = pd.DataFrame(rows)
+    ok = df.dropna(subset=["dE_wet_eV"]) if "dE_wet_eV" in df else df
+    if len(ok) > 1:
+        rng = float(ok.dE_wet_eV.max() - ok.dE_wet_eV.min())
+        df.attrs["termination_range_eV"] = round(rng, 4)
+        df.attrs["note"] = (
+            f"{len(ok)} terminations span {rng:.3f} eV. Compare this against "
+            "the spread between dielectrics before trusting any ranking: if it "
+            "is comparable or larger, the choice of termination dominates the "
+            "result and no dielectric ordering can be claimed.")
+    return df
+
+
+def wetting_comparison(surrogate: MLIPSurrogate, metal: str = "Ag",
+                       dielectrics=("AZO", "Si3N4"), **kwargs):
+    """Rank dielectrics by how well a metal wets them.
+
+    The measured ordering to reproduce (Cueva & Carretero, 10 nm Ag,
+    emissivity, lower is better growth):
+
+        AZO 0.058  <  ZnO 0.064  <  SiAlNx 0.067  <  SnO2 0.083
+
+    A more negative dE_wet means better wetting, so AZO should rank first if
+    adatom binding is the operative mechanism behind `metal_growth_factor`.
+    """
+    import pandas as pd
+    rows, failures = [], {}
+    for d in dielectrics:
+        try:
+            rows.append(adatom_wetting(surrogate, metal, d, **kwargs))
+        except Exception as exc:                            # noqa: BLE001
+            failures[d] = f"{type(exc).__name__}: {exc}"
+    df = pd.DataFrame(rows)
+    df.attrs["failures"] = failures
+    if len(df) < 2:
+        df.attrs["verdict"] = (
+            f"only {len(df)} of {len(dielectrics)} surfaces converged; no "
+            f"ordering can be claimed. failures: {failures}")
+        return df
+    df = df.sort_values("dE_wet_eV")          # most negative first = best wetting
+
+    # A site spread comparable with the binding energy means the adatom is
+    # falling into whichever dangling-bond pocket it happens to land near,
+    # rather than sampling a representative surface. That is a property of an
+    # artificially cleaved crystal, not of a real passivated film, and such a
+    # row should not drive the verdict.
+    df["reliable"] = (df.site_spread_eV / df.dE_wet_eV.abs()) < 0.25
+    unreliable = df[~df.reliable]
+    trusted = df[df.reliable]
+
+    if trusted.empty:
+        df.attrs["verdict"] = (
+            "every surface shows a site spread comparable with its binding "
+            "energy; no ordering can be claimed from this data")
+        return df
+
+    # Entries sharing a proxy are the same calculation and must not be
+    # reported as though one beat the other; GZO and AZO both resolve to
+    # ZnO(0001), so a strict ordering between them is a sort artifact.
+    if "proxy" in trusted.columns:
+        tied = trusted[trusted.proxy == trusted.iloc[0].proxy]
+        if len(tied) > 1:
+            names = " = ".join(sorted(tied.dielectric))
+            df.attrs["tied"] = (
+                f"{names} share a crystalline proxy and are the same "
+                "calculation; no ordering between them is meaningful")
+
+    best = trusted.iloc[0]
+    note = (f"{metal} wets {best.dielectric} best among reliable surfaces "
+            f"(dE_wet {best.dE_wet_eV:+.3f} eV). "
+            + ("Consistent with the measured growth ordering."
+               if best.dielectric in ("AZO", "ZnO") else
+               "NOT consistent with the measured ordering."))
+    if not unreliable.empty:
+        names = ", ".join(unreliable.dielectric)
+        note += (f" EXCLUDED as unreliable: {names} -- site spread is "
+                 f"{100*float((unreliable.site_spread_eV/unreliable.dE_wet_eV.abs()).max()):.0f}% "
+                 "of the binding energy, indicating an artificially reactive "
+                 "cleaved surface rather than a representative one.")
+    df.attrs["verdict"] = note
     return df
 
 
