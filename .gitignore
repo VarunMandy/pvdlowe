@@ -5,3 +5,7 @@ __pycache__/
 report/BRIEFING_SCRIPT.md
 results/*.log
 results/*.xlsx
+report/*.html
+report/*.docx
+report/*.pdf
+docs/word/*.docx
