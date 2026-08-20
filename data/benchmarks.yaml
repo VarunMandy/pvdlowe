@@ -248,3 +248,46 @@ benchmarks:
       Used in the brief to argue that amorphous Ag-Cu retains unusually good
       conductivity. Check the thickness attribution carefully: 1.59 uohm.cm is
       the bulk resistivity of silver to three figures.
+
+  - id: agc_underlayer_sheet_resistance
+    label: "16 nm Ag on ZnO/a-TiOx vs a-TiOx alone"
+    brief_section: null
+    citation: >
+      Glenn, Johnson, Dannenberg, Sieck & Countrywood, Double silver
+      low-emissivity and solar control coatings, US 7,632,572 B2 /
+      US 8,512,883 B2, AFG Industries / AGC Flat Glass North America
+      (now Cardinal CG), priority 2001-09-04, Example 1.
+    verified: true
+    architecture: null
+    reported:
+      R_sheet_on_ZnO_seed: 5.68
+      R_sheet_on_aTiOx: 7.56
+      ratio: 1.331
+      ag_thickness_nm: 16.0
+      grain_size_on_ZnO_nm: 25.0
+      grain_size_on_aTiOx_nm: 15.0
+      min_continuous_Ag_on_ZnO_nm: 8.0
+    verified_note: >
+      FULLY VERIFIED. Full text read via Google Patents; every figure confirmed
+      in the Description, Example 1.
+
+      This is the independent validation of TCOPreset.metal_growth_factor. The
+      framework's factors were calibrated from Cueva & Carretero's EMISSIVITY
+      series and give a TiO2:AZO ratio of 1.250. This patent measured
+      four-point sheet resistance directly and gives 1.331 -- agreement to 6%,
+      from a different group, decade and measured quantity.
+
+      The inventors state the mechanism explicitly: ZnO grows {0001}, which
+      orients Ag to grow {111}, and the epitaxial lattice match between
+      Ag{111} and ZnO{0001} lowers sheet resistance and improves adhesion.
+      That is the templating hypothesis, named by the people who measured it.
+
+      CAVEAT ON THE COMPARISON: the patent contrasts ZnO(5 nm)/a-TiOx against
+      a-TiOx alone -- both stacks contain amorphous titania and the ZnO is a
+      thin seed, so 1.331 is the effect of ADDING a seed layer rather than of
+      ZnO versus TiO2 as bulk dielectrics. The close agreement is encouraging
+      but partly fortuitous.
+
+      ALSO ESTABLISHED: the patent claims continuous, strongly adherent Ag down
+      to 8 nm on a ZnO seed, against the framework's assumed 10 nm critical
+      thickness. A 20% difference that affects every silver-consumption figure.

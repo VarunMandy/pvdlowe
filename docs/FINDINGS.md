@@ -609,11 +609,39 @@ Two surrogate calculations failed to find the mechanism behind
 `metal_growth_factor`. A literature search found it, with direct experimental
 evidence. Full account in `docs/NUCLEATION_MECHANISM.md`.
 
-**Guardian Industries patent US 7,632,572** compared silver deposited on
-crystalline ZnO against amorphous TiOx by TEM: grains of about 25 nm on ZnO
-against 15 nm on the amorphous layer, {111}-oriented grains two to three times
-larger on ZnO, and the film on the amorphous underlayer **clearly
-discontinuous**. That is templating, measured.
+**US 7,632,572 / 8,512,883** (AFG Industries / AGC Flat Glass North America,
+now Cardinal CG; full text read, `verified: true`) deposited 16 nm Ag on
+a-TiOx and on a 5 nm ZnO seed over a-TiOx in the same study. Grains of 25 nm on
+ZnO against 15 nm on a-TiOx, {111}-oriented grains two to three times larger on
+ZnO, and the film on the bare amorphous underlayer **clearly discontinuous**
+where the ZnO-seeded film was continuous everywhere.
+
+*(An earlier version of this section attributed the patent to Guardian
+Industries. Wrong assignee -- Guardian appears in the citation list, not on
+the patent.)*
+
+**The inventors state the mechanism themselves:** ZnO grows {0001}, which
+orients Ag to grow {111}, and the epitaxial lattice match between Ag{111} and
+ZnO{0001} lowers sheet resistance and improves adhesion. Templating, named by
+the people who measured it.
+
+**And the full text validates the framework quantitatively.** The patent
+reports four-point sheet resistance on the two underlayers: **5.68 ohm/sq with
+the ZnO seed against 7.56 without**, a ratio of **1.331**.
+`metal_growth_factor` was calibrated independently -- Carretero's emissivity
+series, different group, different decade, different measured quantity -- and
+gives a TiO2:AZO ratio of **1.250**. The two agree to **6%**. That is the
+first independent validation of a parameter fitted to one dataset reproducing
+another it never saw.
+
+Caveat: the patent contrasts ZnO-on-a-TiOx against a-TiOx alone, so 1.331 is
+the effect of adding a 5 nm seed rather than of ZnO versus TiO2 as bulk
+dielectrics. Close agreement, partly fortuitous.
+
+**A percolation datum too.** The patent claims continuous, strongly adherent Ag
+**down to 8 nm** on a ZnO seed, against the framework's assumed 10 nm critical
+thickness -- a 20% difference affecting every silver-consumption figure, and
+one more thing the section 6.2 XRD session could settle.
 
 **Industrial practice answers the nitride case.** Silicon nitride Low-E stacks
 use thin NiCr barrier layers specifically to increase adhesion between nitride

@@ -41,7 +41,7 @@ plots and `openpyxl` for Excel export are optional. Nothing needs to be
 compiled and nothing needs network access to run.
 
 ```bash
-python tests/run_tests.py     # 68 tests, no pytest required
+python tests/run_tests.py     # 102 tests, no pytest required
 pytest tests/                 # identical, if pytest is available
 ```
 
@@ -90,10 +90,22 @@ opt-in. This is the brief's own caution ("do not put numerical DFT values for
 Ag₇₀Cu₂₉Ti₁ into a thesis as if they were established facts") implemented as
 a type rather than a footnote.
 
-All eight literature benchmarks currently carry `LITERATURE_UNVERIFIED`,
-because the brief's citations were LLM-surfaced (every URL carries
-`utm_source=chatgpt.com`) and none has been read from the publisher. See
-`docs/REFERENCES.md`.
+The brief's citations were LLM-surfaced — every URL carried
+`utm_source=chatgpt.com` — so all began as `LITERATURE_UNVERIFIED`. Checking
+them changed eight of the fourteen:
+
+| State | Count |
+|---|---|
+| Verified — full text read | 3 |
+| Partial — source located, abstract confirmed | 5 |
+| **Disputed — figures appear in no locatable source; do not cite** | **2** |
+| Supported — corroborated independently | 2 |
+| Not pursued | 4 |
+
+Two of the brief's transcribed values also fail model-independent consistency
+checks, and one of those carries the brief's central recommendation. Run
+`python -m pvdlowe validate`. Full account in `docs/REFERENCES.md` and
+`docs/FINDINGS.md` §1.
 
 ## Package layout
 
@@ -106,7 +118,8 @@ because the brief's citations were LLM-surfaced (every URL carries
 | `mp/` | Materials Project client (cached, network-gated) and stage-2 screening |
 | `dft/` | VASP input generation, mixing and interface energies |
 | `doe/` | factorial and response-surface designs, sputter rate model |
-| `optimize/` | thickness optimisation, sweeps, silver-reduction curve |
+| `optimize/` | thickness optimisation, sweeps, composition series |
+| `ml/` | ML interatomic potential surrogate (optional, needs `mace-torch`) |
 | `report/` | tables, plots, markdown/CSV/Excel export |
 | `validate.py` | model-vs-literature and internal-consistency checks |
 
@@ -119,7 +132,21 @@ Read in this order:
 2. **`docs/FINDINGS.md`** — full findings, organised by conclusion: evidence
    audit, method audit, design-space results, limitations, corrections
 3. `docs/METHODOLOGY.md` — the physics, the approximations, and where they break
-- `docs/ROADMAP.md` — the experimental programme this is meant to feed
+4. `docs/METHODOLOGY.md` — the physics, the approximations, and where they break
+
+**Evidence and verification**
+
+- `docs/REFERENCES.md` — all fourteen of the brief's claims, with what became of each
 - `docs/PROVENANCE.md` — the evidence-grading system
-- `docs/REFERENCES.md` — citations with verification status
+- `docs/CARRETERO_COMPARISON.md` — the measurement that reversed the dielectric finding
+- `docs/NUCLEATION_MECHANISM.md` — why the underlayer changes the metal, resolved from literature
+- `docs/LITERATURE_CALIBRATION.md` — why no published scattering parameters explain the copper gap
+- `docs/MLIP_MIXING_ENERGY.md` — Ag–Cu mixing energies, and two failed nucleation calculations
+
+**Practical**
+
+- `docs/ROADMAP.md` — the experimental programme this is meant to feed
+- `docs/CODE_REVIEW.md` — self-review: three medium findings, one new, four low
 - `docs/VERTEX_AI.md` — running it on Google Cloud Vertex AI
+- `experiments/BENCH_cu_series.md` — printable bench procedure
+- `experiments/PROTOCOL_cu_series.md` — pre-registered decision rules

@@ -24,23 +24,80 @@ Two surrogate calculations were run to find the mechanism. Both failed:
 
 ## 2. What the literature says
 
-**Guardian Industries, US 7,632,572 / 8,512,883** — transmission electron
-microscopy comparing silver deposited on **crystalline ZnO** against silver on
-**amorphous TiOx**, in the same study:
+**US 7,632,572 B2 / US 8,512,883 B2**, AFG Industries → AGC Flat Glass North
+America → now assigned to Cardinal CG. Inventors Glenn, Johnson, Dannenberg,
+Sieck and Countrywood; priority 2001. **Full text read.**
 
-> Silver grown directly on the amorphous TiOx has an abnormal microstructure
-> with irregular grains; silver grown directly on the ZnO has a more normal
-> microstructure with regular grains. Average grain size is about **25 nm on
-> ZnO** against about **15 nm on a-TiOx**.
+*(An earlier version of this document attributed the patent to Guardian
+Industries. That was wrong — Guardian appears throughout the citation list,
+not as the assignee.)*
 
-> In dark field on the Ag{220} reflections, the {111}-oriented grains are
-> **two to three times larger** on ZnO than on a-TiOx.
+Example 1 of the patent deposits 16 nm Ag by planar DC magnetron onto two
+underlayers in the same study: **a-TiOx (25 nm)** alone, and **ZnO (5 nm) on
+a-TiOx (25 nm)**. Electron diffraction confirmed the TiOx was amorphous —
+broad diffuse rings only. TEM used silicon-nitride membrane grids; sheet
+resistance was measured separately on bulk glass.
 
-> On the amorphous underlayer, the silver film is **clearly discontinuous**.
+**Confirmed, verbatim from the full text:**
 
-That is the templating hypothesis measured directly. A crystalline oxide
-templates Ag(111) growth; an amorphous underlayer does not, and the film
-islands rather than coalescing.
+> The average normal grain size of the Ag directly on the ZnO is about **25 nm**,
+> while that of the Ag directly on the a-TiOx is about **15 nm**.
+
+> {111} oriented Ag grains giving rise to the strong 220 reflections have a
+> significantly larger average grain size (**two to three times larger**) when
+> deposited directly on the 5 nm thick ZnO than when deposited directly on
+> a-TiOx.
+
+> The Ag film near the center of the TEM grid is **clearly discontinuous**
+> [on a-TiOx]. … Remarkably, the Ag deposited directly on 5 nm thick ZnO was
+> continuous over the entire TEM grid, even in places where Ag deposited
+> directly on a-TiOx was discontinuous.
+
+**And the mechanism is stated explicitly by the inventors — more strongly than
+this document previously claimed:**
+
+> The zinc oxide grows with the {0001} orientation, which orients the Ag to
+> preferentially grow with a {111} orientation. **The epitaxial lattice match
+> between Ag {111} and ZnO {0001} leads to lower sheet resistance and improved
+> adhesion of the Ag.**
+
+That is templating, named as such, by the people who measured it.
+
+## 2a. The measurement that validates the framework
+
+The full text contains a quantity the search snippets did not: **direct
+four-point sheet resistance on the two underlayers**, same silver thickness,
+same run.
+
+> The sheet resistance of the Ag films, measured when deposited on substrates
+> of bulk glass, was found to be **5.68 Ω/□** with the ZnO/a-TiOx under
+> (bi)layer and **7.56 Ω/□** with the a-TiOx underlayer.
+
+That ratio is **1.331**.
+
+`TCOPreset.metal_growth_factor` was calibrated independently — from Cueva &
+Carretero's *emissivity* series, a different group, a different decade, a
+different measured quantity — and gives AZO 1.00, TiO₂ 1.25, a ratio of
+**1.250**.
+
+**The two agree to 6%.**
+
+| | ratio, TiO₂-like : ZnO-like |
+|---|---|
+| Patent, four-point sheet resistance, 16 nm Ag | 1.331 |
+| Framework, calibrated to emissivity, 10 nm Ag | 1.250 |
+| Agreement | **93.9%** |
+
+This is the first independent quantitative validation of `metal_growth_factor`.
+It was fitted to one dataset and reproduces another that it never saw.
+
+**A caveat on what is being compared.** The patent's comparison is
+ZnO-on-a-TiOx against a-TiOx alone — both stacks contain amorphous titania, and
+the ZnO is only a 5 nm interlayer. So the measured 1.331 is the effect of
+*adding a ZnO seed*, not of ZnO versus TiO₂ as bulk underlayers. The framework's
+1.250 compares the two as full dielectric layers. That the two agree so closely
+is encouraging but partly fortuitous, and the comparison should not be
+presented as exact.
 
 **Confirmation from the DFT literature.** Studies of Ag/ZnO interfaces report
 that the ZnO(0001) polar plane binds metals better through surface charge
@@ -64,6 +121,14 @@ That is the opposite of what the surrogate predicted from a crystalline
 reactive dangling bonds that a passivated amorphous film does not.
 
 ## 3. Why this matters beyond the one parameter
+
+**A percolation datum, also from the full text.** The patent states that zinc
+oxide "provides a means for forming a high conductivity, strongly adherent Ag
+layer with a thickness as low as **8 nm**". The framework uses a critical
+thickness of 10 nm for silver, taken from an unverified literature value in the
+brief. The patent suggests 8 nm is achievable on a ZnO seed — a 20% difference
+that would matter for every silver-consumption figure, and one more thing the
+§8.2 XRD session could settle.
 
 **The framework's grain-size assumption was accidentally correct — for AZO.**
 
@@ -133,9 +198,11 @@ to search for.**
 
 ## 6. Sources
 
-- Guardian Industries, *Double silver low-emissivity and solar control
-  coatings*, US 7,632,572 B2 and US 8,512,883 B2 — TEM grain-size comparison,
-  Ag on ZnO versus amorphous TiOx.
+- Glenn, Johnson, Dannenberg, Sieck & Countrywood, *Double silver
+  low-emissivity and solar control coatings*, US 7,632,572 B2 / US 8,512,883 B2,
+  AFG Industries / AGC Flat Glass North America (now Cardinal CG), priority
+  2001-09-04. Example 1: TEM grain sizes, epitaxial mechanism, and four-point
+  sheet resistance on the two underlayers. **Full text read.**
 - *Tuning the interface adhesion of Ag/ZnO composites by metallic dopants: a
   DFT study*, Comput. Mater. Sci. (2023) — polar-plane binding, O- versus
   Zn-termination.
@@ -144,5 +211,7 @@ to search for.**
 - Society of Vacuum Coaters technical review, silicon nitride Low-E stacks —
   NiCr barrier layers for nitride/silver adhesion.
 
-All located and cross-checked against abstracts and available excerpts; none
-read in full text. Grade: `LITERATURE_UNVERIFIED`.
+The patent is **fully verified**: full text read via Google Patents, all quoted
+figures confirmed in the Description, Example 1. The remaining three sources are
+cross-checked against abstracts only. Grade: `LITERATURE` for the patent,
+`LITERATURE_UNVERIFIED` for the rest.

@@ -781,17 +781,45 @@ run to find it, and both failed:
 A literature search then resolved it in under an hour, with direct
 experimental evidence.
 
-**The measurement.** Guardian Industries (US 7,632,572 B2) compared silver
-deposited on **crystalline ZnO** with silver on **amorphous TiOx** by
-transmission electron microscopy. Silver on the amorphous layer shows an
-abnormal microstructure with irregular grains averaging about 15 nm; on ZnO it
-shows regular grains averaging about 25 nm. In dark field on the Ag{220}
-reflections, {111}-oriented grains are two to three times larger on ZnO. On
-the amorphous underlayer the film is **clearly discontinuous**.
+**The measurement.** US 7,632,572 B2 / US 8,512,883 B2 (AFG Industries / AGC
+Flat Glass North America, now Cardinal CG; **full text read and verified**)
+deposited 16 nm Ag by DC magnetron onto amorphous TiOx and onto a 5 nm ZnO seed
+over the same amorphous TiOx, in one study. Silver on the bare amorphous layer
+shows an abnormal microstructure with irregular grains averaging about 15 nm;
+on the ZnO seed, regular grains averaging about 25 nm. In dark field on the
+Ag{220} reflections, {111}-oriented grains are two to three times larger on
+ZnO. The film on bare a-TiOx is **clearly discontinuous** where the ZnO-seeded
+film was continuous across the entire specimen.
 
-That is templating, measured directly: a crystalline oxide templates Ag(111)
-growth, an amorphous underlayer does not, and the film islands instead of
-coalescing.
+**The inventors name the mechanism.** Zinc oxide grows with {0001} orientation,
+which orients the silver to grow {111}, and the epitaxial lattice match between
+Ag{111} and ZnO{0001} lowers sheet resistance and improves adhesion. That is
+templating, stated by the people who measured it.
+
+**And it validates this framework quantitatively.** The patent reports
+four-point sheet resistance on the two underlayers — **5.68 Ω/□ with the ZnO
+seed, 7.56 Ω/□ without**, a ratio of **1.331**. The `metal_growth_factor`
+values of §5.2 were calibrated independently, from Cueva & Carretero's
+*emissivity* series — a different group, a different decade, a different
+measured quantity — and give a TiO₂:AZO ratio of **1.250**.
+
+| | Ratio, titania-like : zinc-oxide-like |
+|---|---|
+| Patent, four-point sheet resistance, 16 nm Ag | 1.331 |
+| This framework, calibrated to emissivity | 1.250 |
+| **Agreement** | **93.9%** |
+
+This is the first independent quantitative validation of a parameter in this
+work: fitted to one dataset, it reproduces another it never saw. The comparison
+is not exact — the patent contrasts a ZnO *seed over* titania against titania
+alone, rather than the two as bulk dielectrics — so the closeness is partly
+fortuitous and should be presented as corroboration rather than confirmation.
+
+**A percolation datum follows too.** The patent claims continuous, strongly
+adherent silver **down to 8 nm** on a zinc oxide seed, against the 10 nm
+critical thickness this framework assumes from an unverified literature value.
+A 20% difference, and one that would move every silver-consumption figure in
+§5.1 and §5.8.
 
 **The nitride case is settled by industrial practice.** Silicon nitride Low-E
 stacks use thin NiCr barrier layers specifically to increase adhesion between
