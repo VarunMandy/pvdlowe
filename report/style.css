@@ -1,0 +1,41 @@
+@page { size: A4; margin: 20mm 18mm 18mm 18mm; }
+body {
+  font-family: "DejaVu Serif", Georgia, serif;
+  font-size: 10pt; line-height: 1.5; color: #1a2230; max-width: none;
+}
+h1 { font-size: 22pt; color: #16202E; margin: 0 0 4pt 0; line-height: 1.2;
+     border-bottom: 2px solid #065A82; padding-bottom: 8pt; }
+h2 { font-size: 15pt; color: #065A82; margin: 22pt 0 6pt 0; page-break-after: avoid;
+     border-bottom: 1px solid #DDE5EC; padding-bottom: 3pt; }
+h3 { font-size: 12pt; color: #16202E; margin: 15pt 0 4pt 0; page-break-after: avoid; }
+h4 { font-size: 10.5pt; color: #42505F; margin: 12pt 0 3pt 0; page-break-after: avoid; }
+p  { margin: 0 0 7pt 0; text-align: justify; }
+strong { color: #16202E; }
+em { color: #42505F; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.5pt;
+       background: #F1F5F9; padding: 1pt 3pt; border-radius: 2pt; color: #065A82; }
+pre { background: #F6F9FB; border-left: 3px solid #1C7293; padding: 8pt 10pt;
+      font-size: 8pt; line-height: 1.4; overflow-x: auto; page-break-inside: avoid;
+      border-radius: 0 3pt 3pt 0; }
+pre code { background: none; padding: 0; color: #1a2230; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0 12pt 0;
+        font-size: 8.5pt; page-break-inside: avoid; }
+th { background: #EAF2F7; color: #065A82; font-weight: bold; text-align: left;
+     padding: 5pt 7pt; border-bottom: 1.5px solid #065A82; font-size: 8.5pt; }
+td { padding: 4pt 7pt; border-bottom: 1px solid #E6ECF2; vertical-align: top; }
+tr:nth-child(even) td { background: #FAFCFD; }
+blockquote { border-left: 3px solid #E8845C; background: #FCF6F3; margin: 10pt 0;
+             padding: 8pt 12pt; font-style: normal; page-break-inside: avoid; }
+blockquote p { margin: 0 0 5pt 0; }
+blockquote p:last-child { margin-bottom: 0; }
+ul, ol { margin: 0 0 8pt 0; padding-left: 18pt; }
+li { margin-bottom: 3pt; }
+hr { border: none; border-top: 1px solid #DDE5EC; margin: 18pt 0; }
+del { color: #8A98A6; }
+a { color: #065A82; text-decoration: none; }
+
+/* title-block metadata */
+p.meta { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.5pt;
+         color: #42505F; line-height: 1.65; text-align: left;
+         margin: 0 0 16pt 0; padding: 8pt 0 0 0; }
+p.meta strong { color: #065A82; }

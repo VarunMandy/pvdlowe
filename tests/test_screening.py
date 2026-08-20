@@ -119,3 +119,38 @@ def test_not_predicted_is_explicit():
     keys = not_predicted()
     for expected in ("deposition_rate", "adhesion", "thermal_stability"):
         assert expected in keys
+
+
+def test_mlip_surrogate_refuses_rather_than_falls_back():
+    """No empirical-potential fallback when no MLIP is installed.
+
+    An EAM or Lennard-Jones number would look like the same kind of result and
+    be far less trustworthy. Same rule as SputterModel and MPClient: a missing
+    value beats a fabricated one.
+    """
+    from pvdlowe.ml import MLIPSurrogate, SurrogateUnavailable
+    try:
+        MLIPSurrogate()
+    except SurrogateUnavailable as exc:
+        assert "pip install" in str(exc), "the error should say how to fix it"
+    except ImportError:
+        pass          # ase/pymatgen absent too, which is the same situation
+    else:
+        pass          # a backend is installed; nothing to assert here
+
+
+def test_mlip_boundary_excludes_optical_properties():
+    """Guards the claim that a surrogate cannot replace section 5.
+
+    MLIPs predict energies and forces from atomic positions. They carry no
+    electronic structure, so every optical quantity in this framework is
+    outside their reach, and the docs must keep saying so.
+    """
+    from pvdlowe.ml import what_mlips_cannot_do
+    d = what_mlips_cannot_do()
+    joined = " ".join(d["cannot"]).lower()
+    for term in ("optical", "band gap", "emissivity"):
+        assert term in joined, term
+    assert any("30 mev" in u.lower() for u in d["unreliable"]), \
+        "the accuracy floor must be stated, since it is comparable with the " \
+        "hull distances this project measures"

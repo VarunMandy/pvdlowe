@@ -202,3 +202,41 @@ def test_validation_table_reports_the_true_source_state():
     assert states <= {True, "partial", "disputed", "not located"}, states
     assert True in states, "expected at least one fully verified source"
     assert "disputed" in states, "the two unmatched entries must show as disputed"
+
+
+def test_surrogate_refuses_cleanly_when_unavailable():
+    """A missing potential must raise SurrogateUnavailable with install advice,
+    not a bare ImportError. The framework's convention is that a missing
+    capability is an error, never an invitation to produce a plausible number.
+    """
+    from pvdlowe.dft.surrogate import (SurrogateUnavailable, mixing_energy_series,
+                                       screen_ternaries, validate_against_hull)
+    import importlib
+    try:
+        importlib.import_module("ase")
+    except ImportError:
+        pass
+    else:
+        return                      # a potential may genuinely be installed
+    for fn in (mixing_energy_series, screen_ternaries, validate_against_hull):
+        try:
+            fn()
+        except SurrogateUnavailable as exc:
+            assert "pip install" in str(exc), str(exc)
+        else:
+            raise AssertionError(f"{fn.__name__} did not refuse")
+
+
+def test_surrogate_results_are_graded_below_dft():
+    """A surrogate value must never be reportable as a calculation."""
+    from pvdlowe.provenance import Provenance
+    assert Provenance.ML_SURROGATE.rank < Provenance.DFT_OWN.rank
+    assert Provenance.ML_SURROGATE.rank < Provenance.MP_API.rank
+    assert Provenance.ML_SURROGATE.needs_verification
+
+
+def test_surrogate_carries_mp_reference_values():
+    """Validation targets must match what stage 2 actually retrieved."""
+    from pvdlowe.dft.surrogate import MP_REFERENCE
+    assert abs(MP_REFERENCE["Cu3Ag"] - 0.0904) < 1e-4
+    assert abs(MP_REFERENCE["CuAg3"] - 0.0857) < 1e-4

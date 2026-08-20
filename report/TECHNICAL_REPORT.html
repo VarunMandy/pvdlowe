@@ -1,0 +1,1879 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="style.css"></head><body><h1 id="computational-screening-of-sustainable-low-emissivity-pvd-coatings-on-soda-lime-float-glass">Computational screening of sustainable low-emissivity PVD coatings on soda-lime float glass</h1><p class="meta"><strong>Technical report</strong>
+Saint-Gobain Research India
+Author: Varun Mandy, Research Intern<br>Framework: <code>pvdlowe</code> v0.1.0 — https://github.com/VarunMandy/pvdlowe</p>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>A computational framework was developed to execute the screening workflow set
+out in the project brief <em>PVD_Usecase.docx</em>: element screening, thermodynamic
+stability, optical multilayer modelling, design of experiments and
+multi-objective ranking, for cost-effective low-emissivity coatings deposited by
+argon magnetron sputtering.</p>
+<p>Applying the framework to the brief produced three classes of result. First, the
+proposed multi-objective weighting was found to contain four defects, one of
+which allowed a thickness optimiser to return a design consuming 29% <em>more</em>
+silver than the incumbent while scoring 100/100. Second, two of the brief's
+literature citations could not be matched to any locatable source, and one
+pivotal measurement was found inconsistent with a model-independent
+electrodynamic limit. Thermodynamic screening of all fifteen nominated chemical systems confirmed that
+Ag–Cu possesses no stable ordered compound, supporting the brief's suspicion of
+phase separation with first-principles evidence. Third, the design-space search
+identified a material class
+and a stack architecture outside the brief's framing, both of which outperform
+the proposed candidates: silicon nitride dielectrics improve visible
+transmittance by up to nine percentage points over AZO, and the composition
+optimum lies at 5–15 at.% Ag rather than the proposed 70%.</p>
+<p><strong>No films were deposited.</strong> All performance figures are model outputs. The
+framework's own validation identifies its largest error — an approximately
+eightfold under-prediction of sputtered copper sheet resistance — in the
+material on which most leading candidates depend. A specified experiment
+resolving this, with pre-registered decision rules and an automated analysis
+path, is delivered with the framework. A subsequent literature review narrowed
+the cause without deposition: no published surface- or grain-boundary-scattering
+parameters account for the discrepancy, whereas a nanocrystalline grain
+structure does — reducing the decisive measurement from an eight-film series to
+a single X-ray diffraction scan.</p>
+<hr />
+<h2 id="1-scope-and-deliverables">1. Scope and deliverables</h2>
+<h3 id="11-what-was-asked">1.1 What was asked</h3>
+<p>The brief proposed a materials-by-design programme for transparent
+low-emissivity coatings on float glass, centred on a dielectric/metal/dielectric
+architecture (AZO/metal/AZO) and asking how much silver could be removed while
+retaining visible transmittance, sheet resistance and far-infrared reflectance.</p>
+<h3 id="12-what-was-delivered">1.2 What was delivered</h3>
+<table>
+<thead>
+<tr>
+<th>Deliverable</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Computational framework implementing the brief's §21 workflow</td>
+<td>Complete — 12,000 lines, 92 tests</td>
+</tr>
+<tr>
+<td>Element and compound screening</td>
+<td>Complete</td>
+</tr>
+<tr>
+<td>Optical multilayer model (transfer matrix, EN 410 / 673 / 12898)</td>
+<td>Complete, validated</td>
+</tr>
+<tr>
+<td>Thin-film transport model coupled to optics</td>
+<td>Complete, <strong>uncalibrated — requires §6 experiment</strong></td>
+</tr>
+<tr>
+<td>Multi-objective scoring with provenance grading</td>
+<td>Complete</td>
+</tr>
+<tr>
+<td>Design of experiments generator</td>
+<td>Complete</td>
+</tr>
+<tr>
+<td>DFT input generation (VASP)</td>
+<td>Complete, <strong>not executed — requires VASP licence and HPC allocation</strong></td>
+</tr>
+<tr>
+<td>Materials Project integration</td>
+<td><strong>Complete and executed</strong> — 15/15 systems retrieved</td>
+</tr>
+<tr>
+<td>Candidate ranking, 38 architectures</td>
+<td>Complete, <strong>model outputs only</strong></td>
+</tr>
+<tr>
+<td>Experimental protocol with pre-registered analysis</td>
+<td>Complete, <strong>not executed — requires tool access</strong></td>
+</tr>
+<tr>
+<td>Illuminant sensitivity quantified</td>
+<td>Complete (§7.3)</td>
+</tr>
+<tr>
+<td>Manufacturability constraints</td>
+<td>Complete</td>
+</tr>
+<tr>
+<td>Triple-metal architecture search</td>
+<td>Complete — negative result (§5.4)</td>
+</tr>
+</tbody>
+</table>
+<p>Repository, documentation, results and protocols are version-controlled and
+archived to <code>gs://sg-llamole-pvdlowe/pvdlowe/source/</code>.</p>
+<h3 id="13-what-was-not-done-and-why">1.3 What was not done, and why</h3>
+<p>No depositions were performed. The author did not have sputter tool access
+during the internship period. The experimental work is therefore specified
+rather than executed, and the protocol in §6 is written as a handover document
+that a colleague with tool access can run without further input.</p>
+<hr />
+<h2 id="2-the-framework">2. The framework</h2>
+<h3 id="21-physical-model">2.1 Physical model</h3>
+<p><strong>Optics.</strong> A vectorised transfer-matrix solver handles arbitrary layer counts,
+complex refractive indices, both polarisations and oblique incidence. Thick
+glass is treated incoherently. Verified against exact Fresnel reflectance for a
+bare interface, exact null for a quarter-wave antireflection layer, and energy
+conservation to 10⁻¹⁰ on absorbing stacks.</p>
+<p><strong>Optical constants.</strong> Metals use the Lorentz–Drude parameterisation of Rakić et
+al. (1998), with one deliberate departure: the free-electron damping is
+re-anchored to DC resistivity rather than taken from the published optical fit.
+Rakić's fitted Γ₀ for silver implies ρ ≈ 4.4 µΩ·cm against a true 1.587, because
+in the visible the Drude term trades off against interband oscillators. Using
+the published value and then applying a thin-film size-effect multiplier
+double-counts the same scattering, and inflated modelled emissivity roughly
+threefold in an early build.</p>
+<p><strong>Transport.</strong> Full Fuchs–Sondheimer integral for surface scattering,
+Mayadas–Shatzkes for grain boundaries, and a percolation model below a critical
+thickness. Critically, the resulting resistivity ratio <strong>feeds back into the
+Drude damping</strong>: a film too thin to conduct is automatically a film that
+reflects poorly. Without this coupling, optimising for transmittance drives the
+metal thickness to zero and reports an excellent coating.</p>
+<p><strong>Standards integration.</strong> EN 410 / ISO 9050 for visible and solar
+transmittance; EN 12898 for normal emissivity, weighted by a 283 K Planck
+radiance; EN 673 for the hemispherical correction and centre-pane U-value,
+cross-checked against direct angular integration.</p>
+<h3 id="22-provenance-grading">2.2 Provenance grading</h3>
+<p>Every physical quantity carries an evidence grade — MEASURED, LITERATURE,
+LITERATURE_UNVERIFIED, MP_API, DFT_OWN, MODEL, CALIBRATED, ESTIMATE, HYPOTHESIS
+— and a guard function refuses to admit HYPOTHESIS-grade values into headline
+tables without explicit opt-in.</p>
+<p>This implements the brief's own caution ("I would not yet put numerical DFT
+values for Ag₇₀Cu₂₉Ti₁ into a thesis as if they were established facts") as a
+type constraint rather than a footnote, so the distinction survives contact
+with a spreadsheet.</p>
+<hr />
+<h2 id="3-method-audit-the-multi-objective-weighting">3. Method audit: the multi-objective weighting</h2>
+<p>The brief's §14 specifies criteria and weights for ranking candidates. Encoding
+that table literally produced a scoring function that did not measure the
+project's stated objective. Four issues were identified by the framework's own
+diagnostics (<code>pvdlowe check-weights</code>). All are documented decisions in
+<code>data/targets.yaml</code>; none is a silent change.</p>
+<h3 id="31-silver-consumption-carried-zero-weight">3.1 Silver consumption carried zero weight</h3>
+<p>The §14 table contains no line for silver consumption, although §17 and §20 both
+name minimising it as an objective. In the literal encoding, silver mass was
+computed, displayed, and reported as the limiting criterion, but contributed
+nothing to the score.</p>
+<p>The thickness optimiser exploited this immediately, returning a 12.84 nm design
+using <strong>0.135 g/m² of silver — 29% more than the incumbent benchmark — at a
+score of 100/100.</strong></p>
+<p><em>Correction applied:</em> weight 0.15.</p>
+<h3 id="32-emissivity-and-sheet-resistance-double-count-one-property">3.2 Emissivity and sheet resistance double-count one property</h3>
+<p>Across the candidate set these correlate at <strong>r = 0.996</strong>, because both are the
+free-carrier response of the same metal layer. The §14 weights of 0.25 and 0.15
+therefore place 0.40 of the total on a single physical quantity.</p>
+<p><em>Correction applied:</em> sheet resistance weighted 0.0 and reported as a
+constraint. This should be reversed (with emissivity reduced to 0.15) if the
+coating is also required to function as a transparent electrode, where sheet
+resistance is an independent objective.</p>
+<p>The same diagnostic flags cost against supply risk (r = 0.993) and silver mass
+against cost (r = 1.000 — silver dominates metal cost so completely that they
+are the same quantity in different units).</p>
+<h3 id="33-targets-set-at-the-specification-minimum-causing-saturation">3.3 Targets set at the specification minimum, causing saturation</h3>
+<p>Derringer–Suich desirability saturates at 1.0 once a target is reached. Setting
+the visible-transmittance target to 0.80 — the brief's <em>floor of acceptability</em>
+— made the criterion flat exactly where candidates differ.</p>
+<p>The consequence was measurable: across 181 oxide-thickness combinations clearing
+T_vis = 0.80, transmittance spanned 0.800 to 0.881 while the <strong>score decreased</strong>
+from 74.99 to 73.30. The optimiser satisficed at the specification floor and
+drove the top oxide to 15 nm, a thickness that would not survive handling.</p>
+<p><em>Correction applied:</em> targets set as aspirations (T_vis 0.90, ε_h 0.02).
+Re-optimising then returned AZO 25 / Ag 10 / AZO 35 nm at T_vis 0.880 — eight
+points better on identical silver.</p>
+<p><em>General principle:</em> a desirability target should be an aspiration, not a
+specification minimum.</p>
+<h3 id="34-the-supply-risk-band-could-not-discriminate">3.4 The supply-risk band could not discriminate</h3>
+<p>With floor 8.0 against candidate values of 4.5–7.5, all silver-bearing
+compositions scored 0.1–0.28 and supply risk was reported as limiting for 12 of
+14 candidates.</p>
+<p><em>Correction applied:</em> floor 9.5, target 4.0 — still zeroing indium-bearing ITO,
+which is the criterion's purpose.</p>
+<h3 id="35-aggregation">3.5 Aggregation</h3>
+<p>The brief states its weighting should prevent a candidate "winning simply
+because it has excellent conductivity while being unacceptable optically". A
+weighted arithmetic sum does not achieve this — a candidate scoring zero on one
+criterion forfeits only that criterion's weight. A geometric mean does.</p>
+<p>Under the corrected weighting the pure-silver benchmark ranks 4th under
+arithmetic aggregation and 7th under geometric; pure copper ranks 1st and 2nd
+respectively. These are precisely the two candidates the brief is concerned with
+comparing. The framework defaults to geometric and reports both.</p>
+<h3 id="36-note-on-interpreting-the-diagnostics">3.6 Note on interpreting the diagnostics</h3>
+<p>The <code>limiting_criterion</code> field is <code>argmin(desirability)</code> — where a candidate is
+weakest, not what drives the ordering. Under geometric aggregation, whichever
+criterion sits nearest its floor is reported as limiting for every candidate.
+The appropriate test of whether weights are doing work is the weight-sensitivity
+analysis: before these corrections, one candidate won 97.5% of randomised
+weightings with a rank standard deviation of 0.16, which indicates the weights
+had no effect rather than that the result was robust.</p>
+<hr />
+<h2 id="4-evidence-audit">4. Evidence audit</h2>
+<p>Eight literature benchmarks were transcribed from the brief. <strong>All eight
+sources have been located. One has been read in full text</strong>; the remainder are
+paywalled and confirmed only against their published abstracts.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fully verified</strong> (full text read, measurement basis confirmed)</td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td>Partial (source identified, figures confirmed against abstract)</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Disputed</strong> (located sources do not contain the quoted figures)</td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td>Not located</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Two further sources outside the brief's citation list have also been read in
+full: Cueva &amp; Carretero (<em>Coatings</em> <strong>13</strong>, 1709, 2023), which corrected the
+dielectric model in §5.2, and the four Cu scattering-parameter studies
+underpinning §6.1. Both are open access.</p>
+<p>Run <code>pvdlowe provenance</code> for the live state; the counts above are generated
+from <code>data/benchmarks.yaml</code> and will change as verification proceeds.</p>
+<h3 id="41-two-citations-could-not-be-supported">4.1 Two citations could not be supported</h3>
+<p>The figures <strong>85.4% T_vis / 3.21 Ω/sq / 97% FIR</strong> and <strong>78.7% T_vis / 2.7 Ω/sq</strong>
+appear in neither located AZO/Ag/AZO study. A companion PET-substrate paper
+reports 78.5% with 91% FIR at 10 nm Ag — close to one, but a different substrate
+and a different figure.</p>
+<p><strong>Recommendation: these two entries should not be cited</strong> pending
+identification of their source. Both are flagged <code>disputed</code> in the framework.</p>
+<p>A corollary worth recording: these two entries are the model's three closest
+agreements (0.3%, 1.0%, 1.2% relative error). Excluding them, the median
+validation error rises from 14.7% to 30.6%. The framework's apparent accuracy
+rested partly on figures that cannot be traced.</p>
+<h3 id="42-a-pivotal-measurement-is-physically-inconsistent">4.2 A pivotal measurement is physically inconsistent</h3>
+<p><em>Applied Surface Science</em> <strong>578</strong> (2022) 152051 reports AZO(40)/Cu/AZO(40) with
+T_vis 87.7%, R_s 9.96 Ω/sq and ε 0.055. The brief's §16 concludes from this that
+a silver-free stack may already meet a low-emissivity target — a conclusion that
+reframes the entire programme.</p>
+<p>The transcription is accurate and the abstract attributes all three values to
+one sample. However, for a conducting sheet thin compared with the wavelength,
+far-infrared reflectance is fixed by sheet resistance alone:</p>
+<pre><code>r = (n₁ − n₂ − Z₀/R_s) / (n₁ + n₂ + Z₀/R_s),    ε = 1 − r²
+</code></pre>
+<p>with Z₀ = 376.73 Ω. No fitted parameter enters. At 9.96 Ω/sq this gives
+<strong>ε ≥ 0.096</strong>; the reported 0.055 would require approximately 5.5 Ω/sq.</p>
+<p>Four candidate explanations were tested and eliminated:</p>
+<table>
+<thead>
+<tr>
+<th>Explanation</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Values from different samples</td>
+<td>Abstract attributes all three to one sample</td>
+</tr>
+<tr>
+<td>Transcription error</td>
+<td>Confirmed against published abstract</td>
+</tr>
+<tr>
+<td>Far-IR glass index assumption</td>
+<td>Limit is 0.091–0.097 across n = 1.5 to 4.0</td>
+</tr>
+<tr>
+<td>Band-limited emissometer (8–14 µm)</td>
+<td><strong>Reads 5–8% higher, not lower — moves it the wrong way</strong></td>
+</tr>
+<tr>
+<td>The framework's own convention</td>
+<td><strong>An industrial formula in use since 2000 gives the same answer</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The band-emissometer hypothesis was the most plausible and was tested by
+implementing band-limited emissivity in the framework. For a Drude metal,
+reflectance is nearly flat across 5–14 µm and the 283 K Planck weighting already
+peaks near 10 µm, so restricting the band removes the 5–8 µm region where these
+stacks reflect slightly less well. Correcting for measurement basis therefore
+<em>worsens</em> the discrepancy, from 0.58 to 0.53 of the limit.</p>
+<p>The same group reports ε = 0.045 at 8.10 Ω/sq and ε = 0.050 at comparable sheet
+resistance. Three measurements at a consistent 0.57–0.63 of the electrodynamic
+limit indicates a systematic effect rather than an isolated error.</p>
+<p><strong>Independent corroboration.</strong> Cueva &amp; Carretero compute emissivity from sheet
+resistance as ε_n = 0.0106·R□, citing Gläser, <em>Large Area Glass Coating</em> (Von
+Ardenne, 2000) — a reference in industrial use for two decades. That relation
+and the impedance limit derived here agree within 10% across 2–17 Ω/sq. At
+9.96 Ω/sq the industrial formula gives <strong>0.106</strong>, against this framework's
+0.096 and the reported 0.055 — a ratio of <strong>0.52</strong>. The objection that the
+discrepancy might be an artifact of the framework's convention is therefore
+answered: two independent methods, one derived from first principles and one in
+commercial use, agree.</p>
+<p><strong>Untested:</strong> hemispherical versus normal basis (which would also raise the
+reading), instrument calibration, or the two quantities being measured on
+different areas of one nominal sample.</p>
+<p><strong>Recommendation:</strong> obtain the full text and establish the measurement basis
+before §16's conclusion is used. This is the single highest-value literature
+action outstanding.</p>
+<h3 id="43-a-reported-thin-film-resistivity-that-cannot-be-correct">4.3 A reported thin-film resistivity that cannot be correct</h3>
+<p>A 2025 study reports ~10 nm films of Ag at 1.59 µΩ·cm, Ag–Cu at 2.97 and Cu at
+20.5, deposited under identical conditions.</p>
+<table>
+<thead>
+<tr>
+<th>Film</th>
+<th>Reported</th>
+<th>× bulk</th>
+<th>Framework model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ag, 10 nm</td>
+<td>1.59 µΩ·cm</td>
+<td>1.00×</td>
+<td>4.44 µΩ·cm (2.79×)</td>
+</tr>
+<tr>
+<td>Cu, 10 nm</td>
+<td>20.5 µΩ·cm</td>
+<td>12.2×</td>
+<td>7.11 µΩ·cm (4.23×)</td>
+</tr>
+</tbody>
+</table>
+<p>Silver's electron mean free path is 53 nm; a 10 nm film cannot reach bulk
+resistivity, and Fuchs–Sondheimer alone forces a ratio above approximately 2.
+The stated thickness uncertainty (±2.5 nm) does not resolve this: the upper
+bound is still 1.25× bulk. Under identical deposition, the copper film shows a
+strong size effect and the silver film shows none.</p>
+<p><strong>Consequence for the brief.</strong> §7 argues that amorphous Ag–Cu retains unusually
+good conductivity by comparing 2.97 against 1.59. If the silver baseline is not
+like-for-like, the comparison should be made against the copper value (20.5),
+against which the alloy appears sevenfold better — the argument survives in
+stronger form.</p>
+<h3 id="44-three-factual-corrections">4.4 Three factual corrections</h3>
+<ul>
+<li><strong>Deposition methods differ across the benchmark set.</strong> The AZO/Ag/AZO
+  trilayers used RF magnetron sputtering (§3 implies DC); the AZO single-layer
+  study used medium-frequency sputtering. Film density and resistivity do not
+  transfer between techniques and these sources should not be pooled.</li>
+<li>~~The AZO visible transmittance is 81.4%, not 82.4%.~~ <strong>Retracted — see
+  §4.5.</strong> The paper reports both figures in different sections; the brief
+  quoted the Results value and was right to.</li>
+<li><strong>§7's resistivity table mixes measurement conventions</strong>, per §4.3 above.</li>
+</ul>
+<h3 id="45-the-one-fully-verified-source-and-a-retraction">4.5 The one fully verified source, and a retraction</h3>
+<p>Mazur et al., <em>Materials</em> <strong>17</strong>(1), 81 (2024), DOI 10.3390/ma17010081 — the
+AZO single-layer benchmark — is open access and has been read in full.</p>
+<p><strong>Confirmed:</strong> resistivity 2.6 × 10⁻³ Ω·cm; optical band gap 3.12 eV by Tauc
+for allowed indirect transitions; hardness 11.4 GPa; reduced modulus 98 GPa;
+sheet resistance 68 Ω/sq. The band gap had been unchecked until now.</p>
+<p><strong>A correction is retracted.</strong> §4.4 of an earlier version of this report
+recorded that the brief's 82.4% visible transmittance was a transcription error
+for 81.4%. <strong>That was wrong.</strong> The paper reports both: §3.1 gives the average
+transparency over 360–760 nm as 82.4%, while the abstract and conclusions give
+81.4%. The source is internally inconsistent, and the brief quoted the Results
+figure — which is defensible. The error was introduced by checking only the
+abstract, which is precisely the shortcut the <code>partial</code> grade exists to flag.</p>
+<p><strong>Two facts established that are not in the brief.</strong> The film thickness is
+380 ± 5 nm by optical profilometry, which independently confirms the
+framework's inference from ρ/R_s and means this resistivity is not transferable
+to the 30–40 nm layers used inside a multilayer. And the crystallite sizes by
+Scherrer are 14.0 nm (ZnO 002), 17.7 nm (Al₂O₃ 023) and 16.2 nm (Al₂ZnO₄ 220) —
+roughly 0.04 × the film thickness, with the authors attributing the unusually
+high hardness to that nanocrystalline structure via Hall–Petch. <strong>Strongly
+nanocrystalline growth is therefore normal for magnetron-sputtered oxide
+films</strong>, which supports the grain-size hypothesis in §6.1.</p>
+<p>Deposition was medium-frequency pulsed magnetron sputtering, on fused silica
+and Corning glass — not soda-lime float glass.</p>
+<h3 id="46-what-verification-confirmed-elsewhere">4.6 What verification confirmed elsewhere</h3>
+<p>The <em>Ceramics International</em> study states that far-infrared reflectance was
+measured by FTIR spectroscopy and sheet resistance by four-point probe — a
+spectroscopic reflectance directly comparable with the framework's convention,
+with no emissometer ambiguity. This is consistent with the model reproducing
+that benchmark to 0.4%, its closest agreement against a traceable source.</p>
+<p>It also independently supports the percolation anchor: silver continuity at
+10 nm is confirmed by XRD (200 and 220 reflections), which is structural
+evidence rather than an inference from a resistivity discontinuity.</p>
+<hr />
+<h2 id="5-design-space-results">5. Design-space results</h2>
+<p>Thirty-eight candidate architectures were evaluated; 58 metal systems screened; a
+168-point composition series run across two microstructure models, two
+dielectrics and two climate profiles.</p>
+<h3 id="51-the-composition-optimum-lies-at-515-at-ag">5.1 The composition optimum lies at 5–15 at.% Ag</h3>
+<p>Eight composition curves were generated with stack geometry re-optimised at
+every composition (Ag 0–100% in 5% steps).</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Microstructure</th>
+<th>Dielectric</th>
+<th>Optimum Ag</th>
+<th>Score</th>
+<th>Plateau</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heating</td>
+<td>Segregated</td>
+<td>Si₃N₄</td>
+<td><strong>0.05</strong></td>
+<td><strong>89.3</strong></td>
+<td>0.00–0.20</td>
+</tr>
+<tr>
+<td>Heating</td>
+<td>Solid solution</td>
+<td>Si₃N₄</td>
+<td>0.00</td>
+<td>88.9</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Heating</td>
+<td>Segregated</td>
+<td>AZO</td>
+<td><strong>0.10</strong></td>
+<td>76.5</td>
+<td><strong>0.05–0.40</strong></td>
+</tr>
+<tr>
+<td>Heating</td>
+<td>Solid solution</td>
+<td>AZO</td>
+<td>0.00</td>
+<td>74.4</td>
+<td>0.00–0.05</td>
+</tr>
+<tr>
+<td>Cooling</td>
+<td>Either</td>
+<td>AZO</td>
+<td>0.00</td>
+<td>68.2</td>
+<td>0.00–0.15</td>
+</tr>
+<tr>
+<td>Cooling</td>
+<td>Either</td>
+<td>Si₃N₄</td>
+<td>0.00</td>
+<td>67.6</td>
+<td>0.00–0.10</td>
+</tr>
+</tbody>
+</table>
+<p>Every curve peaks between 0 and 10 at.% Ag. The brief's Ag₇₀Cu₃₀ priority
+composition is outperformed in all eight combinations.</p>
+<p><strong>This is a sustainability result, not a performance one.</strong> Emissivity and sheet
+resistance continue improving to 50 at.% Ag (0.0386 and 2.59 Ω/sq, the best in
+the series). The score declines because silver mass carries weight. The trade is
+approximately 0.005 in emissivity for an 87% reduction in silver, and it is the
+correct trade only under the premise that silver consumption matters.</p>
+<p><strong>Plateau width is more relevant to process capability than peak position.</strong> The
+segregated/AZO curve is flat from 5 to 40 at.% Ag — a wide composition tolerance.
+Solid-solution curves are sharp (0–5%).</p>
+<p><strong>The unresolved microstructure question loses importance in the dilute regime.</strong>
+At Ag₇₀Cu₃₀ the two hypotheses differ by 9–14 points; at Ag₅Cu₉₅ by 2.5. Designing
+at 5–15 at.% Ag makes the programme robust to a question that is currently
+unsettled, rather than dependent on it.</p>
+<h3 id="52-the-dielectric-choice-matters-through-metal-nucleation-rather-than-optics">5.2 The dielectric choice matters, through metal nucleation rather than optics</h3>
+<p><strong>This section was revised after experimental comparison.</strong> An earlier version
+concluded that silicon nitride outperforms AZO on optical grounds. That
+conclusion is contradicted by measurement, the model has been corrected, and
+the correction is recorded here rather than applied silently.</p>
+<p><strong>The measurement.</strong> Cueva &amp; Carretero (<em>Coatings</em> <strong>13</strong>, 1709, 2023, open
+access, full text read) deposited five dielectrics under identical conditions
+on a semi-industrial inline sputtering system with 10 nm Ag:</p>
+<table>
+<thead>
+<tr>
+<th>Dielectric</th>
+<th>Measured ε</th>
+<th>n(550 nm)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SnO₂</td>
+<td>0.083</td>
+<td>2.00</td>
+</tr>
+<tr>
+<td>ZnO</td>
+<td>0.064</td>
+<td>2.019</td>
+</tr>
+<tr>
+<td><strong>AZO</strong></td>
+<td><strong>0.058</strong></td>
+<td>1.85</td>
+</tr>
+<tr>
+<td>SiAlNx</td>
+<td>0.067</td>
+<td>2.09</td>
+</tr>
+</tbody>
+</table>
+<p>AZO gives the lowest emissivity <em>and</em> the better visible transmission (86.8%
+against 81.9% for SnO₂), despite having the <strong>lowest</strong> refractive index of the
+set. The authors attribute this to silver growth being more efficient on AZO.</p>
+<p><strong>The framework's error.</strong> It modelled the dielectric purely as an interference
+layer — index and thickness — and therefore preferred the higher-index nitride.
+The optical inputs were sound; their measured indices match the framework's
+closely. What was missing is that the underlayer determines the <em>quality of the
+metal grown on it</em>.</p>
+<p><strong>The correction.</strong> A <code>metal_growth_factor</code> per dielectric now applies a
+resistivity penalty, calibrated to that series and normalised to AZO = 1.00:
+ZnO 1.10, SiAlNx 1.16, ITO 1.20, TiO₂ 1.25, SnO₂ 1.43. The model now reproduces
+the measured ordering and the magnitudes to within 4–8%.</p>
+<p><strong>What this implies more broadly.</strong> This is the same class of omission as the
+copper sheet-resistance discrepancy in §6: the framework models ideal metal
+layers, while the dominant effect in practice is underlayer-dependent metal
+microstructure. Two independent findings now converge on that gap, and any
+successor should treat nucleation quality as a first-class parameter.</p>
+<p><strong>The productive outcome: a hybrid stack.</strong> AZO beneath for nucleation, nitride
+above for durability through tempering — which is what industry does, and which
+the same authors measured as giving <em>better</em> emissivity than two AZO layers,
+because nitride deposited over the Ti barrier converts part of it to TiNx. Two
+candidates were added on this basis:</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Stack</th>
+<th>T_vis</th>
+<th>ε_h</th>
+<th>R_s</th>
+<th>Heating score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>H1</strong></td>
+<td>AZO/Ag/Si₃N₄</td>
+<td><strong>0.918</strong></td>
+<td>0.057</td>
+<td>4.30</td>
+<td>67.4</td>
+</tr>
+<tr>
+<td>M0</td>
+<td>AZO/Ag/AZO (benchmark)</td>
+<td>0.876</td>
+<td>0.060</td>
+<td>4.18</td>
+<td>65.0</td>
+</tr>
+<tr>
+<td><strong>H2</strong></td>
+<td>AZO/Cu/Si₃N₄ (silver-free)</td>
+<td>0.788</td>
+<td><strong>0.042</strong></td>
+<td>2.93</td>
+<td>79.9</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>AZO/Cu/AZO</td>
+<td>0.738</td>
+<td>0.046</td>
+<td>2.87</td>
+<td>69.6</td>
+</tr>
+</tbody>
+</table>
+<p>H1 beats the benchmark on transmittance and emissivity simultaneously. H2 gains
+five points of transmittance over the pure-AZO copper stack at lower
+emissivity, and remains silver-free.</p>
+<h3 id="52b-superseded-analysis-index-matching">5.2b Superseded analysis: index matching</h3>
+<p>An initial screen of 58 metal systems at fixed AZO thickness found that <strong>only
+pure silver met the full specification</strong>; copper failed on transmittance alone
+(0.752 against 0.80). Allowing the dielectric to vary changed this:</p>
+<table>
+<thead>
+<tr>
+<th>Metal</th>
+<th>AZO</th>
+<th>SnO₂</th>
+<th>TiO₂</th>
+<th><strong>Si₃N₄</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cu</td>
+<td>0.755</td>
+<td>0.795</td>
+<td>0.786</td>
+<td><strong>0.845</strong></td>
+</tr>
+<tr>
+<td>Cu₉₀Zn₁₀</td>
+<td>0.772</td>
+<td>0.808</td>
+<td>0.780</td>
+<td><strong>0.836</strong></td>
+</tr>
+<tr>
+<td>Ag₇₀Cu₃₀</td>
+<td>0.837</td>
+<td>0.869</td>
+<td>0.835</td>
+<td><strong>0.912</strong></td>
+</tr>
+<tr>
+<td>Ag</td>
+<td>0.880</td>
+<td>0.902</td>
+<td>0.868</td>
+<td><strong>0.923</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Silicon nitride gains <strong>nine percentage points of visible transmittance on
+copper</strong> — the margin that was disqualifying it. All metals improve, indicating
+a dielectric property rather than a copper-specific effect.</p>
+<p>Notably, <strong>the highest-index material does not win</strong>: TiO₂ (n = 2.45)
+underperforms SnO₂ (n = 2.00). Antireflection around a metal layer is an
+index-<em>matching</em> problem, not an index-<em>maximisation</em> problem.</p>
+<p><strong>Why this was outside the brief's framing.</strong> The brief's screening began from
+the periodic table and the Materials Project, both of which surface oxides.
+Nitrides fall outside that search structure. Silicon nitride is nonetheless the
+industry-standard Low-E dielectric — dense, an effective diffusion barrier, and
+durable through tempering — and it blocks the oxygen ingress that is copper's
+dominant degradation pathway, which is precisely why the Cu/Si₃N₄ pairing is
+attractive and why it does not appear in the AZO literature.</p>
+<p><strong>Lattice absorption was checked and found negligible.</strong> Si₃N₄ absorbs near
+11.7 µm, within the thermal band, so far-infrared phonon oscillators were added
+to the model. The penalty on the copper stack is +0.0007 in emissivity (1.7%
+relative), because at 10 µm the copper layer reflects approximately 96% of the
+incident field and little reaches the nitride.</p>
+<h3 id="53-climate-reverses-the-ranking">5.3 Climate reverses the ranking</h3>
+<p>The brief does not specify a climate, and <code>targets.yaml</code> as derived from it does
+not constrain solar heat gain. That omission encodes a heating-dominated
+assumption. Adding the EN 410 / ISO 9050 metrics:</p>
+<pre><code>g = T_sol + N·A_sol      (N = 0.36 for a coating on surface 2)
+LSG = T_vis / g
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Heating</th>
+<th>Rank</th>
+<th>Cooling</th>
+<th>Rank</th>
+<th>g</th>
+<th>LSG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Si₃N₄/Ag₁₀Cu₉₀/Si₃N₄</td>
+<td><strong>89.3</strong></td>
+<td>1</td>
+<td>50.4</td>
+<td>20</td>
+<td>0.760</td>
+<td>1.16</td>
+</tr>
+<tr>
+<td>Si₃N₄/Cu/Si₃N₄</td>
+<td>88.9</td>
+<td>3</td>
+<td>55.5</td>
+<td>12</td>
+<td>0.731</td>
+<td>1.18</td>
+</tr>
+<tr>
+<td><strong>AZO/Cu/AZO</strong></td>
+<td>69.6</td>
+<td>15</td>
+<td><strong>65.4</strong></td>
+<td><strong>1</strong></td>
+<td>0.558</td>
+<td>1.32</td>
+</tr>
+<tr>
+<td>AZO/Ag/AZO (benchmark)</td>
+<td>65.0</td>
+<td>22</td>
+<td>53.0</td>
+<td>17</td>
+<td>0.646</td>
+<td>1.35</td>
+</tr>
+</tbody>
+</table>
+<p>The mechanism is physical, not a scoring artifact. <strong>AZO is a transparent
+conductive oxide</strong>: its free carriers give a screened plasma wavelength at
+1.25 µm, inside the solar band. Si₃N₄ is a passive insulator, transparent
+throughout.</p>
+<table>
+<thead>
+<tr>
+<th>λ (nm)</th>
+<th>1200</th>
+<th>1600</th>
+<th>2000</th>
+<th>2400</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transmittance, AZO stack</td>
+<td>0.240</td>
+<td>0.115</td>
+<td>0.068</td>
+<td>0.046</td>
+</tr>
+<tr>
+<td>Transmittance, Si₃N₄ stack</td>
+<td>0.509</td>
+<td>0.259</td>
+<td>0.151</td>
+<td>0.099</td>
+</tr>
+</tbody>
+</table>
+<p>Same 11 nm copper layer in both. <strong>The conductive oxide performs solar-control
+work that a passive nitride cannot.</strong> §5.2 read AZO's near-infrared absorption
+purely as a transmittance penalty; a substantial part of it is a solar-control
+benefit that the heating-weighted objective could not see.</p>
+<p><strong>For Indian architectural glazing this is decisive</strong>, and the recommended
+material differs from the heating-climate case. A results table should not be
+circulated without its weighting profile attached.</p>
+<h3 id="54-single-metal-architectures-cannot-achieve-solar-control">5.4 Single-metal architectures cannot achieve solar control</h3>
+<p>The best light-to-solar-gain ratio across all 38 candidates is <strong>1.37</strong>, against
+approximately 2.0 for commercial solar-control glazing. Under the cooling
+profile, no single-metal stack met the transmittance target.</p>
+<p>Generalising the framework to n metal layers separated by n+1 dielectrics:</p>
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Metal</th>
+<th>Dielectric</th>
+<th>Geometry (nm)</th>
+<th>T_vis</th>
+<th>g</th>
+<th><strong>LSG</strong></th>
+<th>ε_h</th>
+<th>R_s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single</td>
+<td>Cu</td>
+<td>AZO</td>
+<td>45/12/45</td>
+<td>0.738</td>
+<td>0.558</td>
+<td>1.32</td>
+<td>0.0463</td>
+<td>2.87</td>
+</tr>
+<tr>
+<td><strong>Double</strong></td>
+<td><strong>Ag</strong></td>
+<td><strong>Si₃N₄</strong></td>
+<td><strong>15/12/60/12/15</strong></td>
+<td><strong>0.819</strong></td>
+<td>0.464</td>
+<td><strong>1.76</strong></td>
+<td>0.0248</td>
+<td>1.67</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>Cu</td>
+<td>Si₃N₄</td>
+<td>59/13/105/13/59</td>
+<td>0.716</td>
+<td>0.516</td>
+<td>1.39</td>
+<td>0.0244</td>
+<td><strong>1.33</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>LSG 1.76 against a single-metal ceiling of 1.37 — a 28% improvement.</strong></p>
+<p>A single metal film trades transmittance against infrared reflectance along one
+curve; thickness moves along that curve but not off it. The dielectric <em>between</em>
+two metal layers introduces an interference degree of freedom, allowing the two
+metal reflections to cancel in the visible while adding in the infrared. This
+degree of freedom does not exist with one metal layer at any thickness or
+composition — the limitation is architectural, and no compositional search could
+have revealed it.</p>
+<p><strong>A third metal layer was tested and is not worth adding.</strong> Scanning n = 1, 2, 3
+against the cooling profile, the second layer buys a large gain and the third
+almost none:</p>
+<table>
+<thead>
+<tr>
+<th>n</th>
+<th>Ag/Si₃N₄ LSG</th>
+<th>Ag (g/m²)</th>
+<th>Cu/Si₃N₄ cooling score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1.33</td>
+<td>0.115</td>
+<td>67.3</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>1.76</strong></td>
+<td>0.252</td>
+<td><strong>68.9</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>1.81</td>
+<td>0.315</td>
+<td>37.2</td>
+</tr>
+</tbody>
+</table>
+<p>The third layer adds 0.05 in LSG for a 25% increase in silver, and for copper it
+is actively harmful — transmittance collapses to 0.437 and the cooling score
+halves. <strong>The architecture argument stops at two layers for this
+specification.</strong> Commercial triple-silver products reach LSG ≈ 2.0 using
+asymmetric layer thicknesses and tuned interlayer spacing that this coarse scan
+did not explore; that remains open, but it is a fine-optimisation question
+rather than an architectural one.</p>
+<p><strong>Costs are real.</strong> Silver consumption doubles, since each layer must
+independently exceed percolation near 10 nm. Splitting a film also raises
+resistance: two 12 nm layers are not equivalent to one 24 nm layer, each
+carrying its own surface scattering. Process complexity rises to five layers.</p>
+<p><strong>Of most interest for the Indian application:</strong> the double-copper Si₃N₄ stack
+achieves LSG 1.39 at R_s 1.33 Ω/sq and ε_h 0.0244 with <strong>zero silver</strong>, scoring
+68.9 on the cooling profile — the highest of any candidate evaluated. Its sheet
+resistance and emissivity are the best figures the framework has produced.
+Transmittance at 0.716 remains short of 0.80, but the deficit has narrowed from
+12 points to 8 and the dielectric search was coarse.</p>
+<h3 id="55-thermodynamic-screening-materials-project">5.5 Thermodynamic screening (Materials Project)</h3>
+<p>All fifteen chemical systems nominated in the brief's §9 were retrieved and
+screened for phases within 50 meV/atom of the convex hull.</p>
+<p><strong>The central result: Ag–Cu has no stable ordered compound.</strong> Two intermediate
+phases exist and neither lies on the hull:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>E above hull</th>
+<th>Stable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cu₃Ag</td>
+<td>0.0904 eV/atom</td>
+<td>No</td>
+</tr>
+<tr>
+<td>CuAg₃</td>
+<td>0.0857 eV/atom</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>Ag–Cu is thermodynamically a <strong>phase-separating system</strong> — which the brief's §5
+suspected from the 13% lattice mismatch, and which is now supported by
+first-principles data rather than inferred. The magnitude matters: 86–90 meV/atom
+is well above k_BT at deposition (26 meV at 300 K, 48 meV at 550 K), so the
+driving force to separate is substantial rather than marginal.</p>
+<p><strong>What this does and does not establish.</strong> It is an equilibrium statement. A
+magnetron-sputtered film is quenched from the vapour at effective rates that
+routinely trap metastable solid solutions, so it does not predict the
+as-deposited microstructure. It predicts what the film will do on annealing —
+which is precisely the discriminating experiment of §8.3, and it indicates the
+direction to expect: resistivity should <em>fall</em> as copper precipitates from a
+trapped solution.</p>
+<p>It also lends thermodynamic support to the segregated microstructure model, under
+which §5.1's dilute-silver optimum is strongest.</p>
+<p><strong>Ag–Cu is the only nominated binary with no stable intermediate phase:</strong></p>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>Entries</th>
+<th>Near-hull</th>
+<th>Representative phases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ag–Cu</strong></td>
+<td>2</td>
+<td><strong>0</strong></td>
+<td>— (phase-separating)</td>
+</tr>
+<tr>
+<td>Ag–Ti</td>
+<td>4</td>
+<td>2</td>
+<td>Ti₂Ag, TiAg</td>
+</tr>
+<tr>
+<td>Al–Cu</td>
+<td>15</td>
+<td>10</td>
+<td>Al₂Cu, AlCu, AlCu₃</td>
+</tr>
+<tr>
+<td>Cu–Ti</td>
+<td>12</td>
+<td>8</td>
+<td>TiCu, TiCu₂, Ti₂Cu</td>
+</tr>
+<tr>
+<td>Al–Zn–O</td>
+<td>4</td>
+<td>2</td>
+<td>Al₂ZnO₄, Al₁₀ZnO₁₆</td>
+</tr>
+<tr>
+<td>Cu–O</td>
+<td>37</td>
+<td>9</td>
+<td>Cu₂O, CuO, Cu₄O₃</td>
+</tr>
+<tr>
+<td>Ag–O</td>
+<td>18</td>
+<td>11</td>
+<td>Ag₂O, AgO, Ag₃O</td>
+</tr>
+<tr>
+<td>Ag–Cu–O</td>
+<td>7</td>
+<td>4</td>
+<td>CuAgO₂, Cu₂Ag₂O₃</td>
+</tr>
+</tbody>
+</table>
+<p><strong>This adds a mechanism to the dilute-stabiliser finding in §5.7.</strong> Both Cu–Ti
+and Al–Cu are richly intermetallic — eight and ten near-hull phases
+respectively. A dilute Ti or Al addition to a Cu-bearing film therefore has
+stable compounds available to form, so on annealing it is more likely to
+precipitate an intermetallic than to remain in solution acting as a stabiliser.
+That is a second reason for the ternary underperforming, independent of the
+conductivity penalty.</p>
+<p><strong>Ag–Cu–O is also populated</strong> (four near-hull phases including CuAgO₂), which
+bears on durability: an Ag–Cu film that oxidises has stable ternary oxides
+available, not merely a mixture of Ag₂O and CuO.</p>
+<p><strong>Limitation.</strong> The Materials Project holds DFT results for ordered crystalline
+phases at 0 K. It cannot describe a disordered sputtered solid solution,
+thin-film optical constants at 10 nm, or interface energies against an amorphous
+oxide. The framework records this limitation per query rather than leaving it
+implicit.</p>
+<h3 id="56-ranked-candidates">5.6 Ranked candidates</h3>
+<p>All 38 architectures were scored under both climate profiles. <strong>The two
+top-ten lists share exactly one candidate.</strong> This is the practical form of
+§5.3: the climate is not a refinement to the ranking, it selects a different
+design space.</p>
+<p>The single exception is instructive. <strong>H2, the AZO/Cu/Si₃N₄ hybrid, appears in
+both</strong> — 9th on the heating profile and 2nd on cooling. It is the only
+architecture in the set that combines a conductive-oxide underlayer (for
+solar-NIR rejection, which the cooling profile rewards) with a nitride
+overlayer (for transmittance and durability, which the heating profile
+rewards). Before the §5.2 nucleation correction, no candidate did both, and
+the lists were fully disjoint. That a hybrid is the only design robust to the
+climate question is a result in its own right.</p>
+<p>Columns: geometry as bottom/metal/top in nm; g is the EN 410 solar heat gain
+coefficient; LSG = T_vis/g; "spec" is T_vis ≥ 0.80, R_s ≤ 5 Ω/sq, ε_h ≤ 0.10.</p>
+<h4 id="heating-dominated-northern-europe-datatargetsyaml">Heating-dominated (Northern Europe) — <code>data/targets.yaml</code></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>ID</th>
+<th>Architecture</th>
+<th>Geometry</th>
+<th>T_vis</th>
+<th>ε_h</th>
+<th>R_s</th>
+<th>g</th>
+<th>LSG</th>
+<th>Ag g/m²</th>
+<th>$/m²</th>
+<th>Score</th>
+<th>Spec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>E5e</td>
+<td>Si3N4/Ag5Cu95/Si3N4 (segregated)</td>
+<td>59/11/48</td>
+<td>0.863</td>
+<td>0.0481</td>
+<td>2.98</td>
+<td>0.731</td>
+<td>1.18</td>
+<td>0.008</td>
+<td>0.07</td>
+<td><strong>88.1</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>2</td>
+<td>E10e</td>
+<td>Si3N4/Ag10Cu90/Si3N4 (segregated)</td>
+<td>59/10/48</td>
+<td>0.877</td>
+<td>0.0511</td>
+<td>3.13</td>
+<td>0.758</td>
+<td>1.16</td>
+<td>0.015</td>
+<td>0.12</td>
+<td><strong>88.1</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>3</td>
+<td>N6</td>
+<td>Si3N4/Cu/Si3N4</td>
+<td>60/11/50</td>
+<td>0.858</td>
+<td>0.0538</td>
+<td>3.41</td>
+<td>0.729</td>
+<td>1.18</td>
+<td>0.000</td>
+<td>0.01</td>
+<td><strong>87.5</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>4</td>
+<td>E5</td>
+<td>Si3N4/Ag5Cu95/Si3N4</td>
+<td>59/11/48</td>
+<td>0.861</td>
+<td>0.0609</td>
+<td>3.99</td>
+<td>0.728</td>
+<td>1.18</td>
+<td>0.008</td>
+<td>0.07</td>
+<td><strong>85.1</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>5</td>
+<td>N7</td>
+<td>Si3N4/Cu90Zn10/Si3N4</td>
+<td>60/11/50</td>
+<td>0.850</td>
+<td>0.0695</td>
+<td>4.66</td>
+<td>0.725</td>
+<td>1.17</td>
+<td>0.000</td>
+<td>0.01</td>
+<td><strong>83.0</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>6</td>
+<td>E10</td>
+<td>Si3N4/Ag10Cu90/Si3N4</td>
+<td>59/11/48</td>
+<td>0.864</td>
+<td>0.0670</td>
+<td>4.50</td>
+<td>0.729</td>
+<td>1.19</td>
+<td>0.016</td>
+<td>0.14</td>
+<td><strong>83.0</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>7</td>
+<td>N8</td>
+<td>Si3N4/Cu90Ag10/Si3N4</td>
+<td>60/11/50</td>
+<td>0.863</td>
+<td>0.0671</td>
+<td>4.50</td>
+<td>0.730</td>
+<td>1.18</td>
+<td>0.016</td>
+<td>0.14</td>
+<td><strong>82.9</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>8</td>
+<td>N35e</td>
+<td>Si3N4/Ag60Cu40/Si3N4 (segregated)</td>
+<td>45/9/40</td>
+<td>0.902</td>
+<td>0.0498</td>
+<td>3.04</td>
+<td>0.793</td>
+<td>1.14</td>
+<td>0.065</td>
+<td>0.53</td>
+<td><strong>80.7</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>9</td>
+<td>H2</td>
+<td>AZO/Cu/Si3N4 (hybrid, silver-free)</td>
+<td>40/12/40</td>
+<td>0.788</td>
+<td>0.0425</td>
+<td>2.93</td>
+<td>0.631</td>
+<td>1.25</td>
+<td>0.000</td>
+<td>0.01</td>
+<td><strong>79.9</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td>N3e</td>
+<td>Si3N4/Ag70Cu30/Si3N4 (segregated)</td>
+<td>25/9/35</td>
+<td>0.899</td>
+<td>0.0508</td>
+<td>3.16</td>
+<td>0.769</td>
+<td>1.17</td>
+<td>0.073</td>
+<td>0.59</td>
+<td><strong>78.1</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>—</td>
+<td>M0</td>
+<td>AZO/Ag/AZO (<strong>benchmark</strong>)</td>
+<td>35/10/35</td>
+<td>0.876</td>
+<td>0.0603</td>
+<td>4.18</td>
+<td>0.646</td>
+<td>1.35</td>
+<td>0.105</td>
+<td>0.85</td>
+<td>65.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Nine of ten use silicon nitride</strong>; the exception is the AZO/Cu/Si₃N₄ hybrid
+(H2) introduced by the §5.2 correction. 9 of ten meet the
+full specification, and 8 of ten use less
+than 0.05 g/m² of silver against the benchmark's 0.105. The leading candidate
+uses <strong>one thirteenth of the benchmark's silver</strong> while beating it on
+emissivity and sheet resistance.</p>
+<p>Note these figures moved when the nucleation correction of §5.2 was applied:
+emissivities rose by roughly 5–12% for the nitride stacks, since Si₃N₄ carries
+a growth-factor penalty of 1.16 against AZO's 1.00. The ordering within the
+nitride family was not disturbed, but the margin over AZO narrowed.</p>
+<h4 id="cooling-dominated-india-datatargets_coolingyaml">Cooling-dominated (India) — <code>data/targets_cooling.yaml</code></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>ID</th>
+<th>Architecture</th>
+<th>Geometry</th>
+<th>T_vis</th>
+<th>ε_h</th>
+<th>R_s</th>
+<th>g</th>
+<th>LSG</th>
+<th>Ag g/m²</th>
+<th>$/m²</th>
+<th>Score</th>
+<th>Spec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>M6</td>
+<td>AZO/Cu/AZO (low-cost control)</td>
+<td>35/12/35</td>
+<td>0.738</td>
+<td>0.0463</td>
+<td>2.87</td>
+<td>0.558</td>
+<td>1.32</td>
+<td>0.000</td>
+<td>0.01</td>
+<td><strong>65.4</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>H2</td>
+<td>AZO/Cu/Si3N4 (hybrid, silver-free)</td>
+<td>40/12/40</td>
+<td>0.788</td>
+<td>0.0425</td>
+<td>2.93</td>
+<td>0.631</td>
+<td>1.25</td>
+<td>0.000</td>
+<td>0.01</td>
+<td><strong>63.4</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>D10e</td>
+<td>AZO/Ag10Cu90/AZO (segregated)</td>
+<td>15/9/37</td>
+<td>0.789</td>
+<td>0.0585</td>
+<td>3.52</td>
+<td>0.641</td>
+<td>1.23</td>
+<td>0.013</td>
+<td>0.11</td>
+<td><strong>59.3</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>D15e</td>
+<td>AZO/Ag15Cu85/AZO (segregated)</td>
+<td>15/9/37</td>
+<td>0.794</td>
+<td>0.0564</td>
+<td>3.31</td>
+<td>0.643</td>
+<td>1.23</td>
+<td>0.019</td>
+<td>0.16</td>
+<td><strong>59.3</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>M5</td>
+<td>AZO/Ag25Cu75/AZO</td>
+<td>35/10/35</td>
+<td>0.784</td>
+<td>0.0780</td>
+<td>5.92</td>
+<td>0.612</td>
+<td>1.28</td>
+<td>0.034</td>
+<td>0.28</td>
+<td><strong>58.2</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>M3ema</td>
+<td>AZO/Ag70Cu30/AZO (segregated)</td>
+<td>35/10/35</td>
+<td>0.840</td>
+<td>0.0462</td>
+<td>2.63</td>
+<td>0.635</td>
+<td>1.32</td>
+<td>0.081</td>
+<td>0.66</td>
+<td><strong>57.9</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>7</td>
+<td>M35e</td>
+<td>AZO/Ag60Cu40/AZO (segregated)</td>
+<td>15/9/35</td>
+<td>0.843</td>
+<td>0.0514</td>
+<td>2.95</td>
+<td>0.659</td>
+<td>1.28</td>
+<td>0.065</td>
+<td>0.53</td>
+<td><strong>57.4</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>8</td>
+<td>S10</td>
+<td>ITO/Ag70Cu30/ITO</td>
+<td>35/10/35</td>
+<td>0.848</td>
+<td>0.0764</td>
+<td>5.48</td>
+<td>0.619</td>
+<td>1.37</td>
+<td>0.081</td>
+<td>0.66</td>
+<td><strong>57.3</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>9</td>
+<td>D10</td>
+<td>AZO/Ag10Cu90/AZO</td>
+<td>15/9/37</td>
+<td>0.786</td>
+<td>0.0784</td>
+<td>5.66</td>
+<td>0.638</td>
+<td>1.23</td>
+<td>0.013</td>
+<td>0.11</td>
+<td><strong>57.1</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td>D15</td>
+<td>AZO/Ag15Cu85/AZO</td>
+<td>15/9/37</td>
+<td>0.790</td>
+<td>0.0828</td>
+<td>6.15</td>
+<td>0.639</td>
+<td>1.24</td>
+<td>0.019</td>
+<td>0.16</td>
+<td><strong>56.3</strong></td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>—</td>
+<td>M0</td>
+<td>AZO/Ag/AZO (<strong>benchmark</strong>)</td>
+<td>35/10/35</td>
+<td>0.876</td>
+<td>0.0603</td>
+<td>4.18</td>
+<td>0.646</td>
+<td>1.35</td>
+<td>0.105</td>
+<td>0.85</td>
+<td>53.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Every entry uses a conductive oxide as the underlayer</strong> (AZO or ITO), for the
+reason in §5.3 — the free carriers reject solar near-infrared, which a passive
+nitride cannot. Only <strong>2 of ten meet the full
+specification</strong>, and those use substantial silver. The rest fail on visible
+transmittance.</p>
+<p>The AZO/Cu/Si₃N₄ hybrid (H2) now ranks <strong>second</strong> on this profile, which was
+not the case before the §5.2 correction: it keeps AZO's solar-NIR rejection
+underneath while gaining five points of transmittance from the nitride
+overlayer, and remains silver-free.</p>
+<p><strong>This is the honest state of the cooling-climate answer: the framework is
+ranking near-misses.</strong> No single-metal architecture in the set clears
+T_vis ≥ 0.80 at acceptable solar gain, which is the finding that motivated the
+multi-layer work in §5.4. The double-copper Si₃N₄ stack scores 68.9 on this
+profile — higher than anything in the table above — but at T_vis 0.716 it too
+falls short.</p>
+<h4 id="how-to-read-these-tables">How to read these tables</h4>
+<ol>
+<li><strong>They share one candidate out of ten.</strong> A recommendation is only meaningful
+   with its climate profile named. Circulating one table without the other
+   would be misleading — except for H2, which is defensible under either.</li>
+<li><strong>The benchmark appears in neither top ten</strong>, which is the correct answer to
+   the brief's question: pure silver is the incumbent to beat, and on a
+   sustainability-weighted objective it is beaten.</li>
+<li><strong>Four of ten in each list are "segregated" variants</strong> — the same
+   composition under the alternative microstructure hypothesis. Until the
+   Phase 2 measurement (§8.3) is made, those four entries are conditional. §5.5
+   provides thermodynamic support for segregation but not proof of the
+   as-deposited state.</li>
+<li><strong>All copper-bearing entries are contingent on §6.</strong> The framework
+   under-predicts sputtered copper sheet resistance by roughly eightfold; if
+   that gap is real film quality rather than model error, most of both tables is
+   affected.</li>
+<li><strong>Scores are not comparable between the two tables</strong>, being computed under
+   different weightings. Compare within a column only.</li>
+</ol>
+<h3 id="57-the-dilute-titanium-ternary-is-predicted-to-underperform">5.7 The dilute-titanium ternary is predicted to underperform</h3>
+<p>Ag₇₀Cu₂₉Ti₁, proposed in the brief on the hypothesis that dilute Ti stabilises
+the metal layer, ranks 13th of 14 in the original candidate set. Titanium's bulk
+resistivity is 42 µΩ·cm, approximately 26× silver's; even at 1 at.% this raises
+alloy resistivity enough to give the worst sheet resistance (7.55 Ω/sq) and
+worst emissivity (0.0921) in the set. The interfacial benefit may be real, but
+the conductivity penalty is weighting-independent.</p>
+<p>A titanium <em>barrier layer</em> remains the better test of the interface hypothesis,
+isolating the interfacial effect without placing Ti in the conduction path — as
+industrial coatings do. It is not, however, a silver-reduction candidate: it
+uses a full pure-silver layer and ranks last once silver consumption is
+weighted. The two claims should be kept separate.</p>
+<hr />
+<h2 id="6-the-critical-unknown-and-the-experiment-that-resolves-it">6. The critical unknown, and the experiment that resolves it</h2>
+<h3 id="61-the-discrepancy">6.1 The discrepancy</h3>
+<p>Validation against literature shows the model reproducing silver stacks well in
+the infrared — its intended strength — and failing on copper:</p>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Metric</th>
+<th>Reported</th>
+<th>Modelled</th>
+<th>Error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AZO/Ag(13)/AZO</td>
+<td>Far-IR reflectance</td>
+<td>0.960</td>
+<td>0.964</td>
+<td>0.4%</td>
+</tr>
+<tr>
+<td>AZO/Cu/AZO (2022)</td>
+<td>Sheet resistance</td>
+<td>9.96</td>
+<td>2.86</td>
+<td>71%</td>
+</tr>
+<tr>
+<td>AZO/Cu(15)/AZO</td>
+<td>Sheet resistance</td>
+<td>16.6</td>
+<td>2.10</td>
+<td>87%</td>
+</tr>
+</tbody>
+</table>
+<p>The model under-predicts sputtered copper sheet resistance by approximately
+eightfold. The classical size effect cannot account for a gap of this magnitude,
+which points to a mechanism the model does not contain: oxygen incorporation
+during deposition, native oxide at the interfaces, or substantially poorer grain
+structure than silver on the same underlayer.</p>
+<p><strong>If this reading is correct, the obstacle to the copper route is film quality
+rather than intrinsic physics</strong> — an engineering problem with known levers (base
+pressure, seed layers, getter, substrate temperature) rather than a fundamental
+limit. That is a considerably more tractable target than replacing silver's
+electronic structure.</p>
+<p><strong>It also gates six of the leading candidates</strong> in both climate profiles.</p>
+<p><strong>A literature review has since narrowed the cause without any deposition.</strong>
+Fuchs–Sondheimer specularity and Mayadas–Shatzkes grain-boundary reflection are
+well characterised for copper because interconnect scaling depends on them. Four
+independent published fits give p between 0.48 and 0.80 and R between 0.16 and
+0.43; the framework's assumed p = 0.50, R = 0.25 sits inside that range.</p>
+<table>
+<thead>
+<tr>
+<th>p</th>
+<th>R</th>
+<th>Source</th>
+<th>Predicted R_s, AZO/Cu(15)/AZO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.52</td>
+<td>0.43</td>
+<td>Chawla &amp; Gall, <em>Phys. Rev. B</em> <strong>81</strong>, 155454 (2010)</td>
+<td>2.69</td>
+</tr>
+<tr>
+<td>0.48</td>
+<td>0.27</td>
+<td>twin-boundary study, nanocrystalline Cu</td>
+<td>2.23</td>
+</tr>
+<tr>
+<td>0.80</td>
+<td>0.38</td>
+<td><em>Thin Solid Films</em> (2006)</td>
+<td>2.17</td>
+</tr>
+<tr>
+<td>≈0</td>
+<td>0.17</td>
+<td><em>AIP Advances</em> <strong>9</strong>, 025015 (2019)</td>
+<td>2.71</td>
+</tr>
+<tr>
+<td>0.50</td>
+<td>0.25</td>
+<td>framework default</td>
+<td>2.16</td>
+</tr>
+</tbody>
+</table>
+<p>All cluster near 2.2–2.7 Ω/sq against the 16.6 to be explained. An exhaustive
+scan over the entire admissible range — p ∈ [0, 1], R ∈ [0, 0.6] — reaches only
+<strong>4.42 Ω/sq</strong>, short by a factor of 3.8.</p>
+<p><strong>No scattering parameters anywhere in the literature range explain the
+discrepancy.</strong> Decision rule A below is eliminated on that basis.</p>
+<p><strong>What does explain it is grain size.</strong> Both models take grain size as an input,
+and the framework assumes lateral grains three times the film thickness,
+appropriate to a coalesced film. Grains at roughly <em>half</em> the thickness give
+14.1 Ω/sq:</p>
+<table>
+<thead>
+<tr>
+<th>Grain size</th>
+<th>R_s(15 nm)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.0 × thickness (assumed)</td>
+<td>4.42</td>
+</tr>
+<tr>
+<td>1.0 × thickness</td>
+<td>8.31</td>
+</tr>
+<tr>
+<td><strong>0.5 × thickness</strong></td>
+<td><strong>14.13</strong></td>
+</tr>
+<tr>
+<td>0.25 × thickness</td>
+<td>25.77</td>
+</tr>
+</tbody>
+</table>
+<p>That is a nanocrystalline structure — grains of order 5–8 nm in a 15 nm film —
+which is plausible for copper sputtered at room temperature onto an oxide it
+wets poorly. It is now the leading hypothesis, displacing oxygen contamination.</p>
+<p><strong>Caveat on transferability.</strong> The published values are for copper on Ta or SiO₂
+at 25–158 nm, deposited for interconnects. This work concerns copper on AZO at
+10–15 nm, where nucleation differs and the thickness lies below anything in the
+cited studies. The transferable conclusion is therefore the <em>negative</em> one — that
+p and R cannot account for the gap — rather than a positive calibration. Grain
+size for copper on AZO at these thicknesses was not found in the literature
+searched, and is the missing number. Full analysis in
+<code>docs/LITERATURE_CALIBRATION.md</code>.</p>
+<h3 id="62-the-experiment">6.2 The experiment</h3>
+<p>Specified in <code>experiments/BENCH_cu_series.md</code> with pre-registered decision rules
+in <code>experiments/PROTOCOL_cu_series.md</code>.</p>
+<p><strong>Matrix.</strong> Cu at 8, 10, 12, 14, 16, 18, 20 nm plus a 10 nm Ag control, all as
+AZO(40)/metal/AZO(40) capped trilayers, deposition order randomised. Plus one
+uncapped Cu film at 12 nm as an oxidation control.</p>
+<p><strong>Key design decisions.</strong></p>
+<p><em>Films must be capped.</em> Bare 10 nm copper oxidises in air within minutes, and the
+hypothesis under test is that oxygen degrades these films. A bare film measured
+after venting reports air oxidation rather than deposition quality. The
+framework de-embeds the AZO shunt to recover the metal layer; the correction is
+non-linear and largest where it matters — a measured 16.6 Ω/sq trilayer is
+22.6 Ω/sq in the metal alone, a 36% difference. Omitting it would bias the
+result toward "the copper is acceptable".</p>
+<p><em>Order randomised.</em> Target erosion drifts across a campaign; in ascending
+thickness order that drift aliases directly onto thickness and cannot be
+separated from a size effect.</p>
+<p><em>Thickness measured independently.</em> ρ = R_s · t, so a 20% thickness error becomes
+a 20% resistivity error and would be misattributed to a scattering parameter.</p>
+<p><em>Silver control is a stop condition.</em> AZO/Ag(10)/AZO should give approximately
+4–5 Ω/sq. If it does not, the tool requires diagnosis before the copper series
+can be interpreted.</p>
+<p><strong>A cheaper measurement now comes first.</strong> Because the leading hypothesis is
+grain structure, a <strong>single XRD scan on one 12–15 nm copper film on AZO</strong> gives
+the grain size directly by Scherrer broadening of the Cu(111) reflection, and
+discriminates between the remaining hypotheses:</p>
+<ul>
+<li>Grain size ≲ 0.6 × film thickness → nanocrystalline structure confirmed; the
+  model's grain assumption is wrong and the remedy is thermal or morphological
+  (seed layer, elevated substrate temperature, brief anneal).</li>
+<li>Grain size ≳ film thickness → grain structure is not the cause, and attention
+  returns to impurity scattering.</li>
+</ul>
+<p>One sample rather than eight, and XRD is more widely available than a dedicated
+sputter session. <strong>If only one measurement can be obtained, this is now the one
+to take.</strong> The thickness series remains the better experiment where both are
+possible, since it also calibrates the model.</p>
+<p><strong>Analysis.</strong> One command:</p>
+<pre><code class="language-bash">pvdlowe calibrate -i experiments/cu_series_runsheet.csv --capped
+</code></pre>
+<p>This fits specularity, grain-boundary reflection, percolation threshold and a
+thickness-independent excess resistivity, then diagnoses which of three
+mechanisms is operating.</p>
+<h3 id="63-pre-registered-decision-rules">6.3 Pre-registered decision rules</h3>
+<p>Written before any data exists, so that interpretation is not selected to suit
+the outcome. Rule A was subsequently eliminated and rule E added by the
+literature review in §6.1, which was also completed before any deposition; both
+changes are recorded rather than applied silently.</p>
+<p><strong>Distinguishing E from B requires measuring grain size</strong>, not inferring it: a
+small-grain film and a contaminated film produce similar R_s(d) curves, so a
+thickness series alone cannot separate them.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Criterion</th>
+<th>Interpretation</th>
+<th>Consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong></td>
+<td>Excess &lt; 1 µΩ·cm, ρ(100 nm)/ρ_bulk &lt; 1.5</td>
+<td>Classical size effect; model form correct, parameters wrong</td>
+<td><strong>Eliminated by literature review</strong> (§6.1). Retained here unaltered so the amendment is auditable</td>
+</tr>
+<tr>
+<td><strong>E</strong></td>
+<td>XRD grain size ≲ 0.6 × film thickness</td>
+<td><strong>Nanocrystalline grain structure — now the leading hypothesis</strong></td>
+<td>Set <code>grain_size_ratio</code> from the measured value and re-run the ranking. Remedy is thermal or morphological, not vacuum hygiene</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>Excess &gt; 50% of bulk, improving fit by &gt; 20%</td>
+<td>Impurity scattering, most likely oxygen</td>
+<td><strong>Favourable</strong>: film quality, not physics. Follow with base-pressure study and XPS depth profile</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td>Fitted d_c differs from 11 nm by &gt; 1.5 nm</td>
+<td>Dewetting on this underlayer</td>
+<td>Minimum usable thickness changes, and with it every silver-consumption figure. Trial a seed layer</td>
+</tr>
+<tr>
+<td><strong>D</strong></td>
+<td>R_s at 15 nm near 16.6 Ω/sq</td>
+<td>Literature is correct; model optics optimistic by ~8×</td>
+<td><strong>Six leading candidates fall.</strong> Programme reverts to silver reduction, with §5.1's dilute-silver optimum as the recommendation in its own right</td>
+</tr>
+</tbody>
+</table>
+<h3 id="64-validation-of-the-analysis-path">6.4 Validation of the analysis path</h3>
+<p>The fitter was tested against synthetic data generated with known parameters.
+All four cases were diagnosed correctly at 0.5–2.4% relative residual, and the
+percolation threshold was recovered to better than 1 nm in every case.</p>
+<p><strong>A limitation identified by that testing and stated in the protocol:</strong>
+specularity and grain-boundary reflection are <strong>not separately identifiable</strong>
+from R_s(d) alone — across an 8–20 nm window they produce nearly the same 1/d
+dependence. A synthetic film generated with p = 0.35 was fitted at p = 1.00 with
+a 1.5% residual: an excellent fit to the data and an incorrect value for the
+parameter.</p>
+<p>The fitted model therefore predicts sheet resistance reliably within the fitted
+range, which is what the framework requires, but the individual parameters must
+not be reported as measurements. Separating them requires varying grain size
+independently, for instance by annealing at fixed thickness. The percolation
+threshold <strong>is</strong> identifiable, and is the parameter of greatest consequence
+since it sets minimum usable thickness.</p>
+<hr />
+<h2 id="7-limitations">7. Limitations</h2>
+<h3 id="71-no-experimental-validation">7.1 No experimental validation</h3>
+<p>No films were deposited. Every performance figure in this report is a model
+output. The candidate rankings are hypotheses ordered by physics, suitable for
+directing experimental effort, and are not results.</p>
+<h3 id="72-calibrated-and-fitted-parameters">7.2 Calibrated and fitted parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Glass far-IR oscillator scale</td>
+<td>Calibrated to bare-glass ε_n = 0.837</td>
+</tr>
+<tr>
+<td>TCO band-edge strength</td>
+<td>Calibrated to n(550 nm)</td>
+</tr>
+<tr>
+<td>Ag percolation d_c = 10 nm</td>
+<td>Literature, XRD-confirmed</td>
+</tr>
+<tr>
+<td>Cu percolation d_c = 11 nm</td>
+<td>Literature, unconfirmed</td>
+</tr>
+<tr>
+<td>Drude damping</td>
+<td>Anchored to DC resistivity</td>
+</tr>
+<tr>
+<td>Specularity, grain-boundary reflection</td>
+<td><strong>Fitted, not measured</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-known-weaknesses">7.3 Known weaknesses</h3>
+<ul>
+<li><strong>Si₃N₄ and TiO₂ optical constants are ESTIMATE grade</strong> — indices from typical
+  sputtered values, phonon parameters order-of-magnitude.</li>
+<li><strong>D65 and AM1.5 spectra are Planckian approximations</strong>, flagged as MODEL.
+  The cost of this has now been quantified rather than left open
+  (<code>illuminant_sensitivity</code>): varying the assumed colour temperature over
+  5000–7500 K moves <strong>T_vis by 0.1%</strong> and <strong>T_sol by 8.3%</strong>. The asymmetry is
+  structural — the photopic response V(λ) is narrow and dominates the visible
+  weighting, whereas in the solar band the spectrum <em>is</em> the weighting.</li>
+</ul>
+<p><em>Consequence:</em> T_vis is reportable as computed. <strong>T_sol, and the g-value and
+  LSG derived from it, carry a systematic uncertainty of order 5–10%</strong> until a
+  tabulated AM1.5G spectrum is supplied. Rankings within a climate profile are
+  unaffected, the bias being common to all candidates, but absolute solar-gain
+  figures quoted against a building code are.
+- <strong>Visible-range metal optics are accurate to a few per cent at best.</strong> The
+  far-infrared response is reliable, being pure Drude and anchored to
+  resistivity; the visible is not.
+- <strong>Roughness, interdiffusion and barrier absorption are not modelled.</strong> A real
+  stack will transmit somewhat less than predicted.
+- <strong>Reactive Si₃N₄ deposition is more demanding than AZO</strong> — target poisoning,
+  lower rate. The brief's §15 deposition-efficiency criterion would penalise it,
+  and the framework cannot score this without a calibrated rate model.</p>
+<h3 id="74-scores-are-not-portable-between-weightings">7.4 Scores are not portable between weightings</h3>
+<p>Absolute scores moved by approximately 25 points as the §3 corrections were
+applied. <strong>A score is not a property of a material.</strong> A figure of 89.3 is a
+statement about one architecture under one weighting of eight criteria, three of
+which the framework cannot populate. Rankings should be quoted with the
+weighting file attached and the unverified elements identified.</p>
+<hr />
+<h2 id="8-recommendations">8. Recommendations</h2>
+<h3 id="81-immediate-literature">8.1 Immediate — literature</h3>
+<ol>
+<li><strong>Obtain the full text of <em>Applied Surface Science</em> 578 (2022) 152051</strong> and
+   establish whether the reported emissivity is normal or hemispherical, and the
+   instrument's spectral band. §16's conclusion depends on this.</li>
+<li><strong>Withdraw the two disputed citations</strong> (§4.1) from any document derived from
+   the brief pending identification of their source.</li>
+<li><strong>Apply the three factual corrections</strong> in §4.4.</li>
+</ol>
+<h3 id="82-first-experimental-priority">8.2 First experimental priority</h3>
+<p><strong>One XRD scan on a single 12–15 nm copper film on AZO.</strong> An afternoon, one
+sample. Following the literature review in §6.1, grain structure is the leading
+explanation for the model's largest error, and Scherrer broadening measures it
+directly. This is now the highest information-per-hour measurement available.</p>
+<p><strong>Then the copper thickness series</strong> (§6.2). Half a day of tool time. It
+confirms or refutes six leading candidates and calibrates the transport model.
+The protocol is written for handover and requires no further specification.</p>
+<p>If both can be obtained, run both — the XRD identifies the mechanism, the series
+calibrates the model. If only one, take the XRD.</p>
+<h3 id="83-second-experimental-priority">8.3 Second experimental priority</h3>
+<p><strong>One AZO/Ag₇₀Cu₃₀/AZO film at 10 nm, sheet resistance measured.</strong> The two
+microstructure hypotheses predict 6.4 versus 2.6 Ω/sq — far outside probe
+resolution. Better still, measure across Ag 0, 25, 50, 75 at.%: the <em>curve shape</em>
+is diagnostic, with the segregated model predicting a flat ~3 Ω/sq and a
+metastable solid solution predicting a Nordheim maximum above 7 Ω/sq.</p>
+<h3 id="84-first-deposition-run-for-the-target-application">8.4 First deposition run for the target application</h3>
+<p>For a cooling-dominated application (Indian architectural glazing):
+<strong>AZO/Cu/AZO at 45/12/45 nm</strong>, measured for T_vis, sheet resistance and FTIR
+emissivity, against an AZO/Ag/AZO control.</p>
+<p>For a heating-dominated application: <strong>Si₃N₄/Cu/Si₃N₄ at 60/12/50 nm</strong> against
+the same control.</p>
+<p>Either comparison tests the dielectric hypothesis, the copper film-quality
+question and the silver-free premise simultaneously.</p>
+<h3 id="85-framework-extensions-worth-the-effort">8.5 Framework extensions worth the effort</h3>
+<ul>
+<li><strong>Finer optimisation of the double-copper stack</strong> — asymmetric outer layers,
+  mixed-metal pairing, finer dielectric steps. The transmittance deficit is 8
+  points and the scan performed was coarse. This is the most likely route to
+  closing it, now that the triple-layer route has been ruled out (§5.4).</li>
+<li><strong>A tabulated AM1.5G spectrum</strong>, to remove the 5–10% systematic on T_sol,
+  g and LSG.</li>
+<li><strong>Measured n and k</strong> for in-house AZO, Si₃N₄ and metal films — the largest
+  single source of visible-range error.</li>
+</ul>
+<hr />
+<h2 id="9-handover">9. Handover</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source, documentation, results</td>
+<td><code>github.com/VarunMandy/pvdlowe</code></td>
+</tr>
+<tr>
+<td>Archive</td>
+<td><code>gs://sg-llamole-pvdlowe/pvdlowe/source/</code></td>
+</tr>
+<tr>
+<td>Executive summary</td>
+<td><code>docs/SUMMARY.md</code></td>
+</tr>
+<tr>
+<td>Full findings</td>
+<td><code>docs/FINDINGS.md</code></td>
+</tr>
+<tr>
+<td>Physics and approximations</td>
+<td><code>docs/METHODOLOGY.md</code></td>
+</tr>
+<tr>
+<td>Evidence grading</td>
+<td><code>docs/PROVENANCE.md</code></td>
+</tr>
+<tr>
+<td>Experimental programme</td>
+<td><code>docs/ROADMAP.md</code></td>
+</tr>
+<tr>
+<td>Bench procedure</td>
+<td><code>experiments/BENCH_cu_series.md</code></td>
+</tr>
+<tr>
+<td>Pre-registered decision rules</td>
+<td><code>experiments/PROTOCOL_cu_series.md</code></td>
+</tr>
+<tr>
+<td>Blank run sheet</td>
+<td><code>experiments/cu_series_runsheet.csv</code></td>
+</tr>
+<tr>
+<td>Worked example output</td>
+<td><code>experiments/EXAMPLE_filled_runsheet.csv</code></td>
+</tr>
+</tbody>
+</table>
+<p>Installation is <code>pip install -e .</code>; the test suite (92 tests, no external
+dependencies beyond numpy/scipy/pandas/pyyaml) runs with
+<code>python tests/run_tests.py</code> (92 tests) and should be run after any environment change, as
+it validates the physics rather than only the interfaces.</p>
+<hr />
+<h2 id="10-conclusion">10. Conclusion</h2>
+<p>The framework delivered implements the brief's proposed workflow and, in doing
+so, identified several respects in which the brief's own assumptions do not
+survive quantitative examination: a weighting scheme that omitted the
+programme's primary objective, two citations that could not be traced, a
+measurement inconsistent with a model-independent physical limit, and a
+material class and stack architecture excluded by the search framing but
+outperforming the proposed candidates.</p>
+<p>The candidate rankings produced should be treated as hypotheses for
+experimental prioritisation. Their principal weakness is known, quantified, and
+addressed by a specified experiment with pre-registered decision rules — which
+is offered as the more useful deliverable. A model that identifies the
+measurement capable of falsifying it is more valuable to an experimental
+programme than one that does not.</p>
+<p>The recommended next action is half a day of sputter tool time.</p></body></html>

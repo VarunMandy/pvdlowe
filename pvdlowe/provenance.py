@@ -44,6 +44,14 @@ class Provenance(enum.Enum):
     MP_API = "materials_project"
     DFT_OWN = "dft_own"
     DFT_LITERATURE = "dft_literature"
+    #: A machine-learned interatomic potential trained on DFT data -- MACE,
+    #: CHGNet, M3GNet and similar. Ranked BELOW DFT deliberately. These models
+    #: reproduce their training distribution well and degrade unpredictably
+    #: outside it, and the compositions this project cares about (disordered
+    #: sputtered alloys, dilute ternaries) are exactly the sparse regions of
+    #: that distribution. A surrogate result is a screening signal, not a
+    #: calculation, and must not be reported as DFT.
+    ML_SURROGATE = "ml_surrogate"
     MODEL = "model"
     CALIBRATED = "calibrated"
     ESTIMATE = "estimate"
@@ -62,7 +70,7 @@ class Provenance(enum.Enum):
     def needs_verification(self) -> bool:
         """True if this value must not be quoted without further work."""
         return self in (Provenance.LITERATURE_UNVERIFIED, Provenance.HYPOTHESIS,
-                        Provenance.ESTIMATE)
+                        Provenance.ESTIMATE, Provenance.ML_SURROGATE)
 
 
 _RANK = {
@@ -71,6 +79,7 @@ _RANK = {
     Provenance.MP_API: 70,
     Provenance.DFT_OWN: 65,
     Provenance.DFT_LITERATURE: 60,
+    Provenance.ML_SURROGATE: 50,
     Provenance.LITERATURE_UNVERIFIED: 55,
     Provenance.CALIBRATED: 45,
     Provenance.MODEL: 40,

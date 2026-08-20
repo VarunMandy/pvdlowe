@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>body{font-family:"DejaVu Sans",Arial,sans-serif;font-size:7pt;color:#8A98A6;
+margin:0;padding:0 4mm;}
+.f{display:flex;justify-content:space-between;border-top:0.5pt solid #DDE5EC;padding-top:3pt;}</style>
+<script>
+function subst(){var v={},x=document.location.search.substring(1).split('&');
+for(var i in x){var z=x[i].split('=',2);v[z[0]]=decodeURIComponent(z[1]);}
+var e=document.getElementsByClassName('page');for(var i=0;i<e.length;++i)e[i].textContent=v.page;
+var t=document.getElementsByClassName('topage');for(var i=0;i<t.length;++i)t[i].textContent=v.topage;}
+</script></head>
+<body onload="subst()"><div class="f">
+<span>pvdlowe v0.1.0 &nbsp;·&nbsp; Technical Report &nbsp;·&nbsp; Saint-Gobain Research India</span>
+<span><span class="page"></span> / <span class="topage"></span></span>
+</div></body></html>

@@ -219,6 +219,56 @@ def cmd_calibrate(args):
             print(f"    project  : {f['for_the_project']}\n")
 
 
+def cmd_surrogate(args):
+    """Machine-learned interatomic potential as a DFT surrogate."""
+    from .dft.surrogate import (available_models, install_hint,
+                                mixing_energy_series, screen_ternaries,
+                                validate_against_hull, SurrogateUnavailable)
+    avail = available_models()
+    installed = [k for k, v in avail.items() if v["installed"]]
+    print("SURROGATE MODELS\n")
+    for k, v in avail.items():
+        mark = "installed" if v["installed"] else f"pip install {v['package']}"
+        print(f"  {k:10s} {mark:28s} {v['description']}")
+    if not installed:
+        print("\nNone installed.\n")
+        print(install_hint())
+        return
+    print()
+    try:
+        if args.validate:
+            v = validate_against_hull(model=args.model)
+            print(f"VALIDATION against the Materials Project hull "
+                  f"({v['model']})\n")
+            for k, d in v["detail"].items():
+                print(f"  {k:8s} MP {d['mp']:+.4f}   surrogate "
+                      f"{d['surrogate']:+.4f}   error {d['error']:+.4f} eV/atom")
+            print(f"\n  {'PASSED' if v['passed'] else 'FAILED'} at "
+                  f"{v['tolerance_ev']:.3f} eV/atom tolerance")
+            print(f"  {v['note']}")
+            return
+        if args.ternaries:
+            r = screen_ternaries(model=args.model)
+            print(f"DILUTE TERNARY SCREEN — {r['model']}\n")
+            print(f"  binary Ag70Cu30 dE_mix = {r['binary_dE_mix_ev']:+.4f} eV/atom\n")
+            for el, d in r["ternaries"].items():
+                print(f"  +1 at.% {el}: dE_mix {d['dE_mix_ev']:+.4f}  "
+                      f"(delta {d['delta_vs_binary_ev']:+.4f})")
+                print(f"     {d['verdict']}")
+            print(f"\n  {list(r['ternaries'].values())[0]['caveat']}")
+            return
+        res = mixing_energy_series(model=args.model, supercell=(2, 2, 2))
+        print(res.summary())
+        if args.output:
+            import pandas as pd
+            pd.DataFrame({"ag_fraction": res.fractions,
+                          "dE_mix_eV_per_atom": res.mixing_energies_ev}
+                         ).to_csv(args.output, index=False)
+            print(f"\n  written to {args.output}")
+    except SurrogateUnavailable as exc:
+        print(f"error: {exc}")
+
+
 def cmd_doe(args):
     from .doe.design import alias_structure, recommended_screening
     design = recommended_screening()
@@ -335,6 +385,17 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--cap-nm", type=float, default=40.0)
     s.add_argument("--seed", type=int, default=0)
     s.set_defaults(func=cmd_calibrate)
+
+    s = sub.add_parser("surrogate",
+                       help="ML interatomic potential as a DFT surrogate")
+    s.add_argument("--model", default="auto",
+                   choices=["auto", "mace", "chgnet", "m3gnet", "sevennet"])
+    s.add_argument("--validate", action="store_true",
+                   help="check the model against known Materials Project values")
+    s.add_argument("--ternaries", action="store_true",
+                   help="screen the brief's dilute Ti and Al additions")
+    s.add_argument("-o", "--output")
+    s.set_defaults(func=cmd_surrogate)
 
     s = sub.add_parser("doe", help="generate a sputter run sheet")
     s.add_argument("--seed", type=int, default=0)
