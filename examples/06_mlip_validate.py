@@ -6,7 +6,7 @@ training distribution, its predictions for anything else are not usable.
 
     pip install mace-torch ase pymatgen mp-api
     export MP_API_KEY=...
-    python examples/08_mlip_validate.py
+    python examples/06_mlip_validate.py
 """
 
 import sys

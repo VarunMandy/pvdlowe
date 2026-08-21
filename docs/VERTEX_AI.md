@@ -307,8 +307,8 @@ read -s -p "MP API key: " MP_API_KEY && export MP_API_KEY && echo
 ## 6.3 Run
 
 ```bash
-python examples/08_mlip_validate.py     # gate, then Ag-Cu mixing energies
-python examples/09_mlip_adhesion.py     # the adhesion comparison
+python examples/06_mlip_validate.py     # gate, then Ag-Cu mixing energies
+python examples/07_mlip_adhesion.py     # the adhesion comparison
 ```
 
 `08` stops if the surrogate cannot reproduce two known Materials Project hull

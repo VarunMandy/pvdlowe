@@ -9,7 +9,7 @@ acquires a physical basis.
 
     pip install mace-torch ase pymatgen mp-api
     export MP_API_KEY=...
-    python examples/09_mlip_adhesion.py
+    python examples/07_mlip_adhesion.py
 
 Runtime: a few minutes per interface on GPU, considerably longer on CPU.
 """

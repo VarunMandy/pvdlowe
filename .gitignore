@@ -1,11 +1,27 @@
-apply_multimetal.py
-*.egg-info/
+# Python
 __pycache__/
 *.py[cod]
-report/BRIEFING_SCRIPT.md
-results/*.log
-results/*.xlsx
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Generated report artifacts — regenerate with report/build_pdf.sh
 report/*.html
 report/*.docx
-report/*.pdf
 docs/word/*.docx
+
+# Generated result artifacts — regenerate with `pvdlowe report`
+results/*.xlsx
+results/*.log
+
+# Presentation material, not project documentation
+report/BRIEFING_SCRIPT.md
+
+# One-time migration scripts
+apply_multimetal.py
+check_sync.py
+MANIFEST.json
+
+# Local secrets — never commit an API key
+.mp_key
+.env

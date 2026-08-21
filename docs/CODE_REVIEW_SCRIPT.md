@@ -115,7 +115,7 @@ except Exception:
 >
 > But the honest status is: written, syntax-checked, never run. Don't cite a
 > number from it until someone has executed
-> `examples/09_mlip_adhesion.py` once.
+> `examples/07_mlip_adhesion.py` once.
 
 [Volunteer the three specific things you expect to break — slab generation
 assuming a non-empty result, the nearest-integer tiling not reporting lattice

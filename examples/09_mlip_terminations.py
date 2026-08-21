@@ -13,7 +13,7 @@ smaller than the spread BETWEEN dielectrics? If not, example 10's ranking was
 resolving termination choice rather than material.
 
     export MP_API_KEY=...
-    python -u examples/11_mlip_terminations.py
+    python -u examples/09_mlip_terminations.py
 
 Runtime: a few minutes per surface.
 """

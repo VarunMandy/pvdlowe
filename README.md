@@ -125,7 +125,7 @@ checks, and one of those carries the brief's central recommendation. Run
 
 ## Documentation
 
-Read in this order:
+Full index: [`docs/INDEX.md`](docs/INDEX.md). Read in this order:
 
 1. **`docs/SUMMARY.md`** — executive summary: the recommendation, six findings,
    and what must happen before any of it counts as a result

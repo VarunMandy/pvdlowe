@@ -173,9 +173,9 @@ metal-film tiling uses a nearest-integer repeat that could leave several per
 cent lattice mismatch unreported as an error; and `_e()` uses a needlessly
 convoluted call form that should simply branch.
 
-**Recommended.** Run `examples/09_mlip_adhesion.py` once on a machine with a
+**Recommended.** Run `examples/07_mlip_adhesion.py` once on a machine with a
 backend installed, then either fix what breaks or mark the module
-experimental in `docs/README.md`. Do not cite any number from it until then.
+experimental in `README.md`. Do not cite any number from it until then.
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Computed** on Vertex AI Workbench with MACE-MP-0 (medium, float64), 32-site
 fcc supercells, three random decorations per composition, cell and positions
-relaxed. Reproduce with `python examples/08_mlip_validate.py`.
+relaxed. Reproduce with `python examples/06_mlip_validate.py`.
 
 **Grade:** `MODEL`. A surrogate for DFT, not DFT, and its error is quantified
 below rather than assumed.

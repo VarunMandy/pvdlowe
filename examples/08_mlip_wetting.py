@@ -15,7 +15,7 @@ Merwe). Positive means it prefers its own kind, so the film islands
 
     pip install mace-torch ase pymatgen mp-api
     export MP_API_KEY=...
-    python -u examples/10_mlip_wetting.py
+    python -u examples/08_mlip_wetting.py
 
 Runtime: a few minutes per surface on CPU -- far cheaper than example 09.
 """
