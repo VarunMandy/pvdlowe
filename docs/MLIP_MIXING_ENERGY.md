@@ -45,6 +45,54 @@ SQS structures.
 dE_mix = 0.287 · x · (1 − x)      eV/atom
 ```
 
+## 2a. Cross-checked against a second potential
+
+CHGNet was run on the same gate and the same series. It is not an independent
+check — CHGNet and MACE-MP-0 are trained on the same Materials Project
+relaxation trajectories, so agreement shows the bias is *consistent*, not that
+it is absent — but it bounds the model-choice uncertainty.
+
+**Validation gate, both models:**
+
+| Backend | Cu₃Ag | CuAg₃ | mean signed error |
+|---|---|---|---|
+| MP (DFT) | 0.0904 | 0.0857 | — |
+| MACE-MP-0 | 0.0719 | 0.0517 | **−0.0263** |
+| CHGNet | 0.0453 | 0.0376 | **−0.0466** |
+
+**Both under-predict, and MACE is about 1.8× closer to DFT.** The shared sign
+settles a question a single model could not: the bias is inherited from the
+training data rather than specific to one architecture, so ΔE_mix should be
+corrected *upward* rather than merely read as a lower bound.
+
+**Mixing energies:**
+
+| Ag fraction | MACE | CHGNet | spread |
+|---|---|---|---|
+| 0.75 | 0.0479 | 0.0379 | 0.0100 |
+| 0.50 | **0.0721** | **0.0609** | **0.0112** |
+| 0.25 | 0.0591 | 0.0481 | 0.0110 |
+
+CHGNet's regular-solution parameter is Ω = 0.244 eV/atom against MACE's 0.287 —
+a 15% difference, and the two curves have the same shape.
+
+**The §4 conclusion survives, and the test for it was stated in advance.** The
+claim is that the driving force falls below kT at deposition in the dilute
+corner. At Ag 10 at.% the margin is 0.0474 − 0.0258 = 0.0216 eV. The largest
+between-model spread is **0.0112 eV** — half the margin.
+
+It also survives the correction. Scaling MACE upward by the 1.42× its own gate
+implies:
+
+| Ag at.% | MACE | CHGNet | MACE corrected | ×kT (550 K) |
+|---|---|---|---|---|
+| 15 | 0.0366 | 0.0311 | 0.0498 | 1.05 |
+| **10** | 0.0258 | 0.0219 | **0.0351** | **0.74** |
+| **5** | 0.0136 | 0.0116 | **0.0185** | **0.39** |
+
+At 5–10 at.% Ag the driving force stays below thermal energy under both models
+*and* under the correction. Only at 15% does it reach parity.
+
 ## 3. What this adds to the Materials Project result
 
 FINDINGS §3.7 established from the convex hull that Ag–Cu has **no stable

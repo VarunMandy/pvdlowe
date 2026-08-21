@@ -521,6 +521,15 @@ regular-solution form to +/-6 meV/atom:
 
     dE_mix = 0.287 * x * (1 - x)   eV/atom
 
+**Cross-checked against CHGNet.** Both models under-predict the known hull
+distances (MACE by 0.026 eV/atom, CHGNet by 0.047), so the bias is inherited
+from the shared Materials Project training data rather than specific to one
+architecture -- which means dE_mix should be corrected upward, not read as a
+lower bound. The between-model spread is 0.0112 eV/atom against a margin of
+0.0216 at Ag 10%, so the conclusion below holds under both models and under
+the correction. Caveat: CHGNet and MACE-MP-0 share training trajectories, so
+agreement shows the bias is consistent, not absent.
+
 **This extends section 3.7 from ordered compounds to the disordered solid
 solution** a sputtered film might actually be. It also self-checks: at Ag 25%
 the surrogate puts the disordered solution 13 meV/atom BELOW the ordered Cu3Ag

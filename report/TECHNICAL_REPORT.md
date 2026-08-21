@@ -701,6 +701,16 @@ Passed, but the margin should be read: MACE under-predicts both by 20–40%, and
 both errors point the same way, so this is a systematic bias. Every figure
 below is a lower bound.
 
+**Cross-checked.** CHGNet was run on the same gate and series. Both models
+under-predict the known hull distances — MACE by 0.026 eV/atom, CHGNet by
+0.047 — so the bias is inherited from the shared Materials Project training
+data rather than specific to one architecture, and ΔE_mix should be corrected
+upward rather than read as a lower bound. The between-model spread is
+0.0112 eV/atom against a 0.0216 eV margin at Ag 10 at.%, so the conclusion
+below holds under both models and under the correction. The two are not
+independent — they share training trajectories — so agreement shows the bias
+is consistent, not absent.
+
 **Result.** The mixing energy is positive across the whole composition range
 and fits a regular-solution form to within ±6 meV/atom:
 
