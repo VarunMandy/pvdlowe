@@ -226,28 +226,65 @@ benchmarks:
       Ag-Cu amorphous alloy thin-films with unusually high electrical
       conductivity. PII S2589152925001930 (2025). Related patents US 10,822,692
       and US 11,840,756, University of North Texas.
-    verified: partial
-    verified_note: >
-      Numbers confirmed correctly transcribed. IMPORTANT: the framework's
-      original consistency flag proposed that 1.59 uohm.cm was a bulk reference
-      tabulated alongside measurements. THAT HYPOTHESIS IS WRONG. The abstract
-      states the pure Ag and Cu films were "deposited under identical
-      conditions for comparison" at the same ~10 nm thickness, so 1.59 is
-      claimed as a measurement. The physical objection therefore stands and
-      strengthens: films are 10 +/- 2.5 nm on thermal oxide, and even the
-      thickest end of that range gives 1.25x bulk against an FS-MS floor near
-      3x. Their own Cu at 12.2x bulk is consistent with size effects; their Ag
-      at 1.00x is not, under identical deposition.
+    verified: true
     architecture: null
     reported:
       resistivity_ag_uohm_cm: 1.59
       resistivity_agcu_uohm_cm: 2.97
       resistivity_cu_uohm_cm: 20.5
       thickness_nm: 10.0
-    note: >
-      Used in the brief to argue that amorphous Ag-Cu retains unusually good
-      conductivity. Check the thickness attribution carefully: 1.59 uohm.cm is
-      the bulk resistivity of silver to three figures.
+    source_actual:
+      resistivity_ag_uohm_cm: 1.29
+      resistivity_agcu_uohm_cm: 2.97
+      resistivity_cu_uohm_cm: 20.5
+      note: >
+        `reported` is what the brief transcribed and is what the consistency
+        checks run against, since that is the number the brief's argument uses.
+        `source_actual` is what US 10,822,692 states. The silver figure differs,
+        and the source's own value is the more anomalous of the two.
+    verified_note: >
+      FULLY VERIFIED. Full text of the associated patent read: US 10,822,692 B2, US 10,822,692 B2
+      ("Binary Ag-Cu amorphous thin-films for electronic applications", Das &
+      Mukherjee, University of North Texas, filed 2017-08-14, granted
+      2020-11-03, priority to provisional 62/374,209 of 2016-08-12). The
+      journal article is paywalled; the patent carries the same measurements
+      and is freely readable, so full text was obtained that way.
+
+      THE BRIEF MISTRANSCRIBED THE SILVER VALUE. The patent states, verbatim:
+      "The room temperature resistivity of 99.999% Ag and 99.999% Cu thin film
+      shows 1.29e-6 +/- 5.54e-9 and 2.05e-5 +/- 7.39e-7 Ohm-cm, respectively."
+
+        Ag     brief 1.59   patent 1.29   MISMATCH
+        Ag-Cu  brief 2.97   patent 2.97   confirmed
+        Cu     brief 20.5   patent 20.5   confirmed
+
+      The correction makes the anomaly WORSE, not better. Bulk silver is
+      1.587 uohm.cm. The brief's 1.59 was exactly 1.00x bulk, already
+      impossible for a 10 nm film given a 53 nm mean free path. The patent's
+      actual 1.29 is 0.81x bulk -- BELOW bulk, which is impossible at any
+      thickness, because surface and grain-boundary scattering can only add
+      resistivity to a polycrystalline film.
+
+      Framework model for comparison: 4.44 uohm.cm at 10 nm, 1.90 at 100 nm,
+      1.62 at 1000 nm -- asymptotically approaching but never crossing bulk.
+
+      ALSO ESTABLISHED. Composition is stated as "close to 60 at % Ag - 40 at %
+      Cu", the eutectic, with claim 1 covering 20-70 at % Cu. Deposited by DC
+      magnetron on a thermal oxide grown on silicon -- NOT on glass, and not in
+      a Low-E stack. The application is sub-20 nm IC interconnects. The patent
+      cites Chawla et al., Phys. Rev. B 84, 235423 (2011), the same
+      thin-film-scattering literature used in docs/LITERATURE_CALIBRATION.md.
+
+      The patent also prints the Ag-Cu figure as "2.97e6 Ohm-cm", twelve orders
+      of magnitude out. Read alongside the mistranscribed silver value, the
+      numeric care in this source is not high.
+
+      CONSEQUENCE FOR THE BRIEF. Section 7 argues that amorphous Ag-Cu
+      "retains unusually good conductivity" by comparing 2.97 against a silver
+      baseline. That baseline is both mistranscribed and unphysical. The
+      comparison should be made against the copper value, 20.5, against which
+      the alloy is genuinely seven times better -- an argument that survives
+      in stronger form.
 
   - id: agc_underlayer_sheet_resistance
     label: "16 nm Ag on ZnO/a-TiOx vs a-TiOx alone"

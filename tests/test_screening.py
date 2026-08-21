@@ -227,3 +227,21 @@ def test_gzo_and_ito_share_or_declare_their_proxies():
     assert DIELECTRIC_PROXY["GZO"]["mp_id"] == DIELECTRIC_PROXY["AZO"]["mp_id"]
     assert "outside what this can resolve" in DIELECTRIC_PROXY["GZO"]["note"]
     assert DIELECTRIC_PROXY["ITO"]["formula"] == "In2O3"
+
+
+def test_cli_parser_builds_without_duplicate_subcommands():
+    """Guards a bug that broke every CLI command while all tests passed.
+
+    Two `surrogate` subparsers had been registered, so `build_parser()` raised
+    ArgumentError on import of the parser — meaning `python -m pvdlowe <any>`
+    failed entirely. No test called build_parser, so the suite stayed green.
+    """
+    from pvdlowe.cli import build_parser
+    parser = build_parser()
+    subs = [a for a in parser._actions if getattr(a, "choices", None)]
+    assert subs, "no subparsers registered"
+    names = list(subs[0].choices)
+    assert len(names) == len(set(names)), \
+        f"duplicate subcommands: {[n for n in names if names.count(n) > 1]}"
+    for expected in ("evaluate", "validate", "series", "calibrate", "report"):
+        assert expected in names, expected

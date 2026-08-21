@@ -125,10 +125,28 @@ class BenchmarkComparison:
         return abs(self.modelled - self.reported) / abs(self.reported)
 
 
-def validate_model(path: Path | None = None) -> pd.DataFrame:
-    """Compare the framework against every transcribed benchmark."""
+def validate_model(path: Path | None = None,
+                   include_disputed: bool = False) -> pd.DataFrame:
+    """Compare the framework against the transcribed benchmarks.
+
+    **Disputed entries are excluded by default, and the reason is not
+    housekeeping.** The two benchmarks whose figures could not be matched to
+    any locatable source happen to be the model's three closest agreements --
+    0.3%, 1.0% and 1.2% relative error. Including them puts the median error at
+    14.7%; excluding them puts it at 30.6%. The lower number flatters the model
+    using values that cannot be traced, so it is not the one to quote.
+
+    Pass ``include_disputed=True`` to see them, which is worth doing when
+    auditing rather than reporting. The returned frame carries
+    ``.attrs["excluded"]`` naming what was left out, so a table cannot silently
+    become the flattering version.
+    """
     rows = []
+    excluded = []
     for bm in load_benchmarks(path):
+        if bm.get("verified") == "disputed" and not include_disputed:
+            excluded.append(bm["id"])
+            continue
         coating = _build(bm.get("architecture") or {})
         reported = bm.get("reported", {})
         modelled = {}
@@ -158,7 +176,21 @@ def validate_model(path: Path | None = None) -> pd.DataFrame:
                 "source_state": (bm.get("verified") if bm.get("verified")
                                  else "not located"),
             })
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    df.attrs["excluded"] = excluded
+    df.attrs["include_disputed"] = include_disputed
+    comparable = df.dropna(subset=["modelled"]) if "modelled" in df else df
+    if len(comparable):
+        df.attrs["median_rel_error_pct"] = round(
+            float(comparable["rel_error_pct"].median()), 1)
+    if excluded:
+        df.attrs["note"] = (
+            f"{len(excluded)} disputed benchmark(s) excluded: "
+            f"{', '.join(excluded)}. Their figures could not be matched to any "
+            "locatable source, and they are the model's closest agreements, so "
+            "including them would overstate its accuracy. Pass "
+            "include_disputed=True to audit them.")
+    return df
 
 
 def check_consistency(path: Path | None = None) -> pd.DataFrame:
@@ -288,6 +320,13 @@ def report(path: Path | None = None) -> str:
     if len(have):
         lines += ["", f"median relative error: "
                       f"{have['rel_error_pct'].median():.1f}%"]
+    if mv.attrs.get("excluded"):
+        lines += ["", "  " + mv.attrs["note"]]
+        alt = validate_model(path, include_disputed=True).dropna(subset=["modelled"])
+        if len(alt):
+            lines.append(f"  For comparison, including them: "
+                         f"{alt['rel_error_pct'].median():.1f}% -- do not quote "
+                         "this figure.")
 
     lines += ["", "=" * 74, "INTERNAL CONSISTENCY OF THE REPORTED VALUES", "=" * 74]
     cc = check_consistency(path)

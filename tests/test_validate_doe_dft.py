@@ -197,11 +197,17 @@ def test_validation_table_reports_the_true_source_state():
     'partial' and 'disputed' are truthy strings; reporting them as verified
     would defeat the point of grading the evidence at all.
     """
-    df = validate_model()
+    # the audit view, which still contains everything
+    df = validate_model(include_disputed=True)
     states = set(df["source_state"])
     assert states <= {True, "partial", "disputed", "not located"}, states
     assert True in states, "expected at least one fully verified source"
     assert "disputed" in states, "the two unmatched entries must show as disputed"
+
+    # and the default view, which must not
+    default = validate_model()
+    assert "disputed" not in set(default["source_state"]), (
+        "disputed entries must be excluded from the default validation table")
 
 
 def test_surrogate_refuses_cleanly_when_unavailable():
@@ -240,3 +246,58 @@ def test_surrogate_carries_mp_reference_values():
     from pvdlowe.dft.surrogate import MP_REFERENCE
     assert abs(MP_REFERENCE["Cu3Ag"] - 0.0904) < 1e-4
     assert abs(MP_REFERENCE["CuAg3"] - 0.0857) < 1e-4
+
+
+def test_source_actual_records_transcription_differences():
+    """Where a source's own figure differs from the brief's, record both.
+
+    The brief transcribed 1.59 uohm.cm for a 10 nm Ag film; the patent it came
+    from states 1.29. `reported` keeps the brief's number, because that is what
+    the brief's argument uses and what the consistency checks must judge.
+    `source_actual` records the source's. Collapsing them would hide either the
+    transcription error or the physical impossibility, and both matter.
+    """
+    from pvdlowe.validate import load_benchmarks
+    for bm in load_benchmarks():
+        actual = bm.get("source_actual")
+        if not actual:
+            continue
+        assert bm.get("verified") is True, (
+            f"{bm['id']} records source_actual without full verification")
+        reported = bm.get("reported", {})
+        differing = [k for k in actual
+                     if k in reported and actual[k] != reported[k]]
+        assert differing, (
+            f"{bm['id']} has source_actual identical to reported — drop it")
+        assert "note" in actual, "source_actual must explain the discrepancy"
+
+
+def test_disputed_benchmarks_are_excluded_from_validation_by_default():
+    """The flattering number must not be the default.
+
+    The two benchmarks whose figures match no locatable source are also the
+    model's closest agreements. Including them halves the reported median
+    error, from 30.6% to 14.7%. Defaulting to the lower figure would let an
+    untraceable value flatter the model, which is the opposite of what this
+    validation exists to do.
+    """
+    from pvdlowe.validate import validate_model
+    default = validate_model()
+    audit = validate_model(include_disputed=True)
+
+    assert default.attrs["excluded"], "expected disputed entries to be excluded"
+    assert len(default) < len(audit), "the audit view should have more rows"
+    assert default.attrs["median_rel_error_pct"] > audit.attrs["median_rel_error_pct"], (
+        "excluding disputed entries must RAISE the reported error; if it "
+        "lowers it, the exclusion is flattering the model rather than "
+        "protecting against it")
+    assert "note" in default.attrs and "cannot be quoted" not in default.attrs["note"]
+    assert not audit.attrs["excluded"], "audit view must include everything"
+
+
+def test_validation_report_names_which_figure_it_quotes():
+    """A median error printed without saying what it excludes is a trap."""
+    from pvdlowe.validate import report
+    text = report()
+    assert "disputed benchmark" in text
+    assert "do not quote" in text.lower()

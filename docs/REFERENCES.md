@@ -16,8 +16,8 @@ mean none had been checked, and checking changed the status of eight of them.
 
 | Status | Count | Meaning |
 |---|---|---|
-| **Verified** | 3 | full text read, figures confirmed |
-| **Partial** | 5 | source located, figures confirmed against abstract only |
+| **Verified** | 4 | full text read, figures confirmed |
+| **Partial** | 4 | source located, figures confirmed against abstract only |
 | **Disputed** | 2 | located sources do not contain the quoted figures — **do not cite** |
 | Supported | 2 | not the original source, but independently corroborated |
 | Unverified | 4 | not pursued |
@@ -35,7 +35,7 @@ mean none had been checked, and checking changed the status of eight of them.
 | 5 | Ag–Cu Low-E, ~30 at.% Cu, neutral colour, good adhesion | 5 | unverified | Not pursued |
 | 6 | Ag–Cu ~13% lattice mismatch, segregation tendency | 5 | **SUPPORTED** | Not the original source, but independently confirmed: the Materials Project convex hull has no stable ordered Ag–Cu compound (Cu₃Ag 0.0904, CuAg₃ 0.0857 eV/atom above hull), and MACE gives ΔE_mix > 0 across the whole composition range. FINDINGS §3.7, §3.8 |
 | 7 | GGA underestimates Cu-alloy formation energies; +U improves | 6 | unverified | Not pursued. The framework acts on it anyway — `dft/plans.py` requests a PBE/PBE+U comparison rather than a single functional |
-| 8 | ~10 nm films: Ag 1.59, Ag–Cu 2.97, Cu 20.5 µΩ·cm | 7 | partial, **fails consistency** | Source located (2025). 1.59 µΩ·cm is bulk silver to three figures; a 10 nm film cannot reach it (53 nm mean free path). The abstract states both films were deposited under identical conditions, so a "bulk value tabulated alongside" explanation is ruled out. FINDINGS §1.3 |
+| 8 | ~10 nm films: Ag 1.59, Ag–Cu 2.97, Cu 20.5 µΩ·cm | 7 | **VERIFIED**, and **mistranscribed** | US 10,822,692 B2 (Das & Mukherjee, UNT), full text read. **The patent says Ag = 1.29, not 1.59.** Ag–Cu 2.97 and Cu 20.5 confirmed. The correction makes it worse: 1.29 is **0.81× bulk silver**, below bulk, impossible at any thickness. See below |
 | 9 | AZO/Cu/AZO: 16.6 Ω/sq, 67% FIR at 15 nm, continuity ~11 nm | 8 | partial | Located by title; abstract not retrieved. RF sputtering — a different study from #10, and the two should not be pooled |
 | 10 | AZO(40)/Cu/AZO(40): 87.7% T_vis, 9.96 Ω/sq, ε = 0.055 | 16 | partial, **fails consistency** | *Applied Surface Science* **578** (2022) 152051. Numbers confirmed, all three from the same sample. ε = 0.055 at 9.96 Ω/sq is below the thin-sheet impedance limit of 0.096, and below the 0.106 an industrial formula in use since 2000 gives. Four explanations tested and eliminated. **§16's conclusion rests on this.** FINDINGS §1.2 |
 | 11 | Al:ZnO negative formation energies, 6.25–18.75% Al | 2 | **SUPPORTED** | Materials Project Al–Zn–O screening returns 4 entries with 2 near the hull (Al₂ZnO₄ spinel, Al₁₀ZnO₁₆), consistent with negative formation energies for Al in ZnO. Not the original source |
@@ -55,6 +55,36 @@ The paper reports both: §3.1 gives the average transparency over 360–760 nm a
 inconsistent, and the brief quoted the Results figure — which is the defensible
 choice. The error came from checking only the abstract, which is precisely the
 shortcut the `partial` grade exists to flag.
+
+## A second mistranscription, and it matters
+
+Claim **8** was verified through the associated patent, US 10,822,692 B2 — the
+journal article is paywalled but the patent carries the same measurements and
+is free. The patent states verbatim that 99.999% Ag and Cu films measured
+**1.29 × 10⁻⁶** and 2.05 × 10⁻⁵ Ω·cm.
+
+**The brief says 1.59. The source says 1.29.**
+
+| | brief | patent |
+|---|---|---|
+| Ag | 1.59 | **1.29** |
+| Ag–Cu | 2.97 | 2.97 ✓ |
+| Cu | 20.5 | 20.5 ✓ |
+
+The correction makes the anomaly worse. Bulk silver is 1.587 µΩ·cm, so the
+brief's figure was exactly 1.00× bulk — already impossible for a 10 nm film.
+The patent's actual 1.29 is **0.81× bulk**, which is impossible at *any*
+thickness: surface and grain-boundary scattering can only ever add resistivity
+to a polycrystalline film.
+
+The patent also prints the alloy value as "2.97 × 10⁶ Ω·cm", twelve orders of
+magnitude out. The numeric care in this source is not high.
+
+**Consequence.** The brief's §7 argues that amorphous Ag–Cu "retains unusually
+good conductivity" by comparing 2.97 against the silver baseline. That baseline
+is both mistranscribed and unphysical. Compare against the copper value instead
+— 20.5, against which the alloy is genuinely seven times better — and the
+argument survives in stronger form.
 
 ## Two entries that should be withdrawn
 

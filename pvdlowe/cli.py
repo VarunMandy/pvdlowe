@@ -56,8 +56,19 @@ def cmd_evaluate(args):
 
 
 def cmd_validate(args):
-    from .validate import report
+    from .validate import report, validate_model
     print(report())
+    if args.include_disputed:
+        print("\n" + "=" * 74)
+        print("AUDIT VIEW: disputed benchmarks included")
+        print("=" * 74)
+        mv = validate_model(include_disputed=True).dropna(subset=["modelled"])
+        _print(mv)
+        print(f"\n  median relative error including disputed entries: "
+              f"{mv['rel_error_pct'].median():.1f}%")
+        print("  This figure is for auditing only. The disputed entries are "
+              "the model's\n  closest agreements and cannot be traced to a "
+              "source, so quoting it would\n  overstate the model's accuracy.")
 
 
 def cmd_check_weights(args):
@@ -347,6 +358,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_evaluate)
 
     s = sub.add_parser("validate", help="model vs literature, and consistency")
+    s.add_argument("--include-disputed", action="store_true",
+                   help="also show the audit view with untraceable benchmarks "
+                        "included; the resulting error figure must not be quoted")
     s.set_defaults(func=cmd_validate)
 
     s = sub.add_parser("check-weights", help="are the criteria independent?")
@@ -395,21 +409,6 @@ def build_parser() -> argparse.ArgumentParser:
                    help="check the model against known Materials Project values")
     s.add_argument("--ternaries", action="store_true",
                    help="screen the brief's dilute Ti and Al additions")
-    s.add_argument("-o", "--output")
-    s.set_defaults(func=cmd_surrogate)
-
-    s = sub.add_parser("surrogate",
-                       help="mixing energies from an ML interatomic potential")
-    s.add_argument("--model", help="chgnet | mace | matgl")
-    s.add_argument("--configs", type=int, default=4,
-                   help="random decorations averaged per composition")
-    s.add_argument("--temperature", type=float, default=300.0)
-    s.add_argument("--no-relax", action="store_true",
-                   help="skip geometry relaxation (faster, and wrong for Ag-Cu)")
-    s.add_argument("--cross-check", action="store_true",
-                   help="run two potentials and compare")
-    s.add_argument("--limits", action="store_true",
-                   help="print what a surrogate cannot answer")
     s.add_argument("-o", "--output")
     s.set_defaults(func=cmd_surrogate)
 
