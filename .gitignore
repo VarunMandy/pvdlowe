@@ -14,8 +14,6 @@ docs/word/*.docx
 results/*.xlsx
 results/*.log
 
-# Presentation material, not project documentation
-report/BRIEFING_SCRIPT.md
 
 # One-time migration scripts
 apply_multimetal.py
@@ -25,3 +23,9 @@ MANIFEST.json
 # Local secrets — never commit an API key
 .mp_key
 .env
+
+# Presentation and internal working material, not project documentation
+report/BRIEFING_SCRIPT.md
+report/DAY_REPORT_*.md
+report/DAY_REPORT_*.pdf
+docs/CODE_REVIEW_SCRIPT.md

@@ -165,6 +165,46 @@ independently — anneal at fixed thickness and re-measure.
 testing. It is also the one that matters most, since it sets the minimum usable
 thickness.
 
+## The same scan answers the microstructure question too
+
+`pvdlowe.characterise.xrd` predicts what each hypothesis looks like, so the
+scan can be planned rather than interpreted afterwards.
+
+**Peak positions, Cu K-alpha1:**
+
+| Case | (111) 2-theta | Signature |
+|---|---|---|
+| Segregated Ag-Cu | 38.12 and 43.32 | **two** peak sets, at the pure-element angles |
+| Solid solution, Ag70Cu30 | 39.54 | **one** peak set, between them |
+| Pure Ag | 38.12 | — |
+| Pure Cu | 43.32 | — |
+
+The solid-solution peak sits 1.42 degrees from silver, against a peak width of
+0.59 degrees at 15 nm grains. The two cases cannot be confused.
+
+**This is a second, independent discriminator.** The sheet-resistance test
+separates the hypotheses by a number, 6.4 against 2.6 ohm/sq. Diffraction
+separates them by peak count. Two unrelated observables agreeing is far
+stronger evidence than either, and both come from the same film.
+
+**Grain size from the same peak:**
+
+| Underlayer | Grain size | FWHM(111) |
+|---|---|---|
+| Crystalline ZnO / AZO (TEM, patent) | 25 nm | 0.351 deg |
+| Framework default | 30 nm | 0.293 deg |
+| Amorphous TiOx (TEM, patent) | 15 nm | 0.585 deg |
+| Nanocrystalline, the Cu hypothesis | 6 nm | 1.463 deg |
+
+Measure instrumental broadening on a LaB6 or silicon standard and subtract in
+quadrature before inverting. Strain also broadens peaks; separating size from
+strain needs several reflections and a Williamson-Hall plot.
+
+**And the texture answers the templating question.** Compare the observed
+(111)/(200) intensity ratio against the powder value of about 2.2. A much
+larger ratio means {111} texture, which is the epitaxial templating the AGC
+patent attributes to ZnO. That is the third thing this one scan settles.
+
 ## Follow-on, if Experiment 1 is clean
 
 **Experiment 2 (§6.3):** R_s across Ag 0, 25, 50, 75% at fixed 10 nm. The
