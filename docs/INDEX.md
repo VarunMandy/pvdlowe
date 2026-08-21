@@ -42,6 +42,7 @@ Read in this order — each corrected something.
 | File | What it is |
 |---|---|
 | [`CODE_REVIEW.md`](CODE_REVIEW.md) | Self-review: three medium findings, one new, four low, five things not to break |
+| [`CODE_REVIEW_SCRIPT.md`](CODE_REVIEW_SCRIPT.md) | Walkthrough script for a handover session |
 | [`VERTEX_AI.md`](VERTEX_AI.md) | Running the framework, and the ML surrogate, on Google Cloud |
 
 ---
