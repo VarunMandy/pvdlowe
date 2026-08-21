@@ -25,3 +25,4 @@ MANIFEST.json
 # Local secrets — never commit an API key
 .mp_key
 .env
+docs/CODE_REVIEW_SCRIPT.md
