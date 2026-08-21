@@ -245,3 +245,19 @@ def test_cli_parser_builds_without_duplicate_subcommands():
         f"duplicate subcommands: {[n for n in names if names.count(n) > 1]}"
     for expected in ("evaluate", "validate", "series", "calibrate", "report"):
         assert expected in names, expected
+
+
+def test_cross_check_example_states_the_independence_caveat():
+    """CHGNet and MACE-MP-0 share training data; agreement is weak evidence.
+
+    Both are trained on Materials Project relaxation trajectories, so a
+    matching bias shows the bias is consistent, not that it is absent. Any
+    cross-check that does not say so would overstate what it establishes.
+    """
+    import pathlib
+    src = pathlib.Path(__file__).resolve().parents[1] / "examples" / "10_mlip_cross_check.py"
+    # flatten first: the docstring wraps, so phrases span line breaks
+    text = " ".join(src.read_text().split())
+    assert "same Materials Project relaxation trajectories" in text
+    assert "consistent" in text
+    assert "not that it is absent" in text
