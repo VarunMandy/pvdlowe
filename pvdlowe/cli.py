@@ -100,6 +100,20 @@ def cmd_check_weights(args):
     print("\n\nWEIGHT SENSITIVITY\n")
     _print(sensitivity_to_weights(scheme, records))
 
+    from .screening.scoring import weight_sweep
+    print("\n" + "=" * 70)
+    print("WEIGHT SENSITIVITY: does the choice of silver weight decide the answer?")
+    print("=" * 70)
+    sweep = weight_sweep(records, key=args.sweep_key)
+    _print(sweep)
+    print(f"\n  {sweep.attrs['note']}")
+    for tr in sweep.attrs["transitions"]:
+        print(f"    winner becomes {tr['becomes']} at weight {tr['at_weight']:.2f}")
+    thin = sweep[sweep.margin < 0.5] if "margin" in sweep else sweep.iloc[0:0]
+    if len(thin):
+        print(f"\n  {len(thin)} of {len(sweep)} weights separate first from second by")
+        print("  less than 0.5 points. At those settings the ranking is not")
+        print("  meaningfully distinguishing the candidates.")
 
 def cmd_optimise(args):
     from .optimize.thickness import optimise_thicknesses
@@ -347,6 +361,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_validate)
 
     s = sub.add_parser("check-weights", help="are the criteria independent?")
+    s.add_argument("--sweep-key", default="Ag_g_per_m2",
+                   help="criterion whose weight to sweep for sensitivity")
     s.set_defaults(func=cmd_check_weights)
 
     s = sub.add_parser("optimise", help="optimise layer thicknesses")

@@ -261,3 +261,44 @@ def test_cross_check_example_states_the_independence_caveat():
     assert "same Materials Project relaxation trajectories" in text
     assert "consistent" in text
     assert "not that it is absent" in text
+
+
+def test_no_active_double_counts_in_the_default_weighting():
+    """No two criteria may both carry weight and correlate above threshold.
+
+    The original defect was emissivity and sheet resistance at r = 0.996,
+    fixed by zeroing R_sheet. That fix left a triple-count untouched: silver
+    mass, metal cost and supply risk correlate at r = 1.000 and 0.991, because
+    silver dominates metal cost and the supply risk in this candidate set is
+    silver's. Together they carried 36% of the effective weight on one physical
+    property. Cost and supply risk are now zeroed and reported as derived.
+    """
+    from pvdlowe.screening.candidates import evaluate_all
+    from pvdlowe.screening.scoring import ScoringScheme, redundant_criteria
+    scheme = ScoringScheme.from_yaml()
+    records = evaluate_all().to_dict("records")
+    active = [d for d in redundant_criteria(records, scheme)
+              if d["active_double_count"]]
+    assert not active, (
+        "criteria both carrying weight and correlating: "
+        + ", ".join(f"{d['criterion_a']}~{d['criterion_b']} r={d['pearson_r']}"
+                    for d in active))
+
+
+def test_weight_sweep_exposes_that_the_answer_depends_on_a_judgement():
+    """The silver weight decides the winner, and that must be visible.
+
+    At weight 0 the winner carries 0.065 g/m2 of silver; at 0.30 it carries
+    none. Quoting a single ranking hides that the recommendation was selected
+    by a number nobody derived. The sweep reports the transitions instead.
+    """
+    from pvdlowe.screening.candidates import evaluate_all
+    from pvdlowe.screening.scoring import weight_sweep
+    records = evaluate_all().to_dict("records")
+    sweep = weight_sweep(records, key="Ag_g_per_m2")
+    assert sweep.attrs["transitions"], (
+        "expected the winner to change across the swept range; if it no longer "
+        "does, the sensitivity this test guards has gone away and the note "
+        "should be updated")
+    assert sweep.iloc[0].Ag_g_per_m2 > sweep.iloc[-1].Ag_g_per_m2, (
+        "raising the silver weight must reduce the winner's silver content")

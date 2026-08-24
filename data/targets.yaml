@@ -117,8 +117,19 @@ weights:
   R_sheet: 0.0
   structural_stability: 0.15
   thermal_stability_c: 0.10
-  cost_usd_per_m2: 0.05
-  supply_risk: 0.05
+  # Both of these correlate with Ag_g_per_m2 at r = 1.000 and r = 0.991
+  # respectively: silver dominates metal cost so completely that cost is the
+  # same quantity in different units, and supply risk in this candidate set is
+  # silver's supply risk. Weighting all three put 36% of the effective weight
+  # on one physical property -- the same defect as emissivity/R_sheet, one
+  # trio further along. Weighted 0.0 and reported as derived figures, exactly
+  # as R_sheet is.
+  #
+  # Restore supply_risk if indium- or gallium-bearing candidates return, where
+  # the risk is genuinely independent of silver mass. Restore cost if a
+  # non-silver cost driver enters the set.
+  cost_usd_per_m2: 0.0
+  supply_risk: 0.0
   deposition_efficiency: 0.05
 
 # WARNING, and the reason the aggregation defaults to a geometric mean:

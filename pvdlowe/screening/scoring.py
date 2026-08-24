@@ -213,6 +213,53 @@ def criterion_correlations(records, keys=None) -> pd.DataFrame:
     return numeric.corr(method="pearson")
 
 
+def weight_sweep(records, key: str = "Ag_g_per_m2",
+                 weights=(0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40),
+                 scheme: "ScoringScheme | None" = None) -> "pd.DataFrame":
+    """How the winner changes as one criterion's weight is varied.
+
+    **Why this exists.** A weight is a value judgement, not a measurement, and
+    some of them decide the answer. Silver mass is the clearest case here: at
+    weight 0 the winner is a 0.065 g/m2 design, at 0.15 it is 0.008, and at
+    0.25 and above it is silver-free. Quoting a single ranking hides that the
+    recommendation was chosen by a number nobody derived.
+
+    Report the sweep, not the point. "The recommendation is E5e at w = 0.15 and
+    N6 at w >= 0.25" is an honest statement about a value judgement; "the
+    recommendation is E5e" is not.
+
+    The transition weights are the useful output: they are where the answer
+    changes, and therefore where the decision actually has to be made.
+    """
+    import pandas as pd
+    base = scheme or ScoringScheme.from_yaml()
+    rows = []
+    for w in weights:
+        s2 = ScoringScheme(criteria=base.criteria,
+                           weights={**base.weights, key: float(w)},
+                           aggregation=base.aggregation, epsilon=base.epsilon)
+        scored = [(r.get("id", "?"), s2.score(r)["score"], r) for r in records]
+        scored.sort(key=lambda t: -t[1])
+        top_id, top_score, top_rec = scored[0]
+        rows.append({
+            "weight": w, "winner": top_id, "score": round(top_score, 1),
+            key: round(float(top_rec.get(key) or 0.0), 4),
+            "runner_up": scored[1][0] if len(scored) > 1 else None,
+            "margin": round(top_score - scored[1][1], 2) if len(scored) > 1 else None,
+        })
+    df = pd.DataFrame(rows)
+    changes = df[df.winner != df.winner.shift()].iloc[1:]
+    df.attrs["transitions"] = [
+        {"at_weight": float(r.weight), "becomes": r.winner} for _, r in changes.iterrows()]
+    df.attrs["note"] = (
+        f"The winner changes at {len(changes)} weight(s). Quote the sweep "
+        "rather than a single ranking: the choice of weight is a value "
+        "judgement and it decides the answer." if len(changes) else
+        f"The winner is stable across the swept range, so the choice of "
+        f"{key} weight does not decide the answer.")
+    return df
+
+
 def redundant_criteria(records, scheme: ScoringScheme,
                        threshold: float = 0.9) -> list:
     """Criterion pairs that are effectively the same objective.
@@ -233,8 +280,17 @@ def redundant_criteria(records, scheme: ScoringScheme,
                     "weight_b": scheme.weights.get(b, 0.0),
                     "combined_weight": round(
                         scheme.weights.get(a, 0.0) + scheme.weights.get(b, 0.0), 3),
+                    # A correlated pair only double-counts if BOTH sides carry
+                    # weight. Where one is zeroed and reported as a derived
+                    # figure -- R_sheet, cost and supply risk all are -- the
+                    # correlation is worth knowing but is not a defect.
+                    # Reporting both alike buries the cases that matter.
+                    "active_double_count": bool(
+                        scheme.weights.get(a, 0.0) > 0
+                        and scheme.weights.get(b, 0.0) > 0),
                 })
-    return sorted(found, key=lambda d: -d["combined_weight"])
+    return sorted(found, key=lambda d: (not d["active_double_count"],
+                                        -d["combined_weight"]))
 
 
 def sensitivity_to_weights(scheme: ScoringScheme, records, n_trials: int = 400,

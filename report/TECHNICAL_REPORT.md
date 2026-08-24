@@ -165,7 +165,26 @@ free-carrier response of the same metal layer. The §14 weights of 0.25 and 0.15
 therefore place 0.40 of the total on a single physical quantity.
 
 *Correction applied:* sheet resistance weighted 0.0 and reported as a
-constraint. This should be reversed (with emissivity reduced to 0.15) if the
+constraint.
+
+**A fifth defect, found by re-auditing that fix.** Zeroing sheet resistance
+removed one double-count and left a triple-count untouched. Silver mass, metal
+cost and supply risk correlate at **r = 1.000** and **r = 0.991** — silver
+dominates metal cost so completely that cost is the same quantity in different
+units, and supply risk in this candidate set *is* silver's supply risk.
+Together they carried **36% of the effective weight on one physical property**,
+which is the same defect as the emissivity/sheet-resistance pair, one trio
+further along.
+
+*Correction applied:* cost and supply risk weighted 0.0 and reported as derived
+figures. Effective weight on silver-restated criteria falls from 36% to 25%,
+and no criterion pair now both carries weight and correlates above threshold.
+Restore supply risk if indium- or gallium-bearing candidates return, where the
+risk is genuinely independent of silver mass.
+
+The diagnostic itself was also wrong: it flagged correlated pairs regardless of
+whether both carried weight, which buries the cases that matter. It now
+distinguishes an active double-count from an informational correlation. This should be reversed (with emissivity reduced to 0.15) if the
 coating is also required to function as a transparent electrode, where sheet
 resistance is an independent objective.
 
@@ -915,19 +934,48 @@ coefficient; LSG = T_vis/g; "spec" is T_vis ≥ 0.80, R_s ≤ 5 Ω/sq, ε_h ≤ 
 
 #### Heating-dominated (Northern Europe) — `data/targets.yaml`
 
-| # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | $/m² | Score | Spec |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | E5e | Si3N4/Ag5Cu95/Si3N4 (segregated) | 59/11/48 | 0.863 | 0.0481 | 2.98 | 0.731 | 1.18 | 0.008 | 0.07 | **88.1** | yes |
-| 2 | E10e | Si3N4/Ag10Cu90/Si3N4 (segregated) | 59/10/48 | 0.877 | 0.0511 | 3.13 | 0.758 | 1.16 | 0.015 | 0.12 | **88.1** | yes |
-| 3 | N6 | Si3N4/Cu/Si3N4 | 60/11/50 | 0.858 | 0.0538 | 3.41 | 0.729 | 1.18 | 0.000 | 0.01 | **87.5** | yes |
-| 4 | E5 | Si3N4/Ag5Cu95/Si3N4 | 59/11/48 | 0.861 | 0.0609 | 3.99 | 0.728 | 1.18 | 0.008 | 0.07 | **85.1** | yes |
-| 5 | N7 | Si3N4/Cu90Zn10/Si3N4 | 60/11/50 | 0.850 | 0.0695 | 4.66 | 0.725 | 1.17 | 0.000 | 0.01 | **83.0** | yes |
-| 6 | E10 | Si3N4/Ag10Cu90/Si3N4 | 59/11/48 | 0.864 | 0.0670 | 4.50 | 0.729 | 1.19 | 0.016 | 0.14 | **83.0** | yes |
-| 7 | N8 | Si3N4/Cu90Ag10/Si3N4 | 60/11/50 | 0.863 | 0.0671 | 4.50 | 0.730 | 1.18 | 0.016 | 0.14 | **82.9** | yes |
-| 8 | N35e | Si3N4/Ag60Cu40/Si3N4 (segregated) | 45/9/40 | 0.902 | 0.0498 | 3.04 | 0.793 | 1.14 | 0.065 | 0.53 | **80.7** | yes |
-| 9 | H2 | AZO/Cu/Si3N4 (hybrid, silver-free) | 40/12/40 | 0.788 | 0.0425 | 2.93 | 0.631 | 1.25 | 0.000 | 0.01 | **79.9** | **no** |
-| 10 | N3e | Si3N4/Ag70Cu30/Si3N4 (segregated) | 25/9/35 | 0.899 | 0.0508 | 3.16 | 0.769 | 1.17 | 0.073 | 0.59 | **78.1** | yes |
-| — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 0.85 | 65.0 | yes |
+| # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | Score | Spec |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | E10e | Si₃N₄/Ag₁₀Cu₉₀/Si₃N₄ (segregated) | 59/10/48 | 0.877 | 0.0511 | 3.13 | 0.758 | 1.16 | 0.015 | **87.3** | yes |
+| 2 | E5e | Si₃N₄/Ag₅Cu₉₅/Si₃N₄ (segregated) | 59/11/48 | 0.863 | 0.0481 | 2.98 | 0.731 | 1.18 | 0.008 | **87.1** | yes |
+| 3 | N6 | Si₃N₄/Cu/Si₃N₄ | 60/11/50 | 0.858 | 0.0538 | 3.41 | 0.729 | 1.18 | 0.000 | **86.2** | yes |
+| 4 | E5 | Si₃N₄/Ag₅Cu₉₅/Si₃N₄ | 59/11/48 | 0.861 | 0.0609 | 3.99 | 0.728 | 1.18 | 0.008 | **83.7** | yes |
+| 5 | N35e | Si₃N₄/Ag₆₀Cu₄₀/Si₃N₄ (segregated) | 45/9/40 | 0.902 | 0.0498 | 3.04 | 0.793 | 1.14 | 0.065 | **81.5** | yes |
+| 6 | E10 | Si₃N₄/Ag₁₀Cu₉₀/Si₃N₄ | 59/11/48 | 0.864 | 0.0670 | 4.50 | 0.729 | 1.19 | 0.016 | **81.5** | yes |
+| 7 | N8 | Si₃N₄/Cu₉₀Ag₁₀/Si₃N₄ | 60/11/50 | 0.863 | 0.0671 | 4.50 | 0.730 | 1.18 | 0.016 | **81.4** | yes |
+| 8 | N7 | Si₃N₄/Cu₉₀Zn₁₀/Si₃N₄ | 60/11/50 | 0.850 | 0.0695 | 4.66 | 0.725 | 1.17 | 0.000 | **81.1** | yes |
+| 9 | N3e | Si₃N₄/Ag₇₀Cu₃₀/Si₃N₄ (segregated) | 25/9/35 | 0.899 | 0.0508 | 3.16 | 0.769 | 1.17 | 0.073 | **79.3** | yes |
+| 10 | H2 | AZO/Cu/Si₃N₄ (hybrid, silver-free) | 40/12/40 | 0.788 | 0.0425 | 2.93 | 0.631 | 1.25 | 0.000 | **77.6** | **no** |
+| — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 66.6 | yes |
+
+### The ranking depends on a number nobody derived
+
+Silver mass carries a weight of 0.15. That value is a judgement, not a
+measurement, and it selects the answer:
+
+| Silver weight | Winner | Ag g/m² | Runner-up | Margin |
+|---|---|---|---|---|
+| 0.00 | N35e | 0.065 | N3e | 0.52 |
+| 0.05 | N35e | 0.065 | E10e | **0.09** |
+| 0.10 | E10e | 0.015 | E5e | 0.57 |
+| **0.15** | **E10e** | **0.015** | E5e | 0.22 |
+| 0.20 | E5e | 0.008 | E10e | **0.09** |
+| 0.25 | E5e | 0.008 | N6 | 0.15 |
+| 0.30 | N6 | **zero** | E5e | 0.17 |
+| 0.40 | N6 | **zero** | E5e | 0.70 |
+
+**The winner changes three times across a plausible range**, from a 0.065 g/m²
+design at zero weight to a silver-free one at 0.30.
+
+**And five of eight settings separate first from second by under 0.5 points.**
+At those weights the ranking is not meaningfully distinguishing the candidates;
+it is resolving noise in a judgement.
+
+**So the honest statement is the sweep, not the ranking:** *the recommendation
+is E10e at silver weight 0.15, E5e at 0.20–0.25, and the silver-free N6 at 0.30
+and above.* Choosing among them is a decision about how much silver
+consumption matters to Saint-Gobain, and that decision is not the framework's
+to make. Run `pvdlowe check-weights` to reproduce it.
 
 **Nine of ten use silicon nitride**; the exception is the AZO/Cu/Si₃N₄ hybrid
 (H2) introduced by the §5.2 correction. 9 of ten meet the
@@ -943,19 +991,19 @@ nitride family was not disturbed, but the margin over AZO narrowed.
 
 #### Cooling-dominated (India) — `data/targets_cooling.yaml`
 
-| # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | $/m² | Score | Spec |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | M6 | AZO/Cu/AZO (low-cost control) | 35/12/35 | 0.738 | 0.0463 | 2.87 | 0.558 | 1.32 | 0.000 | 0.01 | **65.4** | **no** |
-| 2 | H2 | AZO/Cu/Si3N4 (hybrid, silver-free) | 40/12/40 | 0.788 | 0.0425 | 2.93 | 0.631 | 1.25 | 0.000 | 0.01 | **63.4** | **no** |
-| 3 | D10e | AZO/Ag10Cu90/AZO (segregated) | 15/9/37 | 0.789 | 0.0585 | 3.52 | 0.641 | 1.23 | 0.013 | 0.11 | **59.3** | **no** |
-| 4 | D15e | AZO/Ag15Cu85/AZO (segregated) | 15/9/37 | 0.794 | 0.0564 | 3.31 | 0.643 | 1.23 | 0.019 | 0.16 | **59.3** | **no** |
-| 5 | M5 | AZO/Ag25Cu75/AZO | 35/10/35 | 0.784 | 0.0780 | 5.92 | 0.612 | 1.28 | 0.034 | 0.28 | **58.2** | **no** |
-| 6 | M3ema | AZO/Ag70Cu30/AZO (segregated) | 35/10/35 | 0.840 | 0.0462 | 2.63 | 0.635 | 1.32 | 0.081 | 0.66 | **57.9** | yes |
-| 7 | M35e | AZO/Ag60Cu40/AZO (segregated) | 15/9/35 | 0.843 | 0.0514 | 2.95 | 0.659 | 1.28 | 0.065 | 0.53 | **57.4** | yes |
-| 8 | S10 | ITO/Ag70Cu30/ITO | 35/10/35 | 0.848 | 0.0764 | 5.48 | 0.619 | 1.37 | 0.081 | 0.66 | **57.3** | **no** |
-| 9 | D10 | AZO/Ag10Cu90/AZO | 15/9/37 | 0.786 | 0.0784 | 5.66 | 0.638 | 1.23 | 0.013 | 0.11 | **57.1** | **no** |
-| 10 | D15 | AZO/Ag15Cu85/AZO | 15/9/37 | 0.790 | 0.0828 | 6.15 | 0.639 | 1.24 | 0.019 | 0.16 | **56.3** | **no** |
-| — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 0.85 | 53.0 | yes |
+| # | ID | Architecture | Geometry | T_vis | ε_h | R_s | g | LSG | Ag g/m² | Score | Spec |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | M6 | AZO/Cu/AZO | 35/12/35 | 0.738 | 0.0463 | 2.87 | 0.558 | 1.32 | 0.000 | **65.4** | **no** |
+| 2 | H2 | AZO/Cu/Si₃N₄ (hybrid, silver-free) | 40/12/40 | 0.788 | 0.0425 | 2.93 | 0.631 | 1.25 | 0.000 | **63.4** | **no** |
+| 3 | D10e | AZO/Ag₁₀Cu₉₀/AZO (segregated) | 15/9/37 | 0.789 | 0.0585 | 3.52 | 0.641 | 1.23 | 0.013 | **59.3** | **no** |
+| 4 | D15e | AZO/Ag₁₅Cu₈₅/AZO (segregated) | 15/9/37 | 0.794 | 0.0564 | 3.31 | 0.643 | 1.23 | 0.019 | **59.3** | **no** |
+| 5 | M5 | AZO/Ag₂₅Cu₇₅/AZO | 35/10/35 | 0.784 | 0.0780 | 5.92 | 0.612 | 1.28 | 0.034 | **58.2** | **no** |
+| 6 | M3ema | AZO/Ag₇₀Cu₃₀/AZO (segregated) | 35/10/35 | 0.840 | 0.0462 | 2.63 | 0.635 | 1.32 | 0.081 | **57.9** | yes |
+| 7 | M35e | AZO/Ag₆₀Cu₄₀/AZO (segregated) | 15/9/35 | 0.843 | 0.0514 | 2.95 | 0.659 | 1.28 | 0.065 | **57.4** | yes |
+| 8 | S10 | ITO/Ag₇₀Cu₃₀/ITO | 35/10/35 | 0.848 | 0.0764 | 5.48 | 0.619 | 1.37 | 0.081 | **57.3** | **no** |
+| 9 | D10 | AZO/Ag₁₀Cu₉₀/AZO | 15/9/37 | 0.786 | 0.0784 | 5.66 | 0.638 | 1.23 | 0.013 | **57.1** | **no** |
+| 10 | D15 | AZO/Ag₁₅Cu₈₅/AZO | 15/9/37 | 0.790 | 0.0828 | 6.15 | 0.639 | 1.24 | 0.019 | **56.3** | **no** |
+| — | M0 | AZO/Ag/AZO (**benchmark**) | 35/10/35 | 0.876 | 0.0603 | 4.18 | 0.646 | 1.35 | 0.105 | 53.0 | yes |
 
 **Every entry uses a conductive oxide as the underlayer** (AZO or ITO), for the
 reason in §5.3 — the free carriers reject solar near-infrared, which a passive
@@ -977,22 +1025,25 @@ falls short.
 
 #### How to read these tables
 
-1. **They share one candidate out of ten.** A recommendation is only meaningful
+1. **The scores are not a ranking until the silver weight is fixed.** See the
+   sweep above: three different candidates win across a plausible range, and
+   five of eight settings separate first from second by less than 0.5 points.
+2. **They share one candidate out of ten.** A recommendation is only meaningful
    with its climate profile named. Circulating one table without the other
    would be misleading — except for H2, which is defensible under either.
-2. **The benchmark appears in neither top ten**, which is the correct answer to
+3. **The benchmark appears in neither top ten**, which is the correct answer to
    the brief's question: pure silver is the incumbent to beat, and on a
    sustainability-weighted objective it is beaten.
-3. **Four of ten in each list are "segregated" variants** — the same
+4. **Four of ten in each list are "segregated" variants** — the same
    composition under the alternative microstructure hypothesis. Until the
    Phase 2 measurement (§8.3) is made, those four entries are conditional. §5.5
    provides thermodynamic support for segregation but not proof of the
    as-deposited state.
-4. **All copper-bearing entries are contingent on §6.** The framework
+5. **All copper-bearing entries are contingent on §6.** The framework
    under-predicts sputtered copper sheet resistance by roughly eightfold; if
    that gap is real film quality rather than model error, most of both tables is
    affected.
-5. **Scores are not comparable between the two tables**, being computed under
+6. **Scores are not comparable between the two tables**, being computed under
    different weightings. Compare within a column only.
 
 ### 5.9 The dilute-titanium ternary is predicted to underperform
