@@ -17,10 +17,10 @@ mean none had been checked, and checking changed the status of eight of them.
 | Status | Count | Meaning |
 |---|---|---|
 | **Verified** | 4 | full text read, figures confirmed |
-| **Partial** | 4 | source located, figures confirmed against abstract only |
+| **Partial** | 6 | source located, figures confirmed against abstract only |
 | **Disputed** | 2 | located sources do not contain the quoted figures — **do not cite** |
-| Supported | 2 | not the original source, but independently corroborated |
-| Unverified | 4 | not pursued |
+| Supported | 3 | not the original source, but independently corroborated |
+| Not located | 1 | searched without success |
 
 ---
 
@@ -32,15 +32,15 @@ mean none had been checked, and checking changed the status of eight of them.
 | 2 | AZO: 82.4% T_vis, 2.6e-3 Ω·cm, 68 Ω/sq, Eg 3.12 eV | 2 | **VERIFIED** | *Materials* **17**(1), 81 (2024), open access, full text read. All four confirmed. **The brief was right about 82.4%** — see the retraction note below |
 | 3 | AZO(30)/Ag(10)/AZO(30): 80.5% T_vis; Ag(13): 4.36 Ω/sq, 96% FIR | 3 | partial | *Ceramics International* (2014), PII S0272884214006944. Numbers confirmed. **RF** sputtering, not DC as §3 implies. FTIR + four-point probe, so the measurement basis matches this framework's |
 | 4 | AZO/Ag/AZO: 85.4% T_vis, 3.21 Ω/sq, 97% FIR | 3 | **DISPUTED** | Appears in neither located study. **Do not cite** |
-| 5 | Ag–Cu Low-E, ~30 at.% Cu, neutral colour, good adhesion | 5 | unverified | Not pursued |
+| 5 | Ag–Cu Low-E, ~30 at.% Cu, neutral colour, good adhesion | 5 | **partial** | *Environmentally robust Ag–Cu based low-e coatings*, Sol. Energy Mater. Sol. Cells (2022), PII S0927024822004500. Abstract confirms it exactly: a range of Ag–Cu compositions tested for colour neutrality, transmittance, IR reflectance and adhesion, with **the best performing alloy identified as a 10 nm film of 70% Ag and 30% Cu**. Note the substrate is **polycarbonate**, not float glass — see below |
 | 6 | Ag–Cu ~13% lattice mismatch, segregation tendency | 5 | **SUPPORTED** | Not the original source, but independently confirmed: the Materials Project convex hull has no stable ordered Ag–Cu compound (Cu₃Ag 0.0904, CuAg₃ 0.0857 eV/atom above hull), and MACE gives ΔE_mix > 0 across the whole composition range. FINDINGS §3.7, §3.8 |
-| 7 | GGA underestimates Cu-alloy formation energies; +U improves | 6 | unverified | Not pursued. The framework acts on it anyway — `dft/plans.py` requests a PBE/PBE+U comparison rather than a single functional |
+| 7 | GGA underestimates Cu-alloy formation energies; +U improves | 6 | **partial**, with a magnitude | *Central role of d-band energy level in Cu-based intermetallic alloys*, npj Comput. Mater. (2024), DOI 10.1038/s41524-024-01257-y. Confirms the claim and quantifies it: GGA formation energies for Cu–Au are **nearly 40% smaller than experiment**, an error the authors state is common across Cu–transition-metal intermetallics, caused by GGA placing Cu-3d bands too shallow and so mis-describing d–d hybridisation. The Hubbard U correction eliminates it. **This has a consequence for §5.6 — see below** |
 | 8 | ~10 nm films: Ag 1.59, Ag–Cu 2.97, Cu 20.5 µΩ·cm | 7 | **VERIFIED**, and **mistranscribed** | US 10,822,692 B2 (Das & Mukherjee, UNT), full text read. **The patent says Ag = 1.29, not 1.59.** Ag–Cu 2.97 and Cu 20.5 confirmed. The correction makes it worse: 1.29 is **0.81× bulk silver**, below bulk, impossible at any thickness. See below |
 | 9 | AZO/Cu/AZO: 16.6 Ω/sq, 67% FIR at 15 nm, continuity ~11 nm | 8 | partial | Located by title; abstract not retrieved. RF sputtering — a different study from #10, and the two should not be pooled |
 | 10 | AZO(40)/Cu/AZO(40): 87.7% T_vis, 9.96 Ω/sq, ε = 0.055 | 16 | partial, **fails consistency** | *Applied Surface Science* **578** (2022) 152051. Numbers confirmed, all three from the same sample. ε = 0.055 at 9.96 Ω/sq is below the thin-sheet impedance limit of 0.096, and below the 0.106 an industrial formula in use since 2000 gives. Four explanations tested and eliminated. **§16's conclusion rests on this.** FINDINGS §1.2 |
 | 11 | Al:ZnO negative formation energies, 6.25–18.75% Al | 2 | **SUPPORTED** | Materials Project Al–Zn–O screening returns 4 entries with 2 near the hull (Al₂ZnO₄ spinel, Al₁₀ZnO₁₆), consistent with negative formation energies for Al in ZnO. Not the original source |
-| 12 | Cu/Al co-doped ZnO, gap down to 1.13 eV at high Cu | 9 | unverified | Not pursued |
-| 13 | Ga:ZnO, formation energy rises with Ga content | 11 | unverified | Not pursued |
+| 12 | Cu/Al co-doped ZnO, gap down to 1.13 eV at high Cu | 9 | **mechanism supported, value not located** | Multiple first-principles studies confirm Cu doping *narrows* the ZnO gap through Cu-3d states in the gap and a downward conduction-band shift (e.g. *Materials* **12**, 196, 2019). The specific figure of 1.13 eV for Cu/Al co-doping was not found in any located source. Direction confirmed, magnitude not |
+| 13 | Ga:ZnO, formation energy rises with Ga content | 11 | **not located** | Searched. Al/Ga-doped and co-doped ZnO first-principles studies are plentiful and consistent on optical gaps — AZO 4.61 eV against GZO 4.52 eV in one — but no located source states formation energy rising with Ga content. Remains unverified |
 | 14 | ZnO = mp-2133, Cu = mp-30 | 12 | **VERIFIED** | Both IDs used directly against the live Materials Project API. mp-2133 returns wurtzite ZnO and mp-30 returns fcc Cu, as used in `pvdlowe/ml/surrogate.py` and the adatom calculations |
 
 ---
@@ -85,6 +85,52 @@ good conductivity" by comparing 2.97 against the silver baseline. That baseline
 is both mistranscribed and unphysical. Compare against the copper value instead
 — 20.5, against which the alloy is genuinely seven times better — and the
 argument survives in stronger form.
+
+## Claim 5: the source exists, but on the wrong substrate
+
+The 2022 paper confirms the brief's claim precisely — Ag–Cu compositions
+screened for colour neutrality, transmittance, IR reflectance and adhesion,
+with 70% Ag / 30% Cu at 10 nm identified as best.
+
+**But the substrate is polycarbonate, not float glass.** The paper concerns
+first-surface coatings on plastic. Thermal budget, surface energy, nucleation
+behaviour and durability requirements all differ from a glass line, and the
+nucleation finding of `docs/NUCLEATION_MECHANISM.md` says the underlayer
+determines metal grain structure. A composition optimum established on
+polycarbonate does not transfer to glass without checking.
+
+This weakens the brief's §5 justification for Ag₇₀Cu₃₀ as the priority
+composition — independently of FINDINGS §3.1, which finds the optimum at
+5–15 at.% Ag on modelling grounds.
+
+## Claim 7 has a consequence for the mixing energies
+
+The npj paper quantifies GGA's error on Cu–transition-metal intermetallics at
+**nearly 40% too small**, and attributes it to Cu-3d bands sitting too shallow.
+
+The Materials Project convex hull is computed with GGA/GGA+U. MACE-MP-0 and
+CHGNet are trained on Materials Project data. So there are **two errors in
+series**, both in the same direction:
+
+| Step | Error | Direction |
+|---|---|---|
+| Experiment → GGA | up to ~40% | GGA too small |
+| GGA → MLIP | 20–40% (measured, §5.6) | MLIP too small |
+
+FINDINGS §3.8 already concluded that ΔE_mix should be corrected *upward* rather
+than read as a lower bound, on the evidence that both MLIPs under-predict the
+MP values. This suggests the correction is larger than that analysis assumed,
+because the MP reference is itself low against experiment.
+
+**It strengthens the conclusion rather than threatening it.** §5.6 finds the
+driving force to separate falls *below* thermal energy in the dilute corner;
+a larger correction pushes ΔE_mix up, which narrows that margin. The margin
+survived a 1.42× correction with room to spare — 0.74 kT at Ag 10% — but a
+compounded correction approaching 2× would bring Ag 15% above kT. **The
+conclusion holds at 5–10 at.% Ag and becomes marginal at 15%.**
+
+That is worth stating rather than leaving implicit, and it is a caveat that
+only emerged from verifying a citation the brief made in passing.
 
 ## Two entries that should be withdrawn
 

@@ -232,54 +232,37 @@ def cmd_calibrate(args):
 
 def cmd_surrogate(args):
     """Mixing energies from an ML interatomic potential."""
-    from .surrogate import (BACKENDS, Surrogate, available_backends,
-                            cross_check, interpret, mixing_energy_series,
-                            what_a_surrogate_cannot_answer)
-    avail = available_backends()
-    if not avail:
-        print("No ML interatomic potential installed. Install one:\n")
-        for _, label, cmd in BACKENDS:
-            print(f"  {cmd:28s}  # {label}")
-        print("\nThese are graph neural networks trained on Materials Project")
-        print("DFT data -- not language models. They predict energy and forces")
-        print("in milliseconds against the core-hours of the DFT they mimic.")
-        raise SystemExit(2)
-    print("available:", ", ".join(l for _, l, _ in avail), "\n")
-
-    if args.cross_check:
-        res = cross_check(n_configs=args.configs)
-        for k, v in res.items():
-            if k == "frames":
-                continue
-            print(f"=== {k} ===")
-            for kk, vv in v.items():
-                print(f"  {kk}: {vv}")
-            print()
-        for label, df in res.get("frames", {}).items():
-            print(f"--- {label} ---")
-            _print(df)
-        return
-
-    s = Surrogate.load(prefer=args.model)
-    print(f"model: {s.label}\n")
-    df = mixing_energy_series(s, n_configs=args.configs, relax=not args.no_relax)
-    _print(df)
-    print(f"\n{df.attrs['note']}\n")
-    for k, v in interpret(df, args.temperature).items():
-        print(f"  {k}: {v}")
-    if args.output:
-        df.to_csv(args.output, index=False)
-        print(f"\nwritten to {args.output}")
+    from .ml import (MLIPSurrogate, SurrogateUnavailable, mixing_energy_series,
+                     validate_against_mp, what_mlips_cannot_do)
     if args.limits:
-        print()
-        for k, v in what_a_surrogate_cannot_answer().items():
+        for k, v in what_mlips_cannot_do().items():
             print(f"{k}:")
             if isinstance(v, list):
                 for item in v:
                     print(f"  - {item}")
             else:
                 print(f"  {v}")
+            print()
+        return
+    try:
+        sur = MLIPSurrogate(backend=args.model or "auto")
+    except SurrogateUnavailable as exc:
+        print(exc)
+        raise SystemExit(2)
+    print(f"backend: {sur.name}\n")
 
+    print("=== validation gate: two known Materials Project hull distances ===")
+    gate = validate_against_mp(sur)
+    _print(gate)
+    print(f"\nverdict: {gate.attrs['verdict']}\n")
+
+    print("=== Ag-Cu mixing energy series ===")
+    df = mixing_energy_series(sur, n_configs=args.configs)
+    _print(df)
+    print(f"\n  {df.attrs['note']}")
+    if args.output:
+        df.to_csv(args.output, index=False)
+        print(f"\nwritten to {args.output}")
 
 def cmd_doe(args):
     from .doe.design import alias_structure, recommended_screening
@@ -404,11 +387,11 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("surrogate",
                        help="ML interatomic potential as a DFT surrogate")
     s.add_argument("--model", default="auto",
-                   choices=["auto", "mace", "chgnet", "m3gnet", "sevennet"])
-    s.add_argument("--validate", action="store_true",
-                   help="check the model against known Materials Project values")
-    s.add_argument("--ternaries", action="store_true",
-                   help="screen the brief's dilute Ti and Al additions")
+                   choices=["auto", "mace", "chgnet", "matgl", "sevenn"])
+    s.add_argument("--configs", type=int, default=3,
+                   help="random decorations averaged per composition")
+    s.add_argument("--limits", action="store_true",
+                   help="print what a surrogate cannot answer, and exit")
     s.add_argument("-o", "--output")
     s.set_defaults(func=cmd_surrogate)
 

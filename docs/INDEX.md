@@ -41,6 +41,7 @@ Read in this order — each corrected something.
 
 | File | What it is |
 |---|---|
+| [`CODE_WALKTHROUGH.md`](CODE_WALKTHROUGH.md) | Guided tour of the implementation, with runnable blocks — for a handover session |
 | [`CODE_REVIEW.md`](CODE_REVIEW.md) | Self-review: three medium findings, one new, four low, five things not to break |
 | [`VERTEX_AI.md`](VERTEX_AI.md) | Running the framework, and the ML surrogate, on Google Cloud |
 

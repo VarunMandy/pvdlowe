@@ -521,6 +521,17 @@ regular-solution form to +/-6 meV/atom:
 
     dE_mix = 0.287 * x * (1 - x)   eV/atom
 
+**A compounded correction, from verifying the brief's own citation.** The
+brief's claim 7 -- that GGA underestimates Cu-alloy formation energies -- is now
+supported with a magnitude: npj Comput. Mater. (2024) puts GGA's error on
+Cu-transition-metal intermetallics at nearly 40% too small, caused by Cu-3d
+bands sitting too shallow. The Materials Project hull is GGA/GGA+U, and both
+MLIPs are trained on it, so there are two errors in series and both in the same
+direction. The upward correction to dE_mix is therefore larger than the MLIP
+gate alone implies. That **strengthens** the conclusion below at 5-10 at.% Ag
+and makes it **marginal at 15%**, where a compounded correction approaching 2x
+would bring the driving force above kT.
+
 **Cross-checked against CHGNet.** Both models under-predict the known hull
 distances (MACE by 0.026 eV/atom, CHGNet by 0.047), so the bias is inherited
 from the shared Materials Project training data rather than specific to one

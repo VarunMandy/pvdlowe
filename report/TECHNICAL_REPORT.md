@@ -701,6 +701,17 @@ Passed, but the margin should be read: MACE under-predicts both by 20–40%, and
 both errors point the same way, so this is a systematic bias. Every figure
 below is a lower bound.
 
+**A compounded correction.** Verifying one of the brief's own citations added
+a caveat this analysis had not accounted for. GGA underestimates formation
+energies of copper–transition-metal intermetallics by nearly 40%, because it
+places the Cu-3d bands too shallow (npj Comput. Mater. 2024). The Materials
+Project hull is computed with GGA/GGA+U and both surrogates are trained on it,
+so two errors act in series and in the same direction. The upward correction to
+ΔE_mix is consequently larger than the surrogate gate alone implies — which
+strengthens the conclusion at 5–10 at.% Ag and makes it marginal at 15%, where
+a compounded correction approaching twofold would lift the driving force above
+thermal energy.
+
 **Cross-checked.** CHGNet was run on the same gate and series. Both models
 under-predict the known hull distances — MACE by 0.026 eV/atom, CHGNet by
 0.047 — so the bias is inherited from the shared Materials Project training
