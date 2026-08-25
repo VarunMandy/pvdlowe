@@ -593,6 +593,89 @@ def termination_spread(surrogate: MLIPSurrogate, metal: str = "Ag",
     return df
 
 
+#: A site spread this large relative to the binding energy means the adatom is
+#: sampling dangling-bond pockets rather than a representative surface.
+MAX_SITE_SPREAD_FRACTION = 0.25
+
+
+def judge_wetting(df, metal: str = "Ag", n_requested: int | None = None,
+                  failures: dict | None = None):
+    """Decide what a wetting table does and does not establish.
+
+    Separated from :func:`wetting_comparison` so that the judgement can be
+    tested without an interatomic potential installed. **This is the part that
+    was wrong twice**: once by letting an unreliable surface set the verdict,
+    and once by reporting a strict ordering between two dielectrics that share
+    a crystalline proxy and are therefore the same calculation.
+
+    Takes and returns the frame, setting `.attrs["verdict"]`, `.attrs["tied"]`
+    and a `reliable` column. Expects `dielectric`, `dE_wet_eV` and
+    `site_spread_eV`; uses `proxy` if present.
+    """
+    failures = failures or {}
+    df.attrs["failures"] = failures
+    requested = n_requested if n_requested is not None else len(df) + len(failures)
+
+    if len(df) < 2:
+        df.attrs["verdict"] = (
+            f"only {len(df)} of {requested} surfaces converged; no ordering "
+            f"can be claimed. failures: {failures}")
+        return df
+
+    df = df.sort_values("dE_wet_eV")          # most negative first = best wetting
+    df.attrs["failures"] = failures
+
+    # A site spread comparable with the binding energy means the adatom is
+    # falling into whichever dangling-bond pocket it happens to land near,
+    # rather than sampling a representative surface. That is a property of an
+    # artificially cleaved crystal, not of a real passivated film, and such a
+    # row must not drive the verdict.
+    df["reliable"] = ((df.site_spread_eV / df.dE_wet_eV.abs())
+                      < MAX_SITE_SPREAD_FRACTION)
+    unreliable, trusted = df[~df.reliable], df[df.reliable]
+
+    if trusted.empty:
+        df.attrs["verdict"] = (
+            "every surface shows a site spread comparable with its binding "
+            "energy; no ordering can be claimed from this data")
+        return df
+
+    # Entries sharing a proxy are the same calculation and must not be
+    # reported as though one beat the other; GZO and AZO both resolve to
+    # ZnO(0001), so a strict ordering between them is a sort artifact.
+    best = trusted.iloc[0]
+    winners = {best.dielectric}
+    if "proxy" in trusted.columns:
+        tied = trusted[trusted.proxy == best.proxy]
+        if len(tied) > 1:
+            winners = set(tied.dielectric)
+            df.attrs["tied"] = (
+                f"{' = '.join(sorted(winners))} share a crystalline proxy and "
+                "are the same calculation; no ordering between them is "
+                "meaningful")
+
+    # Consistency is judged against the whole tied set, not the row that
+    # happened to sort first. AZO and GZO both resolve to ZnO(0001) and return
+    # identical energies, so reporting "wets GZO best, NOT consistent" was an
+    # artifact of sort order -- AZO, which IS the measured winner, was tied
+    # with it at the same value.
+    label = " = ".join(sorted(winners)) if len(winners) > 1 else best.dielectric
+    note = (f"{metal} wets {label} best among reliable surfaces "
+            f"(dE_wet {best.dE_wet_eV:+.3f} eV). "
+            + ("Consistent with the measured growth ordering."
+               if winners & {"AZO", "ZnO"} else
+               "NOT consistent with the measured ordering."))
+    if not unreliable.empty:
+        worst = float((unreliable.site_spread_eV
+                       / unreliable.dE_wet_eV.abs()).max())
+        note += (f" EXCLUDED as unreliable: {', '.join(unreliable.dielectric)}"
+                 f" -- site spread is {100*worst:.0f}% of the binding energy, "
+                 "indicating an artificially reactive cleaved surface rather "
+                 "than a representative one.")
+    df.attrs["verdict"] = note
+    return df
+
+
 def wetting_comparison(surrogate: MLIPSurrogate, metal: str = "Ag",
                        dielectrics=("AZO", "Si3N4"), **kwargs):
     """Rank dielectrics by how well a metal wets them.
@@ -612,55 +695,7 @@ def wetting_comparison(surrogate: MLIPSurrogate, metal: str = "Ag",
             rows.append(adatom_wetting(surrogate, metal, d, **kwargs))
         except Exception as exc:                            # noqa: BLE001
             failures[d] = f"{type(exc).__name__}: {exc}"
-    df = pd.DataFrame(rows)
-    df.attrs["failures"] = failures
-    if len(df) < 2:
-        df.attrs["verdict"] = (
-            f"only {len(df)} of {len(dielectrics)} surfaces converged; no "
-            f"ordering can be claimed. failures: {failures}")
-        return df
-    df = df.sort_values("dE_wet_eV")          # most negative first = best wetting
-
-    # A site spread comparable with the binding energy means the adatom is
-    # falling into whichever dangling-bond pocket it happens to land near,
-    # rather than sampling a representative surface. That is a property of an
-    # artificially cleaved crystal, not of a real passivated film, and such a
-    # row should not drive the verdict.
-    df["reliable"] = (df.site_spread_eV / df.dE_wet_eV.abs()) < 0.25
-    unreliable = df[~df.reliable]
-    trusted = df[df.reliable]
-
-    if trusted.empty:
-        df.attrs["verdict"] = (
-            "every surface shows a site spread comparable with its binding "
-            "energy; no ordering can be claimed from this data")
-        return df
-
-    # Entries sharing a proxy are the same calculation and must not be
-    # reported as though one beat the other; GZO and AZO both resolve to
-    # ZnO(0001), so a strict ordering between them is a sort artifact.
-    if "proxy" in trusted.columns:
-        tied = trusted[trusted.proxy == trusted.iloc[0].proxy]
-        if len(tied) > 1:
-            names = " = ".join(sorted(tied.dielectric))
-            df.attrs["tied"] = (
-                f"{names} share a crystalline proxy and are the same "
-                "calculation; no ordering between them is meaningful")
-
-    best = trusted.iloc[0]
-    note = (f"{metal} wets {best.dielectric} best among reliable surfaces "
-            f"(dE_wet {best.dE_wet_eV:+.3f} eV). "
-            + ("Consistent with the measured growth ordering."
-               if best.dielectric in ("AZO", "ZnO") else
-               "NOT consistent with the measured ordering."))
-    if not unreliable.empty:
-        names = ", ".join(unreliable.dielectric)
-        note += (f" EXCLUDED as unreliable: {names} -- site spread is "
-                 f"{100*float((unreliable.site_spread_eV/unreliable.dE_wet_eV.abs()).max()):.0f}% "
-                 "of the binding energy, indicating an artificially reactive "
-                 "cleaved surface rather than a representative one.")
-    df.attrs["verdict"] = note
-    return df
+    return judge_wetting(pd.DataFrame(rows), metal, len(dielectrics), failures)
 
 
 def what_mlips_cannot_do() -> dict:

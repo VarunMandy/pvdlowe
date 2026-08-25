@@ -50,6 +50,7 @@ for the coupling described in P2, then
 | Medium | 0 | **all three fixed** — M1, M2, M3 |
 | Low | 1 | function length, partly addressed (L1, L3, L4 fixed) |
 | Positive | 5 | worth preserving through any refactor |
+| **N1** | **0** | **fixed — pure judgement logic extracted and tested** |
 
 No high-severity findings. The most consequential item (M1) is currently
 harmless and will not stay that way.
@@ -146,35 +147,45 @@ serve the parent's stack.
 
 ---
 
-## N1 — The `ml/` subpackage ships untested against a real backend
+## N1 — The `ml/` subpackage had no numerical coverage — **FIXED**
 
-**Evidence.** `pvdlowe/ml/surrogate.py` is 436 lines and no line of it that
-touches an actual interatomic potential has ever executed. The development
-environment had no network, so `mace-torch`, `chgnet` and `matgl` could not be
-installed and the model weights could not be downloaded. The two tests that
-exist —`test_mlip_surrogate_refuses_rather_than_falls_back` and
-`test_mlip_boundary_excludes_optical_properties` — verify the *absence* path
-and the documented boundary. Neither verifies a calculation.
+**What it was.** 436 lines, and no line touching a real interatomic potential
+had ever executed. MACE, CHGNet and their weights cannot be installed in the
+environment the rest of the suite runs in, so the two tests that existed
+verified the *absence* path and the documented boundary — neither verified a
+calculation.
 
-**Why it is nonetheless shipped.** The alternative was to omit the capability
-entirely. The module fails loudly with installation instructions when no
-backend is present, and the entry-point example gates every prediction behind
-reproducing two known Materials Project hull distances, so a silently wrong
-result is unlikely. But the honest status is *written, syntax-checked,
-never run*.
+**The insight that made it fixable.** The defects in this module were never in
+the energy evaluations; those are the model's job and are gated against known
+Materials Project values at runtime. They were in the **judgement applied to
+the results**, and that judgement is pure logic over tables. It does not need a
+backend to test.
 
-**Specific risks that first execution will probably surface:** the slab
-construction in `adhesion_energy` assumes `SlabGenerator` returns at least one
-slab for every proxy and takes the first without inspecting termination; the
-metal-film tiling uses a nearest-integer repeat that could leave several per
-cent lattice mismatch unreported as an error; and `_e()` uses a needlessly
-convoluted call form that should simply branch.
+**The fix.** `judge_wetting()` is extracted from `wetting_comparison()`, and
+`MAX_SITE_SPREAD_FRACTION` replaces a literal buried in a filter. Eight tests
+in `tests/test_ml_numerics.py` exercise it against **the figures actually
+produced on Vertex AI** — each case is a run that happened, which is stronger
+evidence than synthetic data.
 
-**Recommended.** Run `examples/07_mlip_adhesion.py` once on a machine with a
-backend installed, then either fix what breaks or mark the module
-experimental in `README.md`. Do not cite any number from it until then.
+**And writing them found a third defect.** The tie handling was incomplete. AZO
+and GZO share the ZnO(0001) proxy and return identical energies, so which sorts
+first is arbitrary — and the verdict named GZO and concluded "NOT consistent
+with the measured ordering", when AZO, the measured winner, was tied with it at
+the same value. Consistency is now judged against the whole tied set:
 
----
+    Ag wets AZO = GZO best among reliable surfaces (dE_wet +0.696 eV).
+    Consistent with the measured growth ordering. EXCLUDED as unreliable:
+    ITO, Si3N4 -- site spread is 47% of the binding energy.
+
+That is the third time this function's judgement has been wrong, and the first
+time a test caught it rather than a manual reading of output.
+
+**What is still not covered**, and cannot be here: slab construction, adatom
+placement, relaxation and the energies themselves. Those need a machine with a
+backend, and `examples/06_mlip_validate.py` gates them at runtime against two
+known hull distances. The residual risk is the geometry code, which has now run
+successfully on Vertex AI for the mixing energies, the adhesion attempt and the
+wetting series.
 
 ## L1 — Top-level exports — **FIXED**
 
@@ -282,8 +293,9 @@ highest-value comments in the codebase.
 
 ## Recommended order of work
 
-1. **N1** — run the `ml/` subpackage once against a real backend. It is the
-   only part of the codebase with no execution evidence at all.
+1. ~~**N1**~~ — **done.** Judgement logic extracted to `judge_wetting` and
+   tested against the real Vertex AI figures; writing the tests found a third
+   defect in the tie handling.
 2. ~~**M1**~~ — **done.** Extracted to `candidates.record_for`, with three
    guard tests. The fix also caught an output-schema mismatch the original
    finding had missed.

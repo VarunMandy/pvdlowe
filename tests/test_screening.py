@@ -199,10 +199,13 @@ def test_wetting_verdict_excludes_corrugated_surfaces():
     documented as the weakest analogy.
     """
     import inspect
-    from pvdlowe.ml import wetting_comparison
-    src = inspect.getsource(wetting_comparison)
+    from pvdlowe.ml import MAX_SITE_SPREAD_FRACTION, judge_wetting
+    src = inspect.getsource(judge_wetting)
     assert "reliable" in src and "site_spread_eV" in src
-    assert "0.25" in src, "the spread-to-binding threshold must be explicit"
+    assert "MAX_SITE_SPREAD_FRACTION" in src, (
+        "the spread-to-binding threshold must be a named constant, not a "
+        "literal buried in a filter")
+    assert 0.0 < MAX_SITE_SPREAD_FRACTION <= 0.5
 
 
 def test_termination_is_an_explicit_choice_not_a_default():
