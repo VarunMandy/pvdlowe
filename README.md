@@ -16,10 +16,14 @@ specification?**
 
 ```bash
 python -m pvdlowe evaluate          # score every candidate architecture
+python -m pvdlowe evaluate --targets data/targets_cooling.yaml   # cooling climate
+python -m pvdlowe series            # composition series, geometry re-optimised
 python -m pvdlowe silver            # the silver-reduction trade-off curve
 python -m pvdlowe optimise --metal Ag
 python -m pvdlowe validate          # model vs literature + consistency checks
-python -m pvdlowe check-weights     # are the scoring criteria independent?
+python -m pvdlowe check-weights     # criteria independence, and a weight sweep
+python -m pvdlowe calibrate --runsheet out.csv   # sputter run sheet
+python -m pvdlowe surrogate         # Ag-Cu mixing energies from an MLIP
 python -m pvdlowe doe -o runsheet.csv
 python -m pvdlowe dft -o dft/
 python -m pvdlowe report -o report.md
@@ -41,9 +45,29 @@ plots and `openpyxl` for Excel export are optional. Nothing needs to be
 compiled and nothing needs network access to run.
 
 ```bash
-python tests/run_tests.py     # 112 tests, no pytest required
+python tests/run_tests.py     # 126 tests, no pytest required
 pytest tests/                 # identical, if pytest is available
 ```
+
+## What it found
+
+Six substantive results, in descending order of confidence. Full account in
+`docs/SUMMARY.md`.
+
+| | Finding |
+|---|---|
+| 1 | **The climate decides the answer**, and the brief does not specify one. The two top-ten lists share one candidate out of ten. |
+| 2 | **The composition optimum is 5–15 at.% Ag, not the brief's 70%** — supported on three independent grounds. |
+| 3 | **No single-metal architecture reaches solar-control performance.** Best LSG is 1.37 against ~2.0 commercial; two metal layers reach 1.76. |
+| 4 | **Six defects in the proposed weighting**, one of which let the optimiser return **29% more silver than the incumbent at a perfect score**. |
+| 5 | **Two citations cannot be traced to any source**, and one measurement contradicts a model-independent electrodynamic limit. |
+| 6 | **The dielectric changes the metal, not just the interference stack** — confirmed by TEM in the patent literature, and the cause of the framework's largest error. |
+
+**A ranking is meaningless without its weighting file.** The heating and
+cooling profiles disagree on the winner and on nine of ten top-ten positions,
+and the silver weight alone moves the winner three times across a plausible
+range. Always quote `data/targets.yaml` or `data/targets_cooling.yaml`
+alongside, and run `pvdlowe check-weights` to see the sweep.
 
 ## Scope — read this before using any number
 
@@ -120,6 +144,7 @@ checks, and one of those carries the brief's central recommendation. Run
 | `doe/` | factorial and response-surface designs, sputter rate model |
 | `optimize/` | thickness optimisation, sweeps, composition series |
 | `ml/` | ML interatomic potential surrogate (optional, needs `mace-torch`) |
+| `characterise/` | predicted XRD signatures for the experiments in `experiments/` |
 | `report/` | tables, plots, markdown/CSV/Excel export |
 | `validate.py` | model-vs-literature and internal-consistency checks |
 
