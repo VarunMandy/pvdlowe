@@ -41,7 +41,7 @@ plots and `openpyxl` for Excel export are optional. Nothing needs to be
 compiled and nothing needs network access to run.
 
 ```bash
-python tests/run_tests.py     # 102 tests, no pytest required
+python tests/run_tests.py     # 112 tests, no pytest required
 pytest tests/                 # identical, if pytest is available
 ```
 

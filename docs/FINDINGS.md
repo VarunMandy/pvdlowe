@@ -240,7 +240,7 @@ no effect.
 
 # 3. Design-space results
 
-36 candidates, 58 metal systems screened, 168-point composition series across
+38 candidates, 58 metal systems screened, 168-point composition series across
 two microstructure models, two dielectrics and two climate profiles.
 
 ## 3.1 The composition optimum is 5–15% Ag
@@ -397,7 +397,7 @@ and on most positions.
 
 ## 3.4 No single-metal stack can do solar control; two can
 
-Best LSG across all 36 candidates is **1.37**, against ~2.0 for commercial
+Best LSG across all 38 candidates is **1.37**, against ~2.0 for commercial
 solar-control glazing. Under the cooling profile no single-metal stack met the
 transmittance target at all.
 

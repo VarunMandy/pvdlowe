@@ -27,6 +27,15 @@ climate the glazing serves.
 | Metal cost | $0.12/m² | $0.01/m² |
 | Meets full spec | **yes** | no — T_vis 0.738 < 0.80 |
 
+**The lead candidate is a judgement, not a result.** Silver mass carries a
+weight of 0.15, and that number selects the answer: at weight 0 the winner
+carries 0.065 g/m², at 0.30 it carries none, and the winner changes three times
+in between. Five of eight settings separate first from second by under half a
+point. The honest statement is **E10e at weight 0.15, E5e at 0.20–0.25, and the
+silver-free N6 at 0.30 and above** — choosing among them is a decision about
+how much silver consumption matters to Saint-Gobain, not one the framework can
+make. Run `pvdlowe check-weights`.
+
 Benchmark for comparison: AZO/Ag/AZO at 10 nm — T_vis 0.876, ε_h 0.0603,
 R_s 4.18 Ω/sq, 0.105 g/m² Ag, $0.85/m².
 
@@ -51,12 +60,15 @@ periodic table and the Materials Project, both of which surface oxides.
 a passive nitride cannot. The two profiles disagree on the winner.
 
 **4. No single-metal architecture can reach solar-control performance.** Best
-light-to-solar-gain ratio across 36 candidates is 1.37 against ~2.0 commercial.
+light-to-solar-gain ratio across 38 candidates is 1.37 against ~2.0 commercial.
 Two metal layers reach 1.76 — an architectural limit, not a compositional one.
 
-**5. The brief's section 14 weighting has four defects.** The most serious: it
+**5. The brief's section 14 weighting has five defects.** The most serious: it
 omits silver consumption, so the optimiser returned a design using **29% more
-silver than the benchmark at a perfect 100/100 score.**
+silver than the benchmark at a perfect 100/100 score.** A fifth was found by
+re-auditing the fix for the second — silver mass, metal cost and supply risk
+correlate at r = 1.000 and 0.991, and together carried 36% of the effective
+weight on one physical property.
 
 **6. Two of the brief's citations cannot be matched to any source, and one
 pivotal measurement is physically inconsistent** with a model-independent

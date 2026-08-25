@@ -4,7 +4,7 @@
 
 Saint-Gobain Research India · Varun Mandy, Research Intern
 Framework: `pvdlowe` v0.1.0 · https://github.com/VarunMandy/pvdlowe
-8,900 lines · 110 tests · 38 candidate architectures
+8,995 lines · 112 tests · 38 candidate architectures
 
 ---
 
@@ -598,7 +598,7 @@ can answer it.
 
 ## 17. The framework
 
-8,900 lines, 110 tests, ten subpackages, nine CLI commands.
+8,995 lines, 112 tests, ten subpackages, nine CLI commands.
 
 **The design decision that matters.** Film resistivity feeds the Drude damping,
 so a metal layer too thin to conduct is automatically one that reflects poorly.

@@ -3,7 +3,7 @@
 **Repository:** https://github.com/VarunMandy/pvdlowe (private)
 **Reviewed at:** commit [`a9c4b31`](https://github.com/VarunMandy/pvdlowe/commit/a9c4b31),
 re-audited after the nucleation correction and the `ml/` subpackage.
-**Scope:** 9,124 lines across 22 modules; 97 tests passing.
+**Scope:** 8,995 lines across 44 modules; 112 tests passing.
 
 **Re-audit delta.** M1, M2 and M3 are all unchanged — none has been fixed, and
 none has worsened. Two items are added below: N1 covers the new `ml/`
@@ -32,7 +32,7 @@ whoever inherits the code.
 | [`pvdlowe/mp/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/pvdlowe/mp) | ~350 | Materials Project client and screening |
 | `pvdlowe/ml/` | 436 | ML interatomic potential surrogate (see N1) |
 | [`pvdlowe/validate.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/validate.py) | 310 | model-vs-literature, consistency checks |
-| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 97 tests, physics-level assertions |
+| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 112 tests, physics-level assertions |
 
 **Where to start reading:**
 [`optics/stack.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/stack.py)

@@ -15,7 +15,7 @@ python tests/run_tests.py        # 110 passed
 
 ## 0. Shape of the thing (3 min)
 
-9,600 lines, ten subpackages, 110 tests. The dependency order runs one way:
+8,995 lines, ten subpackages, 112 tests. The dependency order runs one way:
 
 ```
 constants  provenance  spectra          ← no dependencies
@@ -203,6 +203,27 @@ Emissivity and sheet resistance correlate at **r = 0.996** — they are the same
 free-carrier response of the same layer — so weighting them separately put 40%
 of the total on one physical quantity.
 
+**And re-auditing that fix found a fifth defect.** Zeroing sheet resistance left
+a triple-count untouched: silver mass, metal cost and supply risk correlate at
+r = 1.000 and 0.991, because silver dominates metal cost and the supply risk in
+this candidate set *is* silver's. Together they carried 36% of the effective
+weight. Both are now zeroed and reported as derived figures.
+
+The diagnostic itself was also wrong — it flagged correlated pairs regardless of
+whether both carried weight, which buries the cases that matter. It now reports
+`active_double_count` separately.
+
+**One residual cannot be corrected, only disclosed:**
+
+```bash
+python -m pvdlowe check-weights | tail -18
+```
+
+The silver weight of 0.15 is a judgement, and it selects the answer. The winner
+changes three times across a plausible range, and five of eight settings
+separate first from second by under half a point. `weight_sweep()` reports the
+transitions instead of a single ranking.
+
 ---
 
 ## 5. Provenance: a type, not a footnote (5 min)
@@ -362,7 +383,7 @@ intensity ratio tests templating. **Three answers, one film, one afternoon.**
 > The DoE, DFT, ML and XRD subpackages are optional and independent — nothing
 > in the core imports them.
 
-**"110 tests on 9,600 lines — is that enough?"**
+**"112 tests on 8,995 lines — is that enough?"**
 > It is not a coverage figure and I would not claim it as one. The physics
 > assertions are the valuable ones. `report/` and `cli.py` are thinly covered,
 > and the ML module has almost no coverage of its numerical paths — that is

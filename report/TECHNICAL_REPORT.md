@@ -64,7 +64,7 @@ retaining visible transmittance, sheet resistance and far-infrared reflectance.
 
 | Deliverable | Status |
 |---|---|
-| Computational framework implementing the brief's §21 workflow | Complete — 12,000 lines, 92 tests |
+| Computational framework implementing the brief's §21 workflow | Complete — 8,995 lines, 92 tests |
 | Element and compound screening | Complete |
 | Optical multilayer model (transfer matrix, EN 410 / 673 / 12898) | Complete, validated |
 | Thin-film transport model coupled to optics | Complete, **uncalibrated — requires §6 experiment** |
