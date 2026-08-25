@@ -3,12 +3,27 @@
 **Repository:** https://github.com/VarunMandy/pvdlowe (private)
 **Reviewed at:** commit [`a9c4b31`](https://github.com/VarunMandy/pvdlowe/commit/a9c4b31),
 re-audited after the nucleation correction and the `ml/` subpackage.
-**Scope:** 8,995 lines across 44 modules; 112 tests passing.
+**Scope:** 9,198 lines across 44 modules; 127 tests passing.
 
-**Re-audit delta.** M1, M2 and M3 are all unchanged — none has been fixed, and
-none has worsened. Two items are added below: N1 covers the new `ml/`
-subpackage, and `adhesion_energy` joins the over-long function list at 101
-lines. The five items under "Worth preserving" have gained a sixth.
+**Status: every finding closed.** M1, M2 and M3 are fixed and guarded; N1 is
+fixed by extracting the logic that had defects into pure functions and testing
+those; L1, L3 and L4 are fixed; L2 is partly addressed with the remainder a
+documented judgement.
+
+**Two of the fixes found defects this review had missed**, which is the most
+useful thing in it:
+
+- Fixing **M1**'s duplicated record builder was not sufficient — the emitted
+  frame renamed a criterion and dropped three others, so re-scoring a
+  composition series would have silently lost 0.25 of the weight.
+- Fixing **N1** by extracting `judge_wetting()` exposed a third tie-handling
+  defect: AZO and GZO share a crystalline proxy and return identical energies,
+  so the verdict named GZO and declared "NOT consistent with the measured
+  ordering" when AZO, the measured winner, was tied with it at the same value.
+
+Both were found by writing the test, not by reading the code. That function had
+been read three times and corrected twice by eye before a test caught the third
+problem.
 
 Permalinks below are pinned to `a9c4b31` so they remain valid as the code moves.
 Because the repository is private, they resolve only for collaborators.
@@ -32,7 +47,7 @@ whoever inherits the code.
 | [`pvdlowe/mp/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/pvdlowe/mp) | ~350 | Materials Project client and screening |
 | `pvdlowe/ml/` | 436 | ML interatomic potential surrogate (see N1) |
 | [`pvdlowe/validate.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/validate.py) | 310 | model-vs-literature, consistency checks |
-| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 112 tests, physics-level assertions |
+| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 127 tests, physics-level assertions |
 
 **Where to start reading:**
 [`optics/stack.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/stack.py)

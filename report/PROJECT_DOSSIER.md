@@ -4,7 +4,7 @@
 
 Saint-Gobain Research India · Varun Mandy, Research Intern
 Framework: `pvdlowe` v0.1.0 · https://github.com/VarunMandy/pvdlowe
-8,995 lines · 112 tests · 38 candidate architectures
+9,198 lines · 127 tests · 38 candidate architectures
 
 ---
 
@@ -160,12 +160,13 @@ the best solar-control design found.
 
 # PART II — THE AUDIT
 
-## 5. Four defects in the proposed weighting
+## 5. Six defects in the proposed weighting
 
 **What.** The brief's §14 specifies criteria and weights. Encoding that table
 literally produced a scoring function that did not measure the project's stated
-objective. All four defects were found by the framework's own diagnostics
-(`pvdlowe check-weights`).
+objective. **Six defects in total** — four in the proposed table, and two more
+found by re-auditing the corrections for the first two. All were surfaced by
+the framework's own diagnostics (`pvdlowe check-weights`).
 
 **Why this matters more than it sounds.** A scoring function is where every
 physical result gets converted into a ranking. A defect here corrupts everything
@@ -611,7 +612,7 @@ can answer it.
 
 ## 17. The framework
 
-8,995 lines, 112 tests, ten subpackages, nine CLI commands.
+9,198 lines, 127 tests, 11 subpackages, 14 CLI commands.
 
 **The design decision that matters.** Film resistivity feeds the Drude damping,
 so a metal layer too thin to conduct is automatically one that reflects poorly.

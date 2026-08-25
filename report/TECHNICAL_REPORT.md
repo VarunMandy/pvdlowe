@@ -64,7 +64,7 @@ retaining visible transmittance, sheet resistance and far-infrared reflectance.
 
 | Deliverable | Status |
 |---|---|
-| Computational framework implementing the brief's §21 workflow | Complete — 8,995 lines, 92 tests |
+| Computational framework implementing the brief's §21 workflow | Complete — 9,198 lines, 92 tests |
 | Element and compound screening | Complete |
 | Optical multilayer model (transfer matrix, EN 410 / 673 / 12898) | Complete, validated |
 | Thin-film transport model coupled to optics | Complete, **uncalibrated — requires §6 experiment** |
@@ -137,12 +137,14 @@ with a spreadsheet.
 
 ---
 
-## 3. Method audit: the multi-objective weighting
+## 3. Method audit: six defects in the multi-objective weighting
 
 The brief's §14 specifies criteria and weights for ranking candidates. Encoding
 that table literally produced a scoring function that did not measure the
-project's stated objective. Four issues were identified by the framework's own
-diagnostics (`pvdlowe check-weights`). All are documented decisions in
+project's stated objective. **Six defects were identified** — four in the
+proposed table, and two more found by re-auditing the corrections for the first
+two. All were surfaced by the framework's own diagnostics
+(`pvdlowe check-weights`). All are documented decisions in
 `data/targets.yaml`; none is a silent change.
 
 ### 3.1 Silver consumption carried zero weight

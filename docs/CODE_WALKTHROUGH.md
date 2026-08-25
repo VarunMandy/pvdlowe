@@ -15,7 +15,7 @@ python tests/run_tests.py        # 110 passed
 
 ## 0. Shape of the thing (3 min)
 
-8,995 lines, ten subpackages, 112 tests. The dependency order runs one way:
+9,198 lines, 11 subpackages, 127 tests. The dependency order runs one way:
 
 ```
 constants  provenance  spectra          ← no dependencies
@@ -335,6 +335,44 @@ the epitaxial Ag{111}/ZnO{0001} match as the cause.
 
 ---
 
+## 7b. The review, and what fixing it found (3 min)
+
+`docs/CODE_REVIEW.md` is a self-review, re-audited twice. **Every finding is now
+closed**, and two of the fixes found defects the original review had missed —
+which is the part worth mentioning.
+
+| Finding | What it was | What the fix exposed |
+|---|---|---|
+| **M1** | two builders for the scoreable record, differing by ten keys | fixing construction was not enough: the emitted frame renamed a criterion and dropped three others, so re-scoring a composition series would have silently lost 0.25 of the weight |
+| **M2** | bare `except Exception` returning a sentinel | the branch was unreachable — sub-percolation designs score badly rather than raising, so a failure there is a bug. Now counted: **0 in 1,284 evaluations** |
+| **M3** | `_cache` declared, reset, never used | implemented rather than deleted; `stack()` was the hot path. 200 repeat calls now take **1 ms** |
+| **N1** | `ml/` had no numerical coverage | extracting `judge_wetting()` found a third tie-handling defect: AZO and GZO share a proxy and return identical energies, so the verdict named GZO and declared "NOT consistent" when AZO — the measured winner — was tied with it |
+
+> **Say:** "Two of the four fixes found something the review had missed. That is
+> the argument for writing the test rather than reading the code — I had read
+> that wetting function three times and corrected it twice by eye."
+
+Demonstrate the last one:
+
+```bash
+python -c "
+import pandas as pd
+from pvdlowe.ml import judge_wetting
+M = pd.DataFrame([
+  {'dielectric':'Si3N4','proxy':'Si3N4','dE_wet_eV':-0.502,'site_spread_eV':0.2149},
+  {'dielectric':'GZO','proxy':'ZnO','dE_wet_eV':0.6962,'site_spread_eV':0.0124},
+  {'dielectric':'AZO','proxy':'ZnO','dE_wet_eV':0.6962,'site_spread_eV':0.0124}])
+d = judge_wetting(M, 'Ag')
+print(d.attrs['verdict'])
+print(d.attrs['tied'])
+"
+```
+
+Those are the numbers measured on Vertex AI. The nitride is excluded because its
+site spread is 43% of its binding energy — the adatom was falling into
+dangling-bond pockets on an artificially cleaved surface — and AZO and GZO are
+reported as tied rather than ranked.
+
 ## 8. What that produced, and the one thing to take away (4 min)
 
 The patent also reports four-point sheet resistance on the two underlayers:
@@ -383,11 +421,19 @@ intensity ratio tests templating. **Three answers, one film, one afternoon.**
 > The DoE, DFT, ML and XRD subpackages are optional and independent — nothing
 > in the core imports them.
 
-**"112 tests on 8,995 lines — is that enough?"**
+**"127 tests on 9,198 lines — is that enough?"**
 > It is not a coverage figure and I would not claim it as one. The physics
-> assertions are the valuable ones. `report/` and `cli.py` are thinly covered,
-> and the ML module has almost no coverage of its numerical paths — that is
-> finding N1 in the code review, and it is stated there rather than glossed.
+> assertions are the valuable ones — the four closed-form checks in §2, the
+> optics–transport coupling in §1, and the guards that stop each fixed defect
+> from regressing. `report/` and `cli.py` are still thinly covered.
+>
+> The `ml/` module was the weakest part: it shipped with no coverage of its
+> numerical paths, because MACE cannot be installed in the environment the
+> suite runs in. That is now fixed by a route worth mentioning — the defects
+> there were never in the energy evaluations, which are the model's job and are
+> gated at runtime, but in the *judgement applied to the results*, and that is
+> pure logic over tables. Extracting `judge_wetting()` made it testable without
+> a backend, and writing those tests found a third defect in it.
 
 **"What is the worst bug you found?"**
 > The Rakić damping double-count in §3 — it inflated emissivity threefold. The
