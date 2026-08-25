@@ -93,12 +93,23 @@ def optimise_thicknesses(metal="Ag", tco_preset: TCOPreset | None = None,
         def unpack(x):
             return x[0], x[1], x[2]
 
+    failures: list = []
+
     def negative_score(x):
         m, b, t = unpack(x)
         try:
             return -objective_value(build(metal, m, b, t, preset), scheme,
                                     criteria)
-        except Exception:
+        except (ValueError, KeyError, ZeroDivisionError, FloatingPointError) as exc:
+            # Narrow, and counted. A bare `except Exception` here made a bad
+            # design and a genuine bug indistinguishable: the optimiser would
+            # steer away from the region and report a converged result either
+            # way. Note this branch is close to unreachable in normal use --
+            # sub-percolation coatings do not raise, they score badly (4.72 at
+            # 0.1 nm) -- so a failure here almost certainly IS a bug, which is
+            # exactly why it must be visible rather than absorbed.
+            failures.append((float(m), float(b), float(t),
+                             f"{type(exc).__name__}: {exc}"))
             return 1e3
 
     result = optimize.differential_evolution(
@@ -119,6 +130,12 @@ def optimise_thicknesses(metal="Ag", tco_preset: TCOPreset | None = None,
         "coating": best,
         "converged": bool(result.success),
         "n_evaluations": int(result.nfev),
+        # Surfaced rather than absorbed. Any value above zero means the
+        # objective raised somewhere in the search space, and since
+        # sub-percolation designs score badly rather than raising, that is
+        # almost certainly a bug rather than a rejected design.
+        "n_failed_evaluations": len(failures),
+        "failures": failures[:10],
     }
 
 

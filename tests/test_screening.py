@@ -389,3 +389,36 @@ def test_composition_series_records_match_the_candidate_table():
         f"{sorted(missing)} -- the two paths would score differently the "
         "moment any of them is populated")
     assert scored <= set(table.columns)
+
+
+def test_optimiser_reports_failed_evaluations_rather_than_absorbing_them():
+    """A bare `except Exception` made a bad design and a bug indistinguishable.
+
+    Sub-percolation coatings do not raise -- they score badly (4.72 at 0.1 nm)
+    -- so the branch is close to unreachable in normal use. That is exactly why
+    a failure there is almost certainly a bug and must be visible.
+    """
+    from pvdlowe.optimize.thickness import optimise_thicknesses
+    result = optimise_thicknesses(metal="Ag")
+    assert "n_failed_evaluations" in result
+    assert result["n_failed_evaluations"] == 0, (
+        f"objective raised during optimisation: {result['failures']}")
+
+
+def test_stack_is_memoised_and_the_cache_is_not_dead():
+    """`_cache` was declared, reset in three replace() calls, never used.
+
+    It advertised memoisation that did not exist while `stack()` rebuilt every
+    dispersion object on the hot path. Now it is real, and a `replace()` must
+    still produce a fresh stack rather than serving the parent's.
+    """
+    from dataclasses import replace
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optimize.thickness import build
+    coating = build("Ag", 10.0, 35.0, 35.0, tco("AZO"))
+    first, second = coating.stack(), coating.stack()
+    assert first is second, "stack() is not memoised"
+
+    thicker = replace(coating, metal_thickness_nm=14.0, _cache={})
+    assert thicker.stack() is not first, "replace() served a stale cached stack"
+    assert thicker.stack().layers[1].thickness_nm == 14.0

@@ -244,6 +244,21 @@ class LowECoating:
         return disp
 
     def stack(self) -> Stack:
+        """Assemble the layer stack.
+
+        Memoised in `_cache`. This is the hot path: a composition series
+        re-optimises geometry at every composition and calls this tens of
+        thousands of times, each call otherwise rebuilding every dispersion
+        object from scratch.
+
+        The cache is safe because `LowECoating` is only ever modified through
+        `dataclasses.replace`, which produces a new instance; the `_cache={}`
+        arguments at those call sites exist to reset it. Mutating a field in
+        place would stale the cache, which is why none of the accessors do.
+        """
+        cached = self._cache.get("stack")
+        if cached is not None:
+            return cached
         layers = []
         if self.top_thickness_nm > 0:
             layers.append(Layer(self.top_tco.dispersion(), self.top_thickness_nm,
@@ -262,7 +277,9 @@ class LowECoating:
             layers.append(Layer(self.bottom_tco.dispersion(),
                                 self.bottom_thickness_nm,
                                 self.bottom_tco.key, "tco"))
-        return Stack(layers, self.substrate, AIR, self.label)
+        built = Stack(layers, self.substrate, AIR, self.label)
+        self._cache["stack"] = built
+        return built
 
     def evaluate(self, wavelength_nm, angle_deg: float = 0.0, **kwargs):
         return self.stack().evaluate(wavelength_nm, angle_deg, **kwargs)

@@ -47,8 +47,8 @@ for the coupling described in P2, then
 
 | Severity | Count | Theme |
 |---|---|---|
-| Medium | 2 | silent failure, dead abstraction (M1 fixed) |
-| Low | 4 | API surface, function length, annotation gaps, import placement |
+| Medium | 0 | **all three fixed** — M1, M2, M3 |
+| Low | 3 | function length, annotation gaps, import placement (L1 fixed) |
 | Positive | 5 | worth preserving through any refactor |
 
 No high-severity findings. The most consequential item (M1) is currently
@@ -99,61 +99,50 @@ emitted score exactly.
   carry weight while being `None` for every candidate, which is the condition
   that made the original defect invisible.
 
-## M2 — The optimiser swallows all exceptions and returns a sentinel
+## M2 — The optimiser swallowed all exceptions — **FIXED**
 
-**Evidence.** [`optimize/thickness.py#L98-L102`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optimize/thickness.py#L98-L102)
+**What it was.** `optimize/thickness.py` caught bare `Exception` and returned a
+1e3 sentinel, making a genuine bug indistinguishable from a poor design: the
+optimiser would steer away from the region and report a converged result either
+way.
 
-```python
-try:
-    return -objective_value(build(metal, m, b, t, preset), scheme, criteria)
-except Exception:
-    return 1e3
-```
+**And the guard was not doing what it appeared to.** Sub-percolation coatings
+do not raise — they return finite scores (4.72 at 0.1 nm, 3.45 at 5 nm) — so
+the physical rejection was coming from the desirability functions all along.
+The branch was close to unreachable in normal use, which means a failure there
+is almost certainly a bug rather than a rejected design.
 
-Any failure — a bad dispersion lookup, a malformed preset, an arithmetic
-overflow — is indistinguishable from "this is a poor design". The optimiser
-will steer away from the region and report a converged result.
+**The fix.** The catch is narrowed to `ValueError`, `KeyError`,
+`ZeroDivisionError` and `FloatingPointError`, and failures are counted and
+returned: `n_failed_evaluations` and the first ten `failures` now appear in the
+result dict. A full silver optimisation reports **0 failures across 1,284
+evaluations**, confirming the branch was dead protection.
 
-**Compounding issue.** The guard is not doing what it appears to. Sub-percolation
-coatings do **not** raise; they return finite scores:
-
-```
-metal 0.1 nm -> score 4.72
-metal 1.0 nm -> score 4.53
-metal 5.0 nm -> score 3.45
-```
-
-So the `except` branch is effectively unreachable in normal use, and the
-physical rejection it seems to provide is actually coming from the desirability
-functions scoring badly. That is fine, but it means the try/except is dead
-protection that would only ever fire on a genuine bug, which it would then hide.
-
-**Recommended.** Catch specific exceptions, count them, and surface the count in
-the result dict. If more than a few per cent of evaluations fail, that is
-information the caller needs.
+Guarded by `test_optimiser_reports_failed_evaluations_rather_than_absorbing_them`.
 
 ---
 
-## M3 — `_cache` on the coating classes is dead
+## M3 — `_cache` on the coating classes was dead — **FIXED**
 
-**Evidence.** [`LowECoating._cache`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/stack.py#L142) and [`MultiMetalCoating._cache`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/stack.py#L347) are declared
-as fields and reset in every `replace()` call:
+**What it was.** `LowECoating._cache` and `MultiMetalCoating._cache` were
+declared as fields and reset in three `replace()` calls, but never read or
+written. Only `Alloy._cache` was real. It advertised memoisation that did not
+exist — while `stack()`, the actual hot path, rebuilt every dispersion object
+on every call.
 
-```python
-return replace(self, metal_thickness_nm=float(thickness_nm), _cache={})
-```
+**The fix — implemented rather than deleted**, because the cost was real: a
+composition series re-optimises geometry at every composition and calls
+`stack()` tens of thousands of times. `stack()` is now memoised in `_cache`.
+200 repeat calls take **1 ms**.
 
-They are never read or written anywhere. Only `Alloy._cache` is genuinely used
-([`alloys.py#L247-L268`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/materials/alloys.py#L247-L268)).
+The cache is safe because `LowECoating` is only modified through
+`dataclasses.replace`, which produces a new instance; the `_cache={}` arguments
+at those call sites now have a purpose. Mutating a field in place would stale
+it, which is why no accessor does.
 
-**Why it matters.** It advertises memoisation that does not exist. Someone
-optimising a hot loop would reasonably assume `stack()` is cached — it is not,
-and it rebuilds every dispersion on every call, which is the actual hot path in
-the sweeps. Meanwhile the `_cache={}` arguments are noise in three call sites.
-
-**Recommended.** Either delete the field and the three `_cache={}` arguments, or
-implement the memoisation the field implies. The second is worth doing: the
-composition series calls `stack()` tens of thousands of times.
+Guarded by `test_stack_is_memoised_and_the_cache_is_not_dead`, which asserts
+both that repeat calls return the same object and that a `replace()` does not
+serve the parent's stack.
 
 ---
 
@@ -187,23 +176,20 @@ experimental in `README.md`. Do not cite any number from it until then.
 
 ---
 
-## L1 — The top-level package exports almost nothing
+## L1 — Top-level exports — **FIXED**
 
-[`pvdlowe/__init__.py#L12`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/__init__.py#L12)
+`import pvdlowe` exposed only `Provenance`, `Quantity` and `Record`; everything
+else needed a deep import. Thirteen entry points are now re-exported at the top
+level — `dmd`, `dmdmd`, `LowECoating`, `MultiMetalCoating`,
+`performance_summary`, `ScoringScheme`, `evaluate`, `evaluate_all`,
+`record_for`, `load_candidates`, `tco`, `metal`, `validate_model`.
 
-```python
->>> import pvdlowe; pvdlowe.__all__
-['Provenance', 'Quantity', 'Record', '__version__']
-```
+**Deliberately lazy**, via `__getattr__`. Importing optics eagerly would pull
+scipy and every dispersion model into any `import pvdlowe`, including the ones
+that only want `Provenance`. Deep imports still work and remain what the
+internals use.
 
-Everything else requires a deep import (`from pvdlowe.optics.stack import dmd`).
-That is defensible for a library with a large surface, but it makes the
-first five minutes harder than necessary and the README examples all use deep
-paths.
-
-**Recommended.** Re-export the dozen or so entry points people actually start
-with: `dmd`, `dmdmd`, `LowECoating`, `MultiMetalCoating`, `performance_summary`,
-`ScoringScheme`, `evaluate_all`.
+---
 
 ## L2 — Several functions are too long to review comfortably
 
