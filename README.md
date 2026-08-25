@@ -157,7 +157,7 @@ Full index: [`docs/INDEX.md`](docs/INDEX.md). Read in this order:
 2. **`docs/FINDINGS.md`** — full findings, organised by conclusion: evidence
    audit, method audit, design-space results, limitations, corrections
 3. `docs/METHODOLOGY.md` — the physics, the approximations, and where they break
-4. `docs/METHODOLOGY.md` — the physics, the approximations, and where they break
+4. `report/TECHNICAL_REPORT.md` — the written report, for a supervisor
 
 **Evidence and verification**
 
@@ -171,7 +171,7 @@ Full index: [`docs/INDEX.md`](docs/INDEX.md). Read in this order:
 **Practical**
 
 - `docs/ROADMAP.md` — the experimental programme this is meant to feed
-- `docs/CODE_REVIEW.md` — self-review: three medium findings, one new, four low
+- `docs/CODE_REVIEW.md` — self-review: every finding now closed, each fix guarded
 - `docs/VERTEX_AI.md` — running it on Google Cloud Vertex AI
 - `experiments/BENCH_cu_series.md` — printable bench procedure
 - `experiments/PROTOCOL_cu_series.md` — pre-registered decision rules
