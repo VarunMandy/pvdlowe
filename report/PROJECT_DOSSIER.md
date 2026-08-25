@@ -228,8 +228,21 @@ silver-free N6 at 0.30 and above — and choosing among them is a decision about
 how much silver consumption matters to Saint-Gobain, not one the framework can
 make.**
 
-**Conclusion.** Four defects corrected, a fifth found and corrected on re-audit,
-and one residual disclosed rather than papered over. None applied silently.
+**A sixth, found by asking what the framework does not predict.** Three criteria
+carried 0.30 of the 0.90 nominal weight while being `None` for every candidate,
+so a third of the weight renormalised away silently — a file stating emissivity
+at 0.25 was applying 0.42. One of them, `structural_stability`, had no criterion
+definition at all and could never have scored. All three weighted 0.0; the
+ranking is unchanged, which is the point.
+
+`structural_stability` is now partly populatable from the Materials Project
+screening and the surrogate mixing energies, and is deliberately left
+unpopulated: doing so would change every ranking on values carrying 20–40%
+systematic error, at a weight nobody derived. Populating a criterion and
+choosing its weight are one decision, and it belongs to whoever continues.
+
+**Conclusion.** Four defects corrected, two more found and corrected on
+re-audit, and one residual disclosed rather than papered over. None applied silently.
 **General rule extracted: a desirability target should be an aspiration, not a
 specification minimum — and a weight that changes the winner should be reported
 as a sweep, not a value.**

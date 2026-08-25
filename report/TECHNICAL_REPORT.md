@@ -219,7 +219,37 @@ compositions scored 0.1–0.28 and supply risk was reported as limiting for 12 o
 *Correction applied:* floor 9.5, target 4.0 — still zeroing indium-bearing ITO,
 which is the criterion's purpose.
 
-### 3.5 Aggregation
+### 3.5 Weight reserved for criteria that were never populated
+
+Three criteria — structural stability, thermal stability and deposition
+efficiency — carried **0.30 of the 0.90 nominal weight while being `None` for
+every candidate**. The scheme renormalises over available criteria, so that
+third was silently redistributed onto the three that do have values: a file
+stating emissivity at 0.25 was in fact applying 0.42.
+
+Worse, `structural_stability` carried 0.15 **with no criterion definition at
+all** — no entry under `criteria:`, so it could never have scored even had a
+value been supplied.
+
+*Correction applied:* all three weighted 0.0, and the missing definition
+written. The ranking is unchanged, which is the point — they were renormalising
+away already.
+
+**One of them is now partly populatable, and deliberately left unpopulated.**
+When `structural_stability` was written the value was unavailable. It is not any
+more: the Materials Project screening of §5.5 supplies hull distances for
+ordered phases, and the surrogate mixing energies of §5.6 extend that to the
+disordered solid solution — both in eV/atom, which is exactly what the criterion
+asks for.
+
+It is left at weight 0.0 deliberately. Populating it would change every ranking;
+the values carry a 20–40% systematic under-prediction inherited from GGA; and
+0.15 is another weight nobody derived, which is the same problem §5.8 documents
+for silver. **Populating a criterion and choosing its weight are one decision,
+not two**, and that decision belongs to whoever continues the work. The
+criterion block records the data source and the caveat.
+
+### 3.6 Aggregation
 
 The brief states its weighting should prevent a candidate "winning simply
 because it has excellent conductivity while being unacceptable optically". A
@@ -231,7 +261,7 @@ arithmetic aggregation and 7th under geometric; pure copper ranks 1st and 2nd
 respectively. These are precisely the two candidates the brief is concerned with
 comparing. The framework defaults to geometric and reports both.
 
-### 3.6 Note on interpreting the diagnostics
+### 3.7 Note on interpreting the diagnostics
 
 The `limiting_criterion` field is `argmin(desirability)` — where a candidate is
 weakest, not what drives the ordering. Under geometric aggregation, whichever

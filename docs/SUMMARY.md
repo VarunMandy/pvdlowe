@@ -63,12 +63,13 @@ a passive nitride cannot. The two profiles disagree on the winner.
 light-to-solar-gain ratio across 38 candidates is 1.37 against ~2.0 commercial.
 Two metal layers reach 1.76 — an architectural limit, not a compositional one.
 
-**5. The brief's section 14 weighting has five defects.** The most serious: it
+**5. The brief's section 14 weighting has six defects.** The most serious: it
 omits silver consumption, so the optimiser returned a design using **29% more
-silver than the benchmark at a perfect 100/100 score.** A fifth was found by
-re-auditing the fix for the second — silver mass, metal cost and supply risk
-correlate at r = 1.000 and 0.991, and together carried 36% of the effective
-weight on one physical property.
+silver than the benchmark at a perfect 100/100 score.** Two more were found by re-auditing the
+first fixes: silver mass, metal cost and supply risk correlate at r = 1.000 and
+0.991 and together carried 36% of the effective weight on one property; and
+three further criteria carried 30% of the nominal weight while being `None` for
+every candidate, one of them with no definition at all.
 
 **6. Two of the brief's citations cannot be matched to any source, and one
 pivotal measurement is physically inconsistent** with a model-independent

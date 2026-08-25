@@ -81,18 +81,32 @@ def composition_supply_risk(alloy: Alloy, path: Path | None = None) -> float:
                      if sym in df.index))
 
 
-def evaluate(candidate, glass_thickness_mm: float = 4.0, gap_mm: float = 16.0,
-             gas: str = "argon", cost_kwargs: dict | None = None) -> dict:
-    """Full evaluation of one candidate into a scoreable record.
+def record_for(coating, glass_thickness_mm: float = 4.0, gap_mm: float = 16.0,
+               gas: str = "argon", cost_kwargs: dict | None = None,
+               identifier: str | None = None,
+               provenance: Provenance = Provenance.MODEL) -> dict:
+    """Build the canonical scoreable record for a coating.
 
-    Accepts a :class:`Candidate` or a bare :class:`LowECoating`.
+    **This is the single place a scoreable record is constructed.** Everything
+    that scores a coating -- :func:`evaluate`, the composition series, the
+    sweeps, any analysis script -- must go through here.
+
+    The reason is a defect this replaces. `evaluate()` and
+    `optimize.sweep.composition_series()` each built their own record, and the
+    hand-rolled one omitted ten keys, three of which are scored criteria. That
+    was harmless only because those three were `None` for every candidate and
+    :class:`ScoringScheme` renormalises over what is present. The moment any of
+    them is populated -- which is the explicit intent, they are defined in
+    `targets.yaml` -- the two paths would have scored on different criteria
+    subsets, a composition series would have become non-comparable with the
+    candidate table, and nothing would have flagged it.
+
+    `identifier` and `provenance` are the only things a :class:`Candidate`
+    supplies that a bare coating cannot, so they are parameters rather than a
+    reason to have two functions.
     """
-    coating = candidate.coating if isinstance(candidate, Candidate) else candidate
-    prov = candidate.provenance if isinstance(candidate, Candidate) \
-        else Provenance.MODEL
-
     record = performance_summary(coating, glass_thickness_mm, gap_mm, gas)
-    record["id"] = getattr(candidate, "id", coating.label)
+    record["id"] = identifier if identifier is not None else coating.label
     record["label"] = coating.label
 
     masses = coating.element_areal_mass()
@@ -103,18 +117,45 @@ def evaluate(candidate, glass_thickness_mm: float = 4.0, gap_mm: float = 16.0,
     record["film_resistivity_uohm_cm"] = coating.film_resistivity_uohm_cm
     record["size_effect_ratio"] = coating.size_effect_ratio
     record["mixing_model"] = coating.metal_alloy.mixing_model
-    record["provenance"] = prov.value
-    record["reportable"] = prov in {Provenance.MODEL, Provenance.LITERATURE,
-                                    Provenance.LITERATURE_UNVERIFIED,
-                                    Provenance.MEASURED}
+    record["provenance"] = provenance.value
+    record["reportable"] = provenance in {Provenance.MODEL, Provenance.LITERATURE,
+                                          Provenance.LITERATURE_UNVERIFIED,
+                                          Provenance.MEASURED}
 
     # Criteria the framework cannot predict. Left absent rather than guessed:
     # the scoring scheme renormalises over what is present, so a missing
     # thermal-stability measurement reduces confidence instead of the score.
+    # They are weighted 0.0 in targets.yaml for the same reason -- see the
+    # sixth defect in docs/FINDINGS.md section 2.
     record.setdefault("thermal_stability_c", None)
     record.setdefault("structural_stability", None)
     record.setdefault("deposition_efficiency", None)
     return record
+
+
+#: Keys every scoreable record carries. Used by the guard test that keeps the
+#: two construction paths from drifting apart again.
+RECORD_KEYS = frozenset({
+    "id", "label", "cost_usd_per_m2", "supply_risk", "metal_areal_mass_g_m2",
+    "film_resistivity_uohm_cm", "size_effect_ratio", "mixing_model",
+    "provenance", "reportable", "thermal_stability_c", "structural_stability",
+    "deposition_efficiency",
+})
+
+
+def evaluate(candidate, glass_thickness_mm: float = 4.0, gap_mm: float = 16.0,
+             gas: str = "argon", cost_kwargs: dict | None = None) -> dict:
+    """Full evaluation of one candidate into a scoreable record.
+
+    Accepts a :class:`Candidate` or a bare :class:`LowECoating`. A thin wrapper
+    over :func:`record_for`, which does the work.
+    """
+    is_candidate = isinstance(candidate, Candidate)
+    coating = candidate.coating if is_candidate else candidate
+    return record_for(
+        coating, glass_thickness_mm, gap_mm, gas, cost_kwargs,
+        identifier=getattr(candidate, "id", coating.label),
+        provenance=candidate.provenance if is_candidate else Provenance.MODEL)
 
 
 def evaluate_all(candidates=None, **kwargs) -> pd.DataFrame:

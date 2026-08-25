@@ -302,3 +302,90 @@ def test_weight_sweep_exposes_that_the_answer_depends_on_a_judgement():
         "should be updated")
     assert sweep.iloc[0].Ag_g_per_m2 > sweep.iloc[-1].Ag_g_per_m2, (
         "raising the silver weight must reduce the winner's silver content")
+
+
+def test_no_weight_on_criteria_that_are_never_populated():
+    """Weight on an always-missing criterion is weight doing nothing.
+
+    Three criteria -- structural stability, thermal stability and deposition
+    efficiency -- carried 0.30 of a 0.90 nominal total while being None for
+    every candidate. The scheme renormalises over available criteria, so that
+    third was silently redistributed onto the three that do have values,
+    inflating their influence without saying so. Better to state that the
+    framework does not predict them.
+    """
+    from pvdlowe.screening.candidates import evaluate_all
+    from pvdlowe.screening.scoring import ScoringScheme
+    scheme = ScoringScheme.from_yaml()
+    records = evaluate_all().to_dict("records")
+    for key, weight in scheme.weights.items():
+        if weight <= 0:
+            continue
+        populated = sum(r.get(key) is not None for r in records)
+        assert populated, (
+            f"{key} carries weight {weight} but is None for all "
+            f"{len(records)} candidates; it renormalises away silently")
+
+
+def test_every_weighted_criterion_has_a_definition():
+    """A weighted key with no criterion block cannot be scored at all.
+
+    `structural_stability` carried 0.15 with no entry under `criteria:` — so
+    it could never have contributed even if a value had been supplied.
+    """
+    from pvdlowe.screening.scoring import ScoringScheme
+    scheme = ScoringScheme.from_yaml()
+    undefined = [k for k, w in scheme.weights.items()
+                 if w > 0 and k not in scheme.criteria]
+    assert not undefined, f"weighted but undefined: {undefined}"
+
+
+def test_all_scoreable_records_come_from_one_builder():
+    """Every path that scores a coating must produce the same keys.
+
+    `evaluate()` and `optimize.sweep.composition_series()` each built their own
+    record, and the hand-rolled one omitted ten keys -- three of them scored
+    criteria. That was harmless only because those three are None for every
+    candidate and ScoringScheme renormalises over what is present. Populate any
+    of them and the two paths would silently score on different criteria
+    subsets, making a composition series non-comparable with the candidate
+    table with nothing to flag it.
+
+    Both now call `record_for`. This test fails if a second builder appears.
+    """
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optimize.thickness import build
+    from pvdlowe.screening.candidates import RECORD_KEYS, evaluate, record_for
+
+    coating = build("Ag", 10.0, 35.0, 35.0, tco("AZO"))
+    direct = record_for(coating)
+    via_evaluate = evaluate(coating)
+
+    assert set(direct) == set(via_evaluate), (
+        "evaluate() and record_for() disagree on keys: "
+        f"{set(direct) ^ set(via_evaluate)}")
+    assert RECORD_KEYS <= set(direct), (
+        f"record_for is missing declared keys: {RECORD_KEYS - set(direct)}")
+
+
+def test_composition_series_records_match_the_candidate_table():
+    """The two scoring paths must agree key-for-key, not merely by luck.
+
+    This is the specific failure M1 predicted: a series and a candidate table
+    scored on different criteria subsets, looking comparable and not being so.
+    """
+    from pvdlowe.optimize.sweep import composition_series
+    from pvdlowe.screening.candidates import evaluate_all
+
+    series = composition_series(fractions=(1.0, 0.5, 0.0))
+    table = evaluate_all()
+
+    scored = {"T_vis", "emissivity_hemispherical", "Ag_g_per_m2",
+              "structural_stability", "thermal_stability_c",
+              "deposition_efficiency"}
+    missing = scored - set(series.columns)
+    assert not missing, (
+        f"composition_series omits scored criteria the candidate table has: "
+        f"{sorted(missing)} -- the two paths would score differently the "
+        "moment any of them is populated")
+    assert scored <= set(table.columns)

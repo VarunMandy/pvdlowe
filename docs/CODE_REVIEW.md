@@ -47,7 +47,7 @@ for the coupling described in P2, then
 
 | Severity | Count | Theme |
 |---|---|---|
-| Medium | 3 | latent divergence, silent failure, dead abstraction |
+| Medium | 2 | silent failure, dead abstraction (M1 fixed) |
 | Low | 4 | API surface, function length, annotation gaps, import placement |
 | Positive | 5 | worth preserving through any refactor |
 
@@ -56,40 +56,48 @@ harmless and will not stay that way.
 
 ---
 
-## M1 — Record construction is duplicated, and the copies are already divergent
+## M1 — Record construction is duplicated — **FIXED**
 
-**Evidence.** [`screening/candidates.evaluate()`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/screening/candidates.py#L84) builds the canonical scoreable
-record. [`optimize/sweep.composition_series()`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optimize/sweep.py#L112-L193) builds its own:
+**Status: resolved.** Kept here because the fix exposed a second, worse hazard
+that the original finding had not identified.
 
-```python
-r = performance_summary(coating)
-r["cost_usd_per_m2"] = coating_material_cost(masses)["total_usd_per_m2"]
-r["supply_risk"] = composition_supply_risk(coating.metal_alloy)
-```
+**What it was.** `screening/candidates.evaluate()` built the canonical
+scoreable record; `optimize/sweep.composition_series()` built its own, omitting
+ten keys of which three were scored criteria. Harmless only because those three
+were `None` for every candidate and `ScoringScheme` renormalises over what is
+present — both paths scored an identical 64.95 for the benchmark.
 
-The hand-rolled version omits ten keys that `evaluate()` supplies:
-`structural_stability`, `thermal_stability_c`, `deposition_efficiency`,
-`film_resistivity_uohm_cm`, `size_effect_ratio`, `metal_areal_mass_g_m2`,
-`mixing_model`, `provenance`, `reportable`, `id`.
+**The fix.** Record construction is extracted into
+`candidates.record_for(coating, ...)`, the single place a scoreable record is
+built. `evaluate()` is now a thin wrapper that supplies the two things a
+`Candidate` has and a bare coating does not — its identifier and provenance.
+`composition_series()` calls `record_for` directly.
 
-**Why it is currently harmless.** The three scored criteria among those
-(`structural_stability`, `thermal_stability_c`, `deposition_efficiency`) are all
-`None`, and `ScoringScheme` renormalises over available criteria. Both paths
-score an identical 64.95 for the benchmark. Verified.
+**The hazard the fix exposed.** Fixing the construction was not sufficient. The
+emitted frame *renamed* `emissivity_hemispherical` to `emissivity_h` and
+dropped the three unpopulated criteria. Anyone re-scoring that CSV — which is a
+natural thing to do with a 168-row composition series — would have had
+emissivity silently dropped as a missing criterion, losing **0.25 of the
+weight**, and scored on a different subset from the candidate table with
+nothing to flag it.
 
-**Why it will not stay harmless.** The moment any of those three is populated —
-which is the explicit intent, since they carry 0.30 of the weight in
-`targets.yaml` — the two paths will silently score on different criteria
-subsets. A composition series would then be non-comparable with the candidate
-table, and nothing would flag it. The same pattern was reproduced in several
-analysis scripts written during this project, which is how it propagates.
+That is the same class of defect as the original, one layer further out: not
+two builders, but one builder and an output schema that did not match it. The
+frame now uses canonical criterion names throughout and carries the
+unpopulated criteria explicitly. Re-scoring an emitted row reproduces the
+emitted score exactly.
 
-**Recommended.** Extract the record construction into one function, e.g.
-`candidates.record_for(coating)`, and have both `evaluate()` and
-`composition_series()` call it. Add a test asserting the two paths produce
-identical key sets.
+**Guards added.** Three tests:
 
----
+- `test_all_scoreable_records_come_from_one_builder` — `evaluate()` and
+  `record_for()` must agree key-for-key, and both must carry the declared
+  `RECORD_KEYS`.
+- `test_composition_series_records_match_the_candidate_table` — the emitted
+  frame must carry every scored criterion the candidate table has. This is the
+  test that caught the renaming hazard.
+- `test_no_weight_on_criteria_that_are_never_populated` — no criterion may
+  carry weight while being `None` for every candidate, which is the condition
+  that made the original defect invisible.
 
 ## M2 — The optimiser swallows all exceptions and returns a sentinel
 
@@ -286,8 +294,9 @@ highest-value comments in the codebase.
 
 1. **N1** — run the `ml/` subpackage once against a real backend. It is the
    only part of the codebase with no execution evidence at all.
-2. **M1** — extract the shared record builder. Half an hour, prevents a silent
-   correctness failure the moment the stability criteria are populated.
+2. ~~**M1**~~ — **done.** Extracted to `candidates.record_for`, with three
+   guard tests. The fix also caught an output-schema mismatch the original
+   finding had missed.
 3. **M3** — delete or implement `_cache`. Deleting is ten minutes; implementing
    would measurably speed the sweeps.
 4. **M2** — narrow the exception handling and report the failure count.

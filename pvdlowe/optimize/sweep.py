@@ -128,9 +128,10 @@ def composition_series(fractions=None, mixing_model: str = "solid_solution",
     and it will look erratic because the g-value swings with oxide thickness.
     Pass the scheme you care about; the returned frame records which was used.
     """
+    # Local imports: these break an import cycle, since screening imports
+    # optics which this module also uses.
     from ..materials.tco import tco as _tco
-    from ..screening.candidates import composition_supply_risk
-    from ..screening.elements import coating_material_cost
+    from ..screening.candidates import record_for as record
     from ..screening.scoring import ScoringScheme
 
     scheme = scheme or ScoringScheme.from_yaml()
@@ -138,13 +139,6 @@ def composition_series(fractions=None, mixing_model: str = "solid_solution",
                        else np.round(np.arange(0.0, 1.001, 0.05), 3), dtype=float)
     preset = _tco(dielectric)
     a_el, b_el = elements
-
-    def record(coating):
-        r = performance_summary(coating)
-        masses = coating.element_areal_mass()
-        r["cost_usd_per_m2"] = coating_material_cost(masses)["total_usd_per_m2"]
-        r["supply_risk"] = composition_supply_risk(coating.metal_alloy)
-        return r
 
     rows = []
     for x in fracs:
@@ -168,17 +162,29 @@ def composition_series(fractions=None, mixing_model: str = "solid_solution",
         if best is None:
             continue
         sc, dm, b, t, r = best
+        # Canonical criterion names throughout, including the criteria that
+        # are currently unpopulated. An earlier version renamed
+        # emissivity_hemispherical to emissivity_h and omitted the three
+        # unpopulated criteria, so re-scoring the emitted frame would have
+        # silently dropped emissivity -- 0.25 of the weight -- and scored on a
+        # different subset from the candidate table. Keep the names the
+        # scoring scheme uses.
         rows.append({
             "mixing_model": mixing_model, "dielectric": dielectric,
             f"{a_el}_fraction": float(x), "metal_nm": float(dm),
             "bottom_nm": float(b), "top_nm": float(t),
             "T_vis": round(r["T_vis"], 4), "T_sol": round(r["T_sol"], 4),
-            "emissivity_h": round(r["emissivity_hemispherical"], 4),
+            "emissivity_hemispherical": round(r["emissivity_hemispherical"], 4),
+            "emissivity_normal": round(r["emissivity_normal"], 4),
             "R_sheet": round(r["R_sheet"], 2),
             "g_value": round(r["g_value"], 3), "LSG": round(r["LSG"], 2),
             "U_g": round(r["U_g"], 3),
             "Ag_g_per_m2": round(r["Ag_g_per_m2"], 4),
             "cost_usd_per_m2": round(r["cost_usd_per_m2"], 3),
+            "supply_risk": round(r["supply_risk"], 2),
+            "structural_stability": r["structural_stability"],
+            "thermal_stability_c": r["thermal_stability_c"],
+            "deposition_efficiency": r["deposition_efficiency"],
             "score": round(sc, 1),
             "limiting": scheme.score(r)["limiting_criterion"],
             "meets_spec": bool(r["T_vis"] >= 0.80 and r["R_sheet"] <= 5.0

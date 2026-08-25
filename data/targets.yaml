@@ -70,6 +70,31 @@ criteria:
     unit: ""
     source: "brief section 9 stage 1; composition-weighted element supply risk"
 
+  structural_stability:
+    label: Structural stability
+    direction: lower
+    floor: 0.100
+    target: 0.000
+    exponent: 1.0
+    unit: eV/atom
+    source: "energy above the convex hull. Floor 0.100 eV/atom is roughly 2x
+             kT at a 550 C anneal, above which a phase is unlikely to survive
+             processing; target 0 is on the hull.
+
+             NOW PARTLY POPULATABLE. When this criterion was written the value
+             was unavailable and it was carried at weight 0.15 while always
+             being None -- so it silently renormalised away, and a third of the
+             nominal weight was doing nothing. The Materials Project screening
+             of 2026-08 supplies hull distances for ordered phases (Ag-Cu has
+             none stable: Cu3Ag 0.0904, CuAg3 0.0857 eV/atom) and the MLIP
+             mixing energies extend that to the disordered solid solution
+             (dE_mix = 0.287*x*(1-x)). See FINDINGS sections 3.7 and 3.8.
+
+             It is deliberately still weighted 0.0 pending a decision: filling
+             it would change every ranking, and the values carry a systematic
+             under-prediction of 20-40% inherited from GGA. Populate and
+             re-weight together, not separately."
+
   thermal_stability_c:
     label: Thermal stability
     direction: higher
@@ -115,8 +140,18 @@ weights:
   emissivity_hemispherical: 0.25
   Ag_g_per_m2: 0.15
   R_sheet: 0.0
-  structural_stability: 0.15
-  thermal_stability_c: 0.10
+  # These three are weighted 0.0 because none of them is populated for any
+  # candidate. Carrying weight on an always-missing criterion does nothing
+  # except renormalise silently: 0.30 of the 0.90 nominal total -- a third --
+  # was being redistributed onto the three criteria that do have values,
+  # invisibly inflating their influence. Better to state that the framework
+  # does not predict these than to reserve weight it cannot use.
+  #
+  # structural_stability is now partly populatable from the Materials Project
+  # screening and the MLIP mixing energies; see its definition above. Restore
+  # its weight and populate it in the same change, never separately.
+  structural_stability: 0.0
+  thermal_stability_c: 0.0
   # Both of these correlate with Ag_g_per_m2 at r = 1.000 and r = 0.991
   # respectively: silver dominates metal cost so completely that cost is the
   # same quantity in different units, and supply risk in this candidate set is
@@ -130,7 +165,7 @@ weights:
   # non-silver cost driver enters the set.
   cost_usd_per_m2: 0.0
   supply_risk: 0.0
-  deposition_efficiency: 0.05
+  deposition_efficiency: 0.0
 
 # WARNING, and the reason the aggregation defaults to a geometric mean:
 #

@@ -163,7 +163,7 @@ resistivity kink.
 
 ---
 
-# 2. Method audit: four defects in the section 14 weighting
+# 2. Method audit: six defects in the section 14 weighting
 
 Encoding the brief's weighting table literally produced a scorer that did not
 measure what the project is for. Each defect was found by the framework's own
@@ -214,6 +214,36 @@ specification minimum.**
 At floor 8.0 against candidate values of 4.5–7.5, every silver-bearing
 composition scored 0.1–0.28 and `supply_risk` was reported as limiting for 12 of
 14 candidates. Widened to 9.5 / 4.0, which still zeroes indium-bearing ITO.
+
+## 2.4b Weight reserved for criteria that were never populated
+
+**A sixth defect, found by asking what the framework does not predict.** Three
+criteria — structural stability, thermal stability and deposition efficiency —
+carried **0.30 of the 0.90 nominal weight while being `None` for every
+candidate**. The scheme renormalises over available criteria, so that third was
+silently redistributed onto the three that do have values: a file stating
+emissivity at 0.25 was in fact applying 0.42.
+
+Worse, `structural_stability` carried 0.15 **with no criterion definition at
+all** — no entry under `criteria:`, so it could never have scored even had a
+value been supplied.
+
+*Correction applied:* all three weighted 0.0, and the missing definition
+written. The ranking is unchanged, which is the point — they were renormalising
+away already.
+
+**One of them is now partly populatable, and deliberately left unpopulated.**
+When `structural_stability` was written the value was unavailable. It is not
+any more: the Materials Project screening supplies hull distances for ordered
+phases and the surrogate mixing energies extend that to the disordered solid
+solution, both in eV/atom, which is exactly what the criterion asks for.
+
+It is left at weight 0.0 on purpose. Populating it would change every ranking,
+the values carry a 20–40% systematic under-prediction inherited from GGA, and
+0.15 is another weight nobody derived — the same problem the sweep exposes for
+silver. **Populating a criterion and choosing its weight are one decision, not
+two**, and that decision belongs to whoever continues the work. The criterion
+block records the data source and the caveat.
 
 ## 2.5 A weighted sum does not do what the brief wants
 
