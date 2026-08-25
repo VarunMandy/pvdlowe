@@ -17,16 +17,17 @@ depositing the films.
   'disputed' means do not cite: the numbers in the brief could not be matched to any located source.
 
 ## Specification and weighting
-| criterion                | key                      | direction   |   unacceptable_at |   satisfied_at | unit   |   weight | source                                                       |
-|:-------------------------|:-------------------------|:------------|------------------:|---------------:|:-------|---------:|:-------------------------------------------------------------|
-| Hemispherical emissivity | emissivity_hemispherical | lower       |              0.2  |           0.02 |        |     0.25 | brief section 17: <= 0.15; quantitative framework: <= 0.10,  |
-| Visible transmittance    | T_vis                    | higher      |              0.65 |           0.9  |        |     0.2  | brief section 17: >= 80% initial target                      |
-| Silver consumption       | Ag_g_per_m2              | lower       |              0.16 |           0    | g/m2   |     0.15 | brief section 20: minimise critical-material content. Floor  |
-| Thermal stability        | thermal_stability_c      | higher      |            200    |         500    | degC   |     0.1  | brief section 17: 300-500 C test window. NOT PREDICTED by th |
-| Deposition efficiency    | deposition_efficiency    | higher      |              0.2  |           1    |        |     0.05 | brief section 15: performance per unit deposition energy, no |
-| Sheet resistance         | R_sheet                  | lower       |             15    |           5    | ohm/sq |     0    | brief section 17: <= 5 ohm/sq                                |
-| Supply risk              | supply_risk              | lower       |              9.5  |           4    |        |     0    | brief section 9 stage 1; composition-weighted element supply |
-| Metal cost               | cost_usd_per_m2          | lower       |              3    |           0.5  | USD/m2 |     0    | brief section 17: significantly below conventional benchmark |
+| criterion                | key                      | direction   |   unacceptable_at |   satisfied_at | unit    |   weight | source                                                       |
+|:-------------------------|:-------------------------|:------------|------------------:|---------------:|:--------|---------:|:-------------------------------------------------------------|
+| Hemispherical emissivity | emissivity_hemispherical | lower       |              0.2  |           0.02 |         |     0.25 | brief section 17: <= 0.15; quantitative framework: <= 0.10,  |
+| Visible transmittance    | T_vis                    | higher      |              0.65 |           0.9  |         |     0.2  | brief section 17: >= 80% initial target                      |
+| Silver consumption       | Ag_g_per_m2              | lower       |              0.16 |           0    | g/m2    |     0.15 | brief section 20: minimise critical-material content. Floor  |
+| Sheet resistance         | R_sheet                  | lower       |             15    |           5    | ohm/sq  |     0    | brief section 17: <= 5 ohm/sq                                |
+| Metal cost               | cost_usd_per_m2          | lower       |              3    |           0.5  | USD/m2  |     0    | brief section 17: significantly below conventional benchmark |
+| Supply risk              | supply_risk              | lower       |              9.5  |           4    |         |     0    | brief section 9 stage 1; composition-weighted element supply |
+| Structural stability     | structural_stability     | lower       |              0.1  |           0    | eV/atom |     0    | energy above the convex hull. Floor 0.100 eV/atom is roughly |
+| Thermal stability        | thermal_stability_c      | higher      |            200    |         500    | degC    |     0    | brief section 17: 300-500 C test window. NOT PREDICTED by th |
+| Deposition efficiency    | deposition_efficiency    | higher      |              0.2  |           1    |         |     0    | brief section 15: performance per unit deposition energy, no |
 
 The weighting is from the brief's section 14. Note that emissivity and sheet resistance are both governed by the same free-carrier response, so their weights are not independent; see the scoring diagnostics.
 
@@ -222,7 +223,7 @@ INTERNAL CONSISTENCY OF THE REPORTED VALUES
 [HIGH  ] ~10 nm Ag, Ag-Cu and Cu films
          check : Ag thin-film resistivity vs bulk
          detail: 1.59 uohm.cm quoted for a 10 nm film is 1.00x bulk (1.587 uohm.cm). A film this thin cannot reach bulk resistivity: the electron mean free path is 53 nm, so surface and grain-boundary scattering alone force a ratio above about 2
-         action: check whether the bulk value was tabulated alongside measured values for the other films
+         action: RESOLVED: the source states 1.29 uohm.cm, not the 1.59 transcribed in the brief -- and 1.29 is BELOW bulk, so the correction makes the anomaly worse rather than explaining it. See the source_actual block in data/benchmarks.yaml. No further check needed on the transcription; what remains unexplained is the measurement.
 
 ==========================================================================
 VERIFICATION STATUS

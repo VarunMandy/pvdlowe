@@ -301,3 +301,23 @@ def test_validation_report_names_which_figure_it_quotes():
     text = report()
     assert "disputed benchmark" in text
     assert "do not quote" in text.lower()
+
+
+def test_resolved_checks_do_not_suggest_work_already_done():
+    """A consistency check must not send the reader to redo an eliminated test.
+
+    The Ag thin-film resistivity check originally advised checking whether the
+    bulk value had been tabulated alongside the measured ones. That was a
+    reasonable first hypothesis and it was tested: the source patent states
+    1.29 uohm.cm against the 1.59 the brief transcribed, and 1.29 is BELOW
+    bulk, so the correction makes the anomaly worse. Where `source_actual`
+    records a mistranscription, the action must say so.
+    """
+    from pvdlowe.validate import check_consistency
+    rows = check_consistency()
+    resistivity = rows[rows["check"].str.contains("resistivity", case=False)]
+    assert len(resistivity), "the Ag resistivity check should still fire"
+    action = " ".join(resistivity["action"])
+    assert "RESOLVED" in action
+    assert "tabulated alongside" not in action, (
+        "the superseded action is still being suggested")

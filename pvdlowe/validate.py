@@ -193,6 +193,28 @@ def validate_model(path: Path | None = None,
     return df
 
 
+def _resistivity_action(bm: dict) -> str:
+    """What to do about a thin-film resistivity that cannot be right.
+
+    The generic advice -- that the bulk value might have been tabulated
+    alongside the measured ones -- was a reasonable first hypothesis and has
+    since been tested and eliminated for the one entry it applied to. Where a
+    `source_actual` block records that the brief mistranscribed the figure,
+    say so rather than sending the reader to redo the check.
+    """
+    actual = (bm.get("source_actual") or {}).get("resistivity_ag_uohm_cm")
+    reported = (bm.get("reported") or {}).get("resistivity_ag_uohm_cm")
+    if actual is not None and reported is not None and actual != reported:
+        return (f"RESOLVED: the source states {actual} uohm.cm, not the "
+                f"{reported} transcribed in the brief -- and {actual} is BELOW "
+                "bulk, so the correction makes the anomaly worse rather than "
+                "explaining it. See the source_actual block in "
+                "data/benchmarks.yaml. No further check needed on the "
+                "transcription; what remains unexplained is the measurement.")
+    return ("check whether the bulk value was tabulated alongside measured "
+            "values for the other films")
+
+
 def check_consistency(path: Path | None = None) -> pd.DataFrame:
     """Model-independent consistency checks on the reported benchmark values."""
     findings = []
@@ -255,8 +277,7 @@ def check_consistency(path: Path | None = None) -> pd.DataFrame:
                         f"free path is {_metal(symbol).mean_free_path_nm:g} nm, "
                         f"so surface and grain-boundary scattering alone force a "
                         f"ratio above about 2"),
-                    "action": "check whether the bulk value was tabulated "
-                              "alongside measured values for the other films",
+                    "action": _resistivity_action(bm),
                 })
 
         # 3. resistivity, sheet resistance and thickness self-consistency
