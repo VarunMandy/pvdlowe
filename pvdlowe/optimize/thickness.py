@@ -172,6 +172,39 @@ def optimise_all_compositions(fractions=(1.0, 0.9, 0.8, 0.7, 0.5, 0.25, 0.0),
     return pd.DataFrame(rows)
 
 
+def _reduction_row(alloy, ag_fraction, found, spec) -> dict:
+    """One row of the silver-reduction curve.
+
+    Split out because the three outcomes -- meets spec, conducts but fails
+    transmittance, and no thickness works -- were three near-identical dict
+    literals inline, which was most of the length of the caller and made the
+    branching hard to follow. The `note` column is the only part that differs
+    in substance.
+    """
+    base = {"composition": alloy.label, "ag_fraction": ag_fraction}
+
+    if found is None:
+        return {**base, "meets_spec": False, "metal_nm": None,
+                "Ag_g_per_m2": None,
+                "note": "no thickness in 7-20 nm reaches the sheet-resistance "
+                        "and emissivity targets"}
+
+    m, b, t, perf = found
+    row = {**base, "metal_nm": round(m, 2),
+           "T_vis": round(perf["T_vis"], 4),
+           "R_sheet": round(perf["R_sheet"], 2),
+           "emissivity": round(perf["emissivity_hemispherical"], 4),
+           "Ag_g_per_m2": round(perf["Ag_g_per_m2"], 4)}
+
+    if perf["T_vis"] < spec.get("T_vis", 0.0):
+        return {**row, "meets_spec": False,
+                "note": f"conducts at {m:.1f} nm but T_vis "
+                        f"{perf['T_vis']:.3f} < {spec['T_vis']:.2f}"}
+
+    return {**row, "meets_spec": True, "bottom_nm": round(b, 1),
+            "top_nm": round(t, 1), "note": ""}
+
+
 def silver_reduction_curve(targets=None, fractions=None,
                            mixing_model: str = "solid_solution",
                            **kwargs) -> pd.DataFrame:
@@ -247,36 +280,7 @@ def silver_reduction_curve(targets=None, fractions=None,
                     found, hi = (mid, b, t, perf), mid
                 else:
                     lo = mid
-        if found is not None and found[3]["T_vis"] < spec.get("T_vis", 0.0):
-            m, b, t, perf = found
-            rows.append({
-                "composition": alloy.label, "ag_fraction": x,
-                "meets_spec": False, "metal_nm": round(m, 2),
-                "T_vis": round(perf["T_vis"], 4),
-                "R_sheet": round(perf["R_sheet"], 2),
-                "emissivity": round(perf["emissivity_hemispherical"], 4),
-                "Ag_g_per_m2": round(perf["Ag_g_per_m2"], 4),
-                "note": f"conducts at {m:.1f} nm but T_vis "
-                        f"{perf['T_vis']:.3f} < {spec['T_vis']:.2f}"})
-            continue
-        if found is None:
-            rows.append({"composition": alloy.label, "ag_fraction": x,
-                         "meets_spec": False, "metal_nm": None,
-                         "Ag_g_per_m2": None,
-                         "note": "no thickness in 7-20 nm reaches the "
-                                 "sheet-resistance and emissivity targets"})
-            continue
-        m, b, t, perf = found
-        rows.append({
-            "composition": alloy.label, "ag_fraction": x, "meets_spec": True,
-            "metal_nm": round(m, 2), "bottom_nm": round(b, 1),
-            "top_nm": round(t, 1),
-            "T_vis": round(perf["T_vis"], 4),
-            "R_sheet": round(perf["R_sheet"], 2),
-            "emissivity": round(perf["emissivity_hemispherical"], 4),
-            "Ag_g_per_m2": round(perf["Ag_g_per_m2"], 4),
-            "note": "",
-        })
+        rows.append(_reduction_row(alloy, x, found, spec))
     df = pd.DataFrame(rows)
     if "Ag_g_per_m2" in df and df["Ag_g_per_m2"].notna().any():
         base = df.loc[df["ag_fraction"] == 1.0, "Ag_g_per_m2"]

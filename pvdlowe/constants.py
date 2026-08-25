@@ -27,21 +27,21 @@ HC_EV_NM = H_PLANCK * C0 / E_CHARGE * 1e9   # 1239.8419843320025
 HBAR_EV_S = HBAR / E_CHARGE                 # 6.582e-16
 
 
-def wavelength_to_ev(wavelength_nm):
+def wavelength_to_ev(wavelength_nm) -> "float | np.ndarray":
     """Photon energy (eV) from vacuum wavelength (nm)."""
     return HC_EV_NM / np.asarray(wavelength_nm, dtype=float)
 
 
-def ev_to_wavelength(energy_ev):
+def ev_to_wavelength(energy_ev) -> "float | np.ndarray":
     """Vacuum wavelength (nm) from photon energy (eV)."""
     return HC_EV_NM / np.asarray(energy_ev, dtype=float)
 
 
-def wavelength_to_um(wavelength_nm):
+def wavelength_to_um(wavelength_nm) -> "float | np.ndarray":
     return np.asarray(wavelength_nm, dtype=float) / 1000.0
 
 
-def um_to_wavelength(wavelength_um):
+def um_to_wavelength(wavelength_um) -> "float | np.ndarray":
     return np.asarray(wavelength_um, dtype=float) * 1000.0
 
 
@@ -54,7 +54,7 @@ T_STANDARD_K = 283.0
 
 
 def drude_plasma_energy_ev(carrier_density_cm3, effective_mass_ratio,
-                           relative_permittivity=1.0):
+                           relative_permittivity=1.0) -> "float | np.ndarray":
     """Unscreened Drude plasma energy hbar*wp in eV.
 
     wp^2 = N e^2 / (eps0 eps_r m*)
@@ -77,7 +77,7 @@ def drude_plasma_energy_ev(carrier_density_cm3, effective_mass_ratio,
     return HBAR_EV_S * wp                  # eV
 
 
-def drude_damping_energy_ev(mobility_cm2_vs, effective_mass_ratio):
+def drude_damping_energy_ev(mobility_cm2_vs, effective_mass_ratio) -> "float | np.ndarray":
     """Drude damping hbar/tau in eV from a Hall mobility.
 
     tau = m* mu / e  ->  hbar/tau = hbar e / (m* mu)
@@ -89,7 +89,7 @@ def drude_damping_energy_ev(mobility_cm2_vs, effective_mass_ratio):
 
 
 def damping_from_resistivity_ev(resistivity_ohm_cm, carrier_density_cm3,
-                                effective_mass_ratio):
+                                effective_mass_ratio) -> "float | np.ndarray":
     """Drude damping hbar/tau in eV from a measured DC resistivity.
 
     rho = m* / (N e^2 tau)  ->  hbar/tau = hbar N e^2 rho / m*
@@ -100,7 +100,7 @@ def damping_from_resistivity_ev(resistivity_ohm_cm, carrier_density_cm3,
     return HBAR_EV_S * n_si * E_CHARGE ** 2 * rho_si / m_eff
 
 
-def drude_damping_from_resistivity_ev(plasma_energy_ev, resistivity_uohm_cm):
+def drude_damping_from_resistivity_ev(plasma_energy_ev, resistivity_uohm_cm) -> "float | np.ndarray":
     """Drude damping hbar/tau in eV consistent with a DC resistivity.
 
     Within one Drude model, rho = 1/(eps0 wp^2 tau), so
@@ -122,7 +122,7 @@ def drude_damping_from_resistivity_ev(plasma_energy_ev, resistivity_uohm_cm):
     return float(EPS0 * float(plasma_energy_ev) ** 2 * E_CHARGE * rho_si / HBAR)
 
 
-def planck_spectral_radiance_wavelength(wavelength_nm, temperature_k):
+def planck_spectral_radiance_wavelength(wavelength_nm, temperature_k) -> "float | np.ndarray":
     """Planck spectral radiance L(lambda, T) in W/(m^2 sr m).
 
     Returned per metre of wavelength; only its shape matters when it is used

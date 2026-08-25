@@ -95,6 +95,7 @@ def to_excel(path: Path, include_sweeps: bool = False) -> Path:
         "Not predicted": limitations_table(),
     }
     if include_sweeps:
+        # Local import: report/ sits above optimize/, and only this exporter needs it.
         from ..optimize.sweep import microstructure_comparison, thickness_sweep
         sheets["Ag thickness sweep"] = thickness_sweep("Ag")
         sheets["Microstructure"] = microstructure_comparison()

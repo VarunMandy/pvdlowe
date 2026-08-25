@@ -176,6 +176,8 @@ class DrudeSemiconductor(Dispersion):
 
     @property
     def damping_ev(self) -> float:
+        # Local import of a numeric constant, used only here. Kept out of module
+        # scope so that `constants` stays a leaf with no importers to invalidate.
         from ..constants import drude_damping_energy_ev
         return float(drude_damping_energy_ev(
             self.mobility_cm2_vs, self.effective_mass))

@@ -198,6 +198,7 @@ def deembed_parallel(measured_ohm_sq, *shunt_ohm_sq) -> float:
 def deembed_series(measured_ohm_sq, dielectric: str = "AZO",
                    bottom_nm: float = 40.0, top_nm: float = 40.0):
     """De-embed a whole series measured as capped trilayers."""
+    # Local import: electrical/ is below materials/ in the dependency order.
     from ..materials.tco import tco as _tco
     preset = _tco(dielectric)
     shunts = [preset.sheet_resistance(bottom_nm), preset.sheet_resistance(top_nm)]

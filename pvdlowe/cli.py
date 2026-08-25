@@ -16,6 +16,16 @@ import sys
 from pathlib import Path
 
 
+# Every cmd_* function imports what it needs at call time rather than at module
+# scope. This is deliberate and it is one pattern, not fourteen decisions:
+# `pvdlowe --help` and any single subcommand should not pay for loading the
+# optics solver, the Materials Project client and the ML surrogate. Deferring
+# keeps startup to the cost of argparse plus the one subpackage actually used.
+#
+# Local imports elsewhere in the package have different reasons and say so
+# individually: breaking an import cycle (optimize/sweep.py) or keeping a
+# dependency optional (ml/, mp/).
+
 def _print(df, max_rows: int = 60, index: bool = False) -> None:
     import pandas as pd
     if df is None or (hasattr(df, "empty") and df.empty):
@@ -27,7 +37,7 @@ def _print(df, max_rows: int = 60, index: bool = False) -> None:
         print(df.to_string(index=index))
 
 
-def cmd_screen(args):
+def cmd_screen(args) -> None:
     from .screening.elements import ElementCriteria, screen
     res = screen(ElementCriteria(max_supply_risk=args.max_supply_risk,
                                  max_price_usd_per_kg=args.max_price))
@@ -41,7 +51,7 @@ def cmd_screen(args):
     print(f"\n{res['note']}")
 
 
-def cmd_evaluate(args):
+def cmd_evaluate(args) -> None:
     from .report.tables import candidate_table
     from .screening.scoring import ScoringScheme
     scheme = ScoringScheme.from_yaml(args.targets) if args.targets else None
@@ -55,7 +65,7 @@ def cmd_evaluate(args):
           "measured or calculated properties for that composition.")
 
 
-def cmd_validate(args):
+def cmd_validate(args) -> None:
     from .validate import report, validate_model
     print(report())
     if args.include_disputed:
@@ -71,7 +81,7 @@ def cmd_validate(args):
               "source, so quoting it would\n  overstate the model's accuracy.")
 
 
-def cmd_check_weights(args):
+def cmd_check_weights(args) -> None:
     import pandas as pd
     from .screening.candidates import evaluate_all
     from .screening.scoring import (ScoringScheme, compare_aggregations,
@@ -115,7 +125,7 @@ def cmd_check_weights(args):
         print("  less than 0.5 points. At those settings the ranking is not")
         print("  meaningfully distinguishing the candidates.")
 
-def cmd_optimise(args):
+def cmd_optimise(args) -> None:
     from .optimize.thickness import optimise_thicknesses
     print(f"OPTIMISING {args.metal}\n")
     res = optimise_thicknesses(args.metal, symmetric=args.symmetric)
@@ -130,7 +140,7 @@ def cmd_optimise(args):
           f"   Ag {p['Ag_g_per_m2']:.3f} g/m2")
 
 
-def cmd_silver(args):
+def cmd_silver(args) -> None:
     from .optimize.thickness import silver_reduction_curve
     print("HOW MUCH SILVER CAN BE REMOVED?\n")
     df = silver_reduction_curve()
@@ -140,7 +150,7 @@ def cmd_silver(args):
           "oxides re-optimised, that still meets the specification.")
 
 
-def cmd_sweep(args):
+def cmd_sweep(args) -> None:
     from .optimize.sweep import microstructure_comparison, thickness_sweep
     if args.what == "thickness":
         _print(thickness_sweep(args.metal))
@@ -152,7 +162,7 @@ def cmd_sweep(args):
         print(f"\n{df.attrs.get('note', '')}")
 
 
-def cmd_series(args):
+def cmd_series(args) -> None:
     from .optimize.sweep import composition_series, series_optimum
     from .screening.scoring import ScoringScheme
     scheme = ScoringScheme.from_yaml(args.targets) if args.targets else None
@@ -173,7 +183,7 @@ def cmd_series(args):
         print(f"\n  written to {args.output}")
 
 
-def cmd_calibrate(args):
+def cmd_calibrate(args) -> None:
     """Fit the transport model to a measured thickness series."""
     import pandas as pd
     from .electrical.calibrate import diagnose, load_series
@@ -244,7 +254,7 @@ def cmd_calibrate(args):
             print(f"    project  : {f['for_the_project']}\n")
 
 
-def cmd_surrogate(args):
+def cmd_surrogate(args) -> None:
     """Mixing energies from an ML interatomic potential."""
     from .ml import (MLIPSurrogate, SurrogateUnavailable, mixing_energy_series,
                      validate_against_mp, what_mlips_cannot_do)
@@ -278,7 +288,7 @@ def cmd_surrogate(args):
         df.to_csv(args.output, index=False)
         print(f"\nwritten to {args.output}")
 
-def cmd_doe(args):
+def cmd_doe(args) -> None:
     from .doe.design import alias_structure, recommended_screening
     design = recommended_screening()
     print(f"{design.kind}, resolution {design.resolution}, "
@@ -295,7 +305,7 @@ def cmd_doe(args):
         print(f"\nrun sheet written to {args.output}")
 
 
-def cmd_dft(args):
+def cmd_dft(args) -> None:
     from .dft.plans import ag_cu_series_plan, stabiliser_plan
     plan = ag_cu_series_plan()
     plan2 = stabiliser_plan()
@@ -312,7 +322,7 @@ def cmd_dft(args):
               "licensed VASP distribution in the POSCAR element order.")
 
 
-def cmd_provenance(args):
+def cmd_provenance(args) -> None:
     from .report.tables import limitations_table, provenance_table
     from .validate import verification_status
     print("EVIDENCE GRADE BY CANDIDATE\n")
@@ -322,7 +332,7 @@ def cmd_provenance(args):
     print(f"\n\n{verification_status()['message']}")
 
 
-def cmd_report(args):
+def cmd_report(args) -> None:
     from .report.export import markdown_report, to_csv_directory, to_excel
     out = Path(args.output)
     if args.format == "markdown":

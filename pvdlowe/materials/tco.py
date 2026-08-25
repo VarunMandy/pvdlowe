@@ -51,6 +51,8 @@ class _WithPhonons(Dispersion):
     provenance: Provenance = Provenance.ESTIMATE
 
     def epsilon(self, wavelength_nm) -> np.ndarray:
+        # Local import of a numeric constant, used only here. Kept out of module
+        # scope so that `constants` stays a leaf with no importers to invalidate.
         from ..constants import HC_EV_NM
         lam = np.atleast_1d(np.asarray(wavelength_nm, dtype=float))
         eps = np.atleast_1d(self.base.epsilon(lam)).astype(complex)

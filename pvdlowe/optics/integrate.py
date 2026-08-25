@@ -181,6 +181,8 @@ def illuminant_sensitivity(stack, temperatures=(5000., 5500., 6504., 7500.),
     profile, since the bias is common to all candidates, but it does affect
     any absolute solar-gain figure quoted against a building code.
     """
+    # Local import of a numeric constant, used only here. Kept out of module
+    # scope so that `constants` stays a leaf with no importers to invalidate.
     from ..constants import planck_spectral_radiance_wavelength as _planck
     from ..spectra import solar_weighting, visible_weighting
 
@@ -317,6 +319,7 @@ def glazing(coating_stack, glass_thickness_mm: float = 4.0,
     the second glass-air surface reflects about 4% that a semi-infinite
     substrate calculation never gives back.
     """
+    # Local import: avoids optics/integrate depending on materials at module scope.
     from ..materials.dispersion import ConstantIndex
 
     stack = _as_stack(coating_stack)

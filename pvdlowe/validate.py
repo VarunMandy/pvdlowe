@@ -238,6 +238,8 @@ def check_consistency(path: Path | None = None) -> pd.DataFrame:
                             ("resistivity_cu_uohm_cm", "Cu")):
             if key not in rep:
                 continue
+            # Local import: keeps validate.py importable without pulling the materials
+            # package, which matters because the CLI imports it for a bare `validate`.
             from .materials.metals import metal as _metal
             bulk = _metal(symbol).resistivity_bulk_uohm_cm
             thickness = rep.get("thickness_nm")

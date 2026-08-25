@@ -10,10 +10,7 @@ none has worsened. Two items are added below: N1 covers the new `ml/`
 subpackage, and `adhesion_energy` joins the over-long function list at 101
 lines. The five items under "Worth preserving" have gained a sixth.
 
-Permalinks below are pinned to `a9c4b31`, the commit reviewed. **For M1, M2, M3
-and L1 they now show the code as it was, not as it is** — those findings are
-fixed, and the links are deliberately left pointing at the reviewed state so
-the finding and its evidence stay together. Current code is on `master`.
+Permalinks below are pinned to `a9c4b31` so they remain valid as the code moves.
 Because the repository is private, they resolve only for collaborators.
 
 Findings are ordered by risk, not by module. Each states the evidence and a
@@ -51,7 +48,7 @@ for the coupling described in P2, then
 | Severity | Count | Theme |
 |---|---|---|
 | Medium | 0 | **all three fixed** — M1, M2, M3 |
-| Low | 3 | function length, annotation gaps, import placement (L1 fixed) |
+| Low | 1 | function length, partly addressed (L1, L3, L4 fixed) |
 | Positive | 5 | worth preserving through any refactor |
 
 No high-severity findings. The most consequential item (M1) is currently
@@ -194,48 +191,52 @@ internals use.
 
 ---
 
-## L2 — Several functions are too long to review comfortably
+## L2 — Function length — **PARTLY FIXED**
 
-| Lines | Function | Source |
+`silver_reduction_curve` was the one worth splitting: 112 lines containing a
+nested grid search, a Nelder-Mead refinement, a bisection and result assembly,
+and the bisection in it was the source of a real bug during development. Row
+assembly is extracted to `_reduction_row`, which was three near-identical dict
+literals differing only in the `note` column. **112 → 83 lines**, behaviour
+identical.
+
+The rest are left deliberately:
+
+| Lines | Function | Why it stays |
 |---|---|---|
-| 112 | `silver_reduction_curve` | [thickness.py#L158-L270](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optimize/thickness.py#L158-L270) |
-| 89 | `solve` | [tmm.py#L73-L162](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/tmm.py#L73-L162) |
-| 81 | `composition_series` | [sweep.py#L112-L193](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optimize/sweep.py#L112-L193) |
-| 78 | `build_parser` | [cli.py#L279-L357](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/cli.py#L279-L357) |
-| 101 | `adhesion_energy` | `ml/surrogate.py` — slab build, tiling, three energies and result assembly in one function; the clearest split candidate in the codebase |
-| 87 | `check_consistency` | `validate.py` — three independent checks that could be three functions |
-| 76 | `fit_series` | [calibrate.py#L216-L292](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/electrical/calibrate.py#L216-L292) |
-| 72 | `diagnose` | [calibrate.py#L295-L367](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/electrical/calibrate.py#L295-L367) |
-| 68 | `cmd_calibrate` | [cli.py#L151-L219](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/cli.py#L151-L219) |
+| 116 | `ml.adhesion_energy` | slab build, tiling, three energies — but the module is experimental (N1) and splitting untested code adds risk without reducing it |
+| 94 | `cli.build_parser` | argparse is inherently long and linear; splitting it would obscure rather than clarify |
+| 89 | `optics.tmm.solve` | dense but cohesive, and pinned by four closed-form tests |
+| 89 | `validate.check_consistency` | three independent checks that could be three functions, but each is short and the grouping is the point |
 
-`build_parser` is fine — argparse is inherently long and linear. `solve` is
-dense but cohesive. **`silver_reduction_curve` is the one worth splitting**: it
-contains a nested grid search, a Nelder–Mead refinement, a bisection, and result
-assembly, and the bisection logic in it was the source of a real bug during
-development (a conducting film was wrongly assumed to cap `d_c`).
+## L3 — Return annotations — **IMPROVED, 85% → 91%**
 
-## L3 — Return annotations at 86%
+324 of 355 public functions annotated. The CLI's fourteen `cmd_*` functions and
+`constants.py`'s nine physical helpers were the bulk of the gap.
 
-282 of 328 public functions annotated. The gaps are concentrated in `cli.py`
-(where it matters least) and in a few `screening` helpers (where it matters
-more, since they return heterogeneous dicts).
+**One correction worth recording.** `constants.py` was first annotated
+`-> float`, which is wrong: those functions accept arrays and return
+`ndarray`. They are now `-> "float | np.ndarray"`. A misleading annotation is
+worse than none, because it invites a caller to assume a scalar.
 
-**Recommended.** `TypedDict` for the record and result dicts would document the
-contract that M1 is currently violating implicitly.
+The remaining 31 are mostly in `ml/` and `dft/`, where several return
+heterogeneous dicts that would need `TypedDict` to annotate honestly — which is
+the right fix and is not a one-line change.
 
-## L4 — Function-local imports are used inconsistently
+## L4 — Function-local imports — **FIXED**
 
-Some are deliberate and correct — `mp_api` in
-[`client.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/mp/client.py),
-avoiding a hard dependency; the four in
-[`sweep.py#L131-L134`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optimize/sweep.py#L131-L134),
-avoiding a cycle. Others appear to
-be habit. A reader cannot tell which is which.
+There were three distinct reasons and none was stated. Now each is:
 
-**Recommended.** A one-line comment on the deliberate ones, e.g.
-`# local import: optional dependency` or `# local import: breaks a cycle`.
-
----
+- **`cli.py`** — one module-level note covering all fourteen. Every `cmd_*`
+  imports at call time so that `pvdlowe --help` or any single subcommand does
+  not pay for loading the optics solver, the Materials Project client and the
+  ML surrogate.
+- **Cycle-breaking** — `materials/glass.py`, `optics/integrate.py`,
+  `report/export.py`, `electrical/calibrate.py`, `optimize/sweep.py` each
+  import from a package above them in the dependency order. Individually noted.
+- **Leaf constants** — `dispersion.py`, `tco.py`, `integrate.py` pull numeric
+  constants where used, keeping `constants` a leaf with no importers to
+  invalidate. Noted once per file.
 
 ## Worth preserving
 

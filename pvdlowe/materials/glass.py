@@ -104,6 +104,8 @@ def calibrate_far_ir(target: float = UNCOATED_GLASS_EMISSIVITY,
     """
     from scipy import optimize
 
+    # Local import: materials/ is below optics/ in the dependency order, so a
+    # module-level import here would be a cycle. Only the calibration path needs it.
     from ..optics.integrate import normal_emissivity
     from ..optics.stack import Stack
 
@@ -130,6 +132,7 @@ def substrate_sensitivity(stack, scales: tuple = (0.5, 1.0, 2.0)) -> dict:
     which is the evidence that the calibrated substrate model is good enough
     for coated results.
     """
+    # Local import: same cycle as above.
     from ..optics.integrate import normal_emissivity
 
     values = {}
