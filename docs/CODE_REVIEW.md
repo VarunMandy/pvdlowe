@@ -10,7 +10,10 @@ none has worsened. Two items are added below: N1 covers the new `ml/`
 subpackage, and `adhesion_energy` joins the over-long function list at 101
 lines. The five items under "Worth preserving" have gained a sixth.
 
-Permalinks below are pinned to `a9c4b31` so they remain valid as the code moves.
+Permalinks below are pinned to `a9c4b31`, the commit reviewed. **For M1, M2, M3
+and L1 they now show the code as it was, not as it is** — those findings are
+fixed, and the links are deliberately left pointing at the reviewed state so
+the finding and its evidence stay together. Current code is on `master`.
 Because the repository is private, they resolve only for collaborators.
 
 Findings are ordered by risk, not by module. Each states the evidence and a
