@@ -1,3 +1,6 @@
+# STALE: scores in this file predate the weighting correction of 2026-08-25
+# (cost and supply risk zeroed as silver proxies). Physical columns are
+# unaffected; the score column is not. Regenerate with a full metal sweep.
 system,t_nm,T_vis,eps_h,R_s,Ag_g_m2,cost,risk,score,spec
 Cu,11.0,0.752,0.0517,3.26,0.0,0.01,4.5,71.7,False
 Cu90Ag10,9.0,0.783,0.0769,5.54,0.013,0.11,4.8,70.8,False
