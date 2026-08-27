@@ -4,48 +4,35 @@
 <title>pvdlowe — line-of-code review</title>
 <style>
 /* Palette from the subject: float glass seen edge-on is green from its iron
-   content; a sputtering plasma burns sodium-amber. Structure in pewter, the
-   colour of the silver film itself. */
-:root{
-  --glass:#EDF1EE; --glass-deep:#DDE6E1;
-  --ink:#101B17; --ink-soft:#3D4F48;
-  --edge:#1B6B58;            /* float-glass edge green */
-  --plasma:#B8541B;          /* sputter plasma, defects only */
-  --pewter:#8D97A0;          /* the silver film */
-  --paper:#FBFCFB;
-  --rule:#C6D2CC;
-  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,monospace;
-}
+   content; a sputtering plasma burns sodium-amber; pewter is the silver film. */
+:root{--glass:#EDF1EE;--glass-deep:#DDE6E1;--ink:#101B17;--ink-soft:#3D4F48;
+ --edge:#1B6B58;--plasma:#B8541B;--pewter:#8D97A0;--paper:#FBFCFB;--rule:#C6D2CC;
+ --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,monospace;}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 body{margin:0;background:var(--glass);color:var(--ink);
-  font:400 16px/1.6 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;}
-
-/* ---- masthead: the stack cross-section is the hero ---- */
+ font:400 16px/1.6 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
 header.top{padding:44px 32px 26px;border-bottom:1px solid var(--rule);
-  display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+ display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
 h1{margin:0;font-size:clamp(28px,4vw,44px);letter-spacing:-.02em;font-weight:600}
 h1 em{font-style:normal;color:var(--edge)}
-.sub{margin:8px 0 0;color:var(--ink-soft);max-width:62ch}
+.sub{margin:8px 0 0;color:var(--ink-soft);max-width:64ch}
 .counts{display:flex;gap:26px;font-family:var(--mono);font-size:12px;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+ letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
 .counts b{display:block;font:600 26px/1.1 "Iowan Old Style",Georgia,serif;
-  letter-spacing:-.01em;color:var(--ink);text-transform:none}
-
-/* ---- the signature: a layer stack you click through ---- */
-main{display:grid;grid-template-columns:300px 1fr;gap:0;min-height:calc(100vh - 150px)}
-nav{border-right:1px solid var(--rule);padding:22px 0;position:sticky;top:0;
-  align-self:start;max-height:100vh;overflow-y:auto}
+ letter-spacing:-.01em;color:var(--ink);text-transform:none}
+main{display:grid;grid-template-columns:310px 1fr;min-height:calc(100vh - 150px)}
+nav{border-right:1px solid var(--rule);padding:22px 0 40px;position:sticky;top:0;
+ align-self:start;max-height:100vh;overflow-y:auto}
 .navhead{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--pewter);padding:0 22px 12px}
+ text-transform:uppercase;color:var(--pewter);padding:0 22px 12px;margin:0}
 .stratum{display:block;width:100%;text-align:left;border:0;background:none;
-  padding:11px 22px 11px 34px;cursor:pointer;position:relative;
-  border-top:1px solid var(--rule);font:inherit;font-size:14.5px;color:var(--ink-soft);
-  transition:background .15s,color .15s}
+ padding:11px 22px 11px 34px;cursor:pointer;position:relative;font:inherit;
+ font-size:14.5px;color:var(--ink-soft);border-top:1px solid var(--rule);
+ transition:background .15s,color .15s}
 .stratum:last-child{border-bottom:1px solid var(--rule)}
-.stratum::before{content:"";position:absolute;left:0;top:-1px;bottom:0;width:5px;
-  background:var(--pewter)}
+.stratum::before{content:"";position:absolute;left:0;top:-1px;bottom:0;width:5px;background:var(--pewter)}
 .stratum.fixed::before{background:var(--plasma)}
 .stratum.keep::before{background:var(--edge)}
 .stratum:hover{background:var(--glass-deep);color:var(--ink)}
@@ -53,94 +40,76 @@ nav{border-right:1px solid var(--rule);padding:22px 0;position:sticky;top:0;
 .stratum[aria-selected="true"]::before{width:9px}
 .stratum:focus-visible{outline:2px solid var(--edge);outline-offset:-2px}
 .tag{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
-  color:var(--pewter);margin-bottom:2px}
+ color:var(--pewter);margin-bottom:2px}
 .stratum[aria-selected="true"] .tag{color:var(--edge)}
 .stratum.fixed[aria-selected="true"] .tag{color:var(--plasma)}
-
 section.stage{padding:34px 40px 80px;max-width:900px}
 .finding{display:none;animation:rise .28s ease both}
 .finding.on{display:block}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .eyebrow{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--plasma)}
+ text-transform:uppercase;color:var(--plasma)}
 .finding h2{margin:6px 0 4px;font-size:clamp(21px,2.6vw,30px);letter-spacing:-.015em;
-  font-weight:600;line-height:1.2}
+ font-weight:600;line-height:1.2}
 .src{margin:0 0 18px;font-family:var(--mono);font-size:12.5px;color:var(--pewter)}
-
-/* ---- code: the line is the unit of review ---- */
 .code{background:var(--paper);border:1px solid var(--rule);border-radius:3px;
-  overflow-x:auto;margin:0 0 26px}
+ overflow-x:auto;margin:0 0 26px}
 .code table{border-collapse:collapse;width:100%;font-family:var(--mono);
-  font-size:12.5px;line-height:1.72}
+ font-size:12.5px;line-height:1.72}
 .code td{padding:0}
-.code .n{width:1%;white-space:nowrap;text-align:right;padding:0 14px 0 14px;
-  color:#B3BFB8;user-select:none;border-right:1px solid var(--rule)}
+.code .n{width:1%;white-space:nowrap;text-align:right;padding:0 14px;
+ color:#B3BFB8;user-select:none;border-right:1px solid var(--rule)}
 .code .c{padding:0 18px;white-space:pre;color:#243A32}
 .ln.hit{background:#FDF3EC}
 .ln.hit .n{color:var(--plasma);font-weight:600}
 .ln.hit .c{box-shadow:inset 3px 0 0 var(--plasma)}
-
 dl{margin:0;display:grid;grid-template-columns:150px 1fr;gap:0 26px}
 dt{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
-  color:var(--pewter);padding:15px 0 15px;border-top:1px solid var(--rule)}
+ color:var(--pewter);padding:15px 0;border-top:1px solid var(--rule)}
 dd{margin:0;padding:15px 0;border-top:1px solid var(--rule);color:var(--ink-soft)}
 dd strong{color:var(--ink)}
 code{font-family:var(--mono);font-size:.88em;background:var(--glass-deep);
-  padding:1px 5px;border-radius:2px;color:var(--edge)}
-
+ padding:1px 5px;border-radius:2px;color:var(--edge)}
 .hint{position:fixed;right:20px;bottom:18px;font-family:var(--mono);font-size:11px;
-  color:var(--pewter);background:var(--glass);padding:6px 11px;border:1px solid var(--rule);
-  border-radius:3px}
+ color:var(--pewter);background:var(--glass);padding:6px 11px;
+ border:1px solid var(--rule);border-radius:3px}
 kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule);
-  border-bottom-width:2px;border-radius:3px;padding:0 4px;color:var(--ink-soft)}
-
-@media (max-width:860px){
-  main{grid-template-columns:1fr}
-  nav{position:static;border-right:0;border-bottom:1px solid var(--rule);max-height:none}
-  section.stage{padding:26px 20px 60px}
-  dl{grid-template-columns:1fr;gap:0}
-  dt{padding-bottom:0;border-top:1px solid var(--rule)}
-  dd{padding-top:6px;border-top:0}
-  header.top{grid-template-columns:1fr;padding:28px 20px 20px}
-  .hint{display:none}
-}
+ border-bottom-width:2px;border-radius:3px;padding:0 4px;color:var(--ink-soft)}
+@media (max-width:900px){
+ main{grid-template-columns:1fr}
+ nav{position:static;border-right:0;border-bottom:1px solid var(--rule);max-height:none}
+ section.stage{padding:26px 20px 60px}
+ dl{grid-template-columns:1fr;gap:0}
+ dt{padding-bottom:0}dd{padding-top:6px;border-top:0}
+ header.top{grid-template-columns:1fr;padding:28px 20px 20px}
+ .hint{display:none}}
 </style></head><body>
-
 <header class="top">
-  <div>
-    <h1>pvdlowe — <em>line-of-code review</em></h1>
-    <p class="sub">Ten places in the framework worth stopping on: six defects that
-    were found and fixed, and four decisions that should survive any refactor.
-    Every line below is read from the repository, not retyped.</p>
-  </div>
-  <div class="counts">
-    <div><b>136</b>tests</div>
-    <div><b>9,198</b>lines</div>
-    <div><b>0</b>open findings</div>
-  </div>
+ <div><h1>pvdlowe — <em>line-of-code review</em></h1>
+ <p class="sub">Eleven places worth stopping on: seven defects found and fixed,
+ and four decisions that should survive any refactor. Every line below is read
+ from the repository at build time, not retyped. A review of my own code — the
+ ones I did not find are still in there.</p></div>
+ <div class="counts">
+  <div><b>136</b>tests</div><div><b>9,586</b>lines</div><div><b>0</b>open findings</div>
+ </div>
 </header>
-
 <main>
-  <nav role="tablist" aria-label="Findings">
-    <p class="navhead">The stack</p>
-    <button class="stratum keep" data-i="0" role="tab" aria-selected="false"><span class="tag">Design</span><span class="st">Film resistivity feeds the Drude damping</span></button>
+ <nav role="tablist" aria-label="Findings"><p class="navhead">The stack</p><button class="stratum keep" data-i="0" role="tab" aria-selected="false"><span class="tag">Design</span><span class="st">Film resistivity feeds the Drude damping</span></button>
 <button class="stratum keep" data-i="1" role="tab" aria-selected="false"><span class="tag">Design</span><span class="st">Geometric aggregation, not a weighted sum</span></button>
 <button class="stratum keep" data-i="2" role="tab" aria-selected="false"><span class="tag">Design</span><span class="st">Refuse rather than guess</span></button>
-<button class="stratum fixed" data-i="3" role="tab" aria-selected="false"><span class="tag">M1</span><span class="st">Two builders for the same record</span></button>
-<button class="stratum fixed" data-i="4" role="tab" aria-selected="false"><span class="tag">M2</span><span class="st">The optimiser swallowed every exception</span></button>
-<button class="stratum fixed" data-i="5" role="tab" aria-selected="false"><span class="tag">M3</span><span class="st">A cache that advertised memoisation it did not do</span></button>
-<button class="stratum fixed" data-i="6" role="tab" aria-selected="false"><span class="tag">N1</span><span class="st">Judgement extracted so it could be tested at all</span></button>
-<button class="stratum fixed" data-i="7" role="tab" aria-selected="false"><span class="tag">N1</span><span class="st">A verdict decided by sort order</span></button>
-<button class="stratum fixed" data-i="8" role="tab" aria-selected="false"><span class="tag">6th</span><span class="st">The diagnostic was itself wrong</span></button>
-<button class="stratum keep" data-i="9" role="tab" aria-selected="false"><span class="tag">Design</span><span class="st">Report the sweep, not the ranking</span></button>
-  </nav>
-  <section class="stage"><article class="finding" id="f0" role="tabpanel" aria-labelledby="t0">
-  <header>
-    <p class="eyebrow">Design · Preserve</p>
-    <h2>Film resistivity feeds the Drude damping</h2>
-    <p class="src">pvdlowe/optics/stack.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">182</td><td class="c">            percolation=perc)</td></tr>
+<button class="stratum keep" data-i="3" role="tab" aria-selected="false"><span class="tag">Design</span><span class="st">Report the sweep, not the ranking</span></button>
+<button class="stratum fixed" data-i="4" role="tab" aria-selected="false"><span class="tag">M1</span><span class="st">Two builders for the same record</span></button>
+<button class="stratum fixed" data-i="5" role="tab" aria-selected="false"><span class="tag">M2</span><span class="st">The optimiser swallowed every exception</span></button>
+<button class="stratum fixed" data-i="6" role="tab" aria-selected="false"><span class="tag">M3</span><span class="st">A cache that advertised memoisation it did not do</span></button>
+<button class="stratum fixed" data-i="7" role="tab" aria-selected="false"><span class="tag">L5</span><span class="st">Correct code that nothing referenced</span></button>
+<button class="stratum fixed" data-i="8" role="tab" aria-selected="false"><span class="tag">N1</span><span class="st">Judgement extracted so it could be tested at all</span></button>
+<button class="stratum fixed" data-i="9" role="tab" aria-selected="false"><span class="tag">N1</span><span class="st">A verdict decided by sort order</span></button>
+<button class="stratum fixed" data-i="10" role="tab" aria-selected="false"><span class="tag">6th</span><span class="st">The diagnostic was itself wrong</span></button></nav>
+ <section class="stage"><article class="finding" role="tabpanel">
+<header><p class="eyebrow">Design · Preserve</p>
+<h2>Film resistivity feeds the Drude damping</h2><p class="src">pvdlowe/optics/stack.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">182</td><td class="c">            percolation=perc)</td></tr>
 <tr class="ln"><td class="n">183</td><td class="c">&nbsp;</td></tr>
 <tr class="ln"><td class="n">184</td><td class="c">    @property</td></tr>
 <tr class="ln"><td class="n">185</td><td class="c">    def size_effect_ratio(self) -&gt; float:</td></tr>
@@ -156,63 +125,62 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <tr class="ln hit"><td class="n">195</td><td class="c">        The metal grows on the BOTTOM dielectric, so that is the one that</td></tr>
 <tr class="ln hit"><td class="n">196</td><td class="c">        matters. Taken from `TCOPreset.metal_growth_factor`, calibrated to</td></tr>
 <tr class="ln"><td class="n">197</td><td class="c">        measurement (see docs/CARRETERO_COMPARISON.md).</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd>The electrical model feeds the optical one. A metal layer too thin to conduct is automatically a layer that reflects poorly.</dd>
-    <dt>Why it matters</dt><dd>Without the coupling, optimising for visible transmittance drives silver thickness toward zero and the model reports an excellent coating. With it, thinning the metal is penalised twice — in sheet resistance and in emissivity — because those are two faces of the same free-carrier physics.</dd>
-    <dt>Do not break</dt><dd>Decouple these and every interface test still passes while the model becomes nonsense. <code>test_thin_film_penalised_in_both_optics_and_transport</code> exists to catch that.</dd>
-  </dl>
+<dl><dt>What it is</dt><dd>The electrical model feeds the optical one. A metal layer too thin to conduct is automatically a layer that reflects poorly.</dd>
+<dt>Why it matters</dt><dd>Without the coupling, optimising for visible transmittance drives silver thickness toward zero and the model reports an excellent coating. With it, thinning is penalised twice — in sheet resistance and in emissivity — because those are two faces of the same free-carrier physics.</dd>
+<dt>Do not break</dt><dd><strong>Decouple these and every interface test still passes while the model becomes nonsense.</strong> <code>test_thin_film_penalised_in_both_optics_and_transport</code> exists to catch exactly that.</dd></dl>
 </article>
-<article class="finding" id="f1" role="tabpanel" aria-labelledby="t1">
-  <header>
-    <p class="eyebrow">Design · Preserve</p>
-    <h2>Geometric aggregation, not a weighted sum</h2>
-    <p class="src">pvdlowe/screening/scoring.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">108</td><td class="c">        w = {k: v / total_w for k, v in w.items()}</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">Design · Preserve</p>
+<h2>Geometric aggregation, not a weighted sum</h2><p class="src">pvdlowe/screening/scoring.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">108</td><td class="c">        w = {k: v / total_w for k, v in w.items()}</td></tr>
 <tr class="ln"><td class="n">109</td><td class="c">&nbsp;</td></tr>
-<tr class="ln"><td class="n">110</td><td class="c">        if self.aggregation == &quot;geometric&quot;:</td></tr>
+<tr class="ln hit"><td class="n">110</td><td class="c">        if self.aggregation == &quot;geometric&quot;:</td></tr>
 <tr class="ln hit"><td class="n">111</td><td class="c">            logs = sum(w[k] * np.log(max(d[k], self.epsilon)) for k in d)</td></tr>
-<tr class="ln hit"><td class="n">112</td><td class="c">            value = float(np.exp(logs))</td></tr>
+<tr class="ln"><td class="n">112</td><td class="c">            value = float(np.exp(logs))</td></tr>
 <tr class="ln"><td class="n">113</td><td class="c">        elif self.aggregation == &quot;arithmetic&quot;:</td></tr>
 <tr class="ln"><td class="n">114</td><td class="c">            value = float(sum(w[k] * d[k] for k in d))</td></tr>
-<tr class="ln"><td class="n">115</td><td class="c">        elif self.aggregation == &quot;minimum&quot;:</td></tr>
-<tr class="ln"><td class="n">116</td><td class="c">            value = float(min(d.values()))</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd>A candidate scoring zero on any criterion sends the whole score to zero.</dd>
-    <dt>Why it matters</dt><dd>The brief asks that the weighting prevent a candidate winning “simply because it has excellent conductivity while being unacceptable optically.” A weighted arithmetic sum does not do that — a zero forfeits only that criterion's weight. A geometric mean does.</dd>
-    <dt>Do not break</dt><dd>Both halves are pinned: <code>test_geometric_mean_punishes_a_zero</code> and <code>test_arithmetic_mean_does_not_punish_a_zero_as_hard</code>.</dd>
-  </dl>
+<tr class="ln"><td class="n">115</td><td class="c">        elif self.aggregation == &quot;minimum&quot;:</td></tr></table></div>
+<dl><dt>What it is</dt><dd>A candidate scoring zero on any criterion sends the whole score to zero.</dd>
+<dt>Why it matters</dt><dd>The brief asks that its weighting prevent a candidate “winning simply because it has excellent conductivity while being unacceptable optically.” A weighted arithmetic sum cannot do that — a zero forfeits only that criterion's weight.</dd>
+<dt>Do not break</dt><dd>Both halves are pinned: <code>test_geometric_mean_punishes_a_zero</code> and <code>test_arithmetic_mean_does_not_punish_a_zero_as_hard</code>.</dd></dl>
 </article>
-<article class="finding" id="f2" role="tabpanel" aria-labelledby="t2">
-  <header>
-    <p class="eyebrow">Design · Preserve</p>
-    <h2>Refuse rather than guess</h2>
-    <p class="src">pvdlowe/ml/surrogate.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">365</td><td class="c">    strain = [abs(reps[i]*m_cell[i] - ox_cell[i]) / ox_cell[i] for i in (0, 1)]</td></tr>
-<tr class="ln"><td class="n">366</td><td class="c">    if max(strain) &gt; max_mismatch:</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">Design · Preserve</p>
+<h2>Refuse rather than guess</h2><p class="src">pvdlowe/ml/surrogate.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">365</td><td class="c">    strain = [abs(reps[i]*m_cell[i] - ox_cell[i]) / ox_cell[i] for i in (0, 1)]</td></tr>
+<tr class="ln hit"><td class="n">366</td><td class="c">    if max(strain) &gt; max_mismatch:</td></tr>
 <tr class="ln hit"><td class="n">367</td><td class="c">        raise ValueError(</td></tr>
 <tr class="ln hit"><td class="n">368</td><td class="c">            f&quot;{metal}/{dielectric}: lattice mismatch {100*max(strain):.1f}% &quot;</td></tr>
 <tr class="ln hit"><td class="n">369</td><td class="c">            f&quot;exceeds the {100*max_mismatch:.0f}% limit. Straining the film to &quot;</td></tr>
 <tr class="ln hit"><td class="n">370</td><td class="c">            &quot;fit would store elastic energy comparable with the adhesion being &quot;</td></tr>
 <tr class="ln hit"><td class="n">371</td><td class="c">            &quot;measured, and the result would rank strain rather than binding. &quot;</td></tr>
-<tr class="ln hit"><td class="n">372</td><td class="c">            &quot;A supercell that matches these lattices coherently is needed -- &quot;</td></tr>
+<tr class="ln"><td class="n">372</td><td class="c">            &quot;A supercell that matches these lattices coherently is needed -- &quot;</td></tr>
 <tr class="ln"><td class="n">373</td><td class="c">            &quot;see pymatgen.analysis.interfaces.ZSLGenerator -- and it will be &quot;</td></tr>
-<tr class="ln"><td class="n">374</td><td class="c">            &quot;much larger than the cells used here.&quot;)</td></tr>
-<tr class="ln"><td class="n">375</td><td class="c">    film.set_cell([oxide.cell[0], oxide.cell[1], film.cell[2]], scale_atoms=True)</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd>Four functions raise instead of returning a plausible number: the sputter model when uncalibrated, the Materials Project client when offline, the surrogate with no backend, and this one above 4% lattice mismatch.</dd>
-    <dt>Why it matters</dt><dd>Each was tempting to make helpful. Each would have produced fabricated data.</dd>
-    <dt>Do not break</dt><dd>This guard was added <em>after</em> the function returned 9.6 J/m² for Ag/Si₃N₄ — three times any physical metal–oxide adhesion. It exists so the failure recurs as an exception, not as a plausible-looking number.</dd>
-  </dl>
+<tr class="ln"><td class="n">374</td><td class="c">            &quot;much larger than the cells used here.&quot;)</td></tr></table></div>
+<dl><dt>What it is</dt><dd>Four functions raise instead of returning a plausible number: the sputter model when uncalibrated, the Materials Project client when offline, the surrogate with no backend, and this one above 4% lattice mismatch.</dd>
+<dt>Why it matters</dt><dd>Each was tempting to make helpful. Each would have produced fabricated data.</dd>
+<dt>Do not break</dt><dd>This guard was added <em>after</em> the function returned 9.6 J/m² for Ag/Si₃N₄ — three times any physical metal–oxide adhesion. It exists so the failure recurs as an exception, not as a plausible-looking number.</dd></dl>
 </article>
-<article class="finding" id="f3" role="tabpanel" aria-labelledby="t3">
-  <header>
-    <p class="eyebrow">M1 · Medium</p>
-    <h2>Two builders for the same record</h2>
-    <p class="src">pvdlowe/screening/candidates.py</p>
-  </header>
-  <div class="code"><table><tr class="ln hit"><td class="n">84</td><td class="c">def record_for(coating, glass_thickness_mm: float = 4.0, gap_mm: float = 16.0,</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">Design · Preserve</p>
+<h2>Report the sweep, not the ranking</h2><p class="src">pvdlowe/screening/scoring.py</p></header>
+<div class="code"><table><tr class="ln hit"><td class="n">216</td><td class="c">def weight_sweep(records, key: str = &quot;Ag_g_per_m2&quot;,</td></tr>
+<tr class="ln"><td class="n">217</td><td class="c">                 weights=(0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40),</td></tr>
+<tr class="ln"><td class="n">218</td><td class="c">                 scheme: &quot;ScoringScheme | None&quot; = None) -&gt; &quot;pd.DataFrame&quot;:</td></tr>
+<tr class="ln"><td class="n">219</td><td class="c">    &quot;&quot;&quot;How the winner changes as one criterion&#x27;s weight is varied.</td></tr>
+<tr class="ln"><td class="n">220</td><td class="c">&nbsp;</td></tr>
+<tr class="ln"><td class="n">221</td><td class="c">    **Why this exists.** A weight is a value judgement, not a measurement, and</td></tr>
+<tr class="ln"><td class="n">222</td><td class="c">    some of them decide the answer. Silver mass is the clearest case here: at</td></tr>
+<tr class="ln"><td class="n">223</td><td class="c">    weight 0 the winner is a 0.065 g/m2 design, at 0.15 it is 0.008, and at</td></tr>
+<tr class="ln"><td class="n">224</td><td class="c">    0.25 and above it is silver-free. Quoting a single ranking hides that the</td></tr></table></div>
+<dl><dt>What it is</dt><dd>The silver weight of 0.15 is a judgement, not a measurement — and it selects the answer.</dd>
+<dt>Why it matters</dt><dd>At weight 0 the winner carries 0.065 g/m²; at 0.30 it carries none, and the winner changes three times between. <strong>Five of eight settings separate first from second by under half a point</strong> — at those weights the ranking resolves noise in a value judgement.</dd>
+<dt>Do not break</dt><dd>So the honest output is the transitions, not a single ranking. Choosing among them is a decision about how much silver consumption matters to Saint-Gobain — not one the framework can make.</dd></dl>
+</article>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">M1 · Medium</p>
+<h2>Two builders for the same record</h2><p class="src">pvdlowe/screening/candidates.py</p></header>
+<div class="code"><table><tr class="ln hit"><td class="n">84</td><td class="c">def record_for(coating, glass_thickness_mm: float = 4.0, gap_mm: float = 16.0,</td></tr>
 <tr class="ln"><td class="n">85</td><td class="c">               gas: str = &quot;argon&quot;, cost_kwargs: dict | None = None,</td></tr>
 <tr class="ln"><td class="n">86</td><td class="c">               identifier: str | None = None,</td></tr>
 <tr class="ln"><td class="n">87</td><td class="c">               provenance: Provenance = Provenance.MODEL) -&gt; dict:</td></tr>
@@ -220,20 +188,16 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <tr class="ln"><td class="n">89</td><td class="c">&nbsp;</td></tr>
 <tr class="ln"><td class="n">90</td><td class="c">    **This is the single place a scoreable record is constructed.** Everything</td></tr>
 <tr class="ln"><td class="n">91</td><td class="c">    that scores a coating -- :func:`evaluate`, the composition series, the</td></tr>
-<tr class="ln"><td class="n">92</td><td class="c">    sweeps, any analysis script -- must go through here.</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd><code>evaluate()</code> built the canonical scoreable record; <code>composition_series()</code> built its own, omitting ten keys — three of them scored criteria.</dd>
-    <dt>Why it matters</dt><dd>Harmless only because those three were <code>None</code> for every candidate and the scheme renormalises over what is present. Populate any of them — which is the explicit intent — and the two paths score on different criteria subsets, with nothing to flag it.</dd>
-    <dt>What the fix exposed</dt><dd><strong>Fixing construction was not enough.</strong> The emitted frame renamed <code>emissivity_hemispherical</code> to <code>emissivity_h</code> and dropped three criteria, so re-scoring a composition series would have silently lost 0.25 of the weight. The guard test caught that; reading the code had not.</dd>
-  </dl>
+<tr class="ln"><td class="n">92</td><td class="c">    sweeps, any analysis script -- must go through here.</td></tr>
+<tr class="ln"><td class="n">93</td><td class="c">&nbsp;</td></tr></table></div>
+<dl><dt>What it is</dt><dd><code>evaluate()</code> built the canonical scoreable record; <code>composition_series()</code> built its own, omitting ten keys — three of them scored criteria.</dd>
+<dt>Why it matters</dt><dd>Harmless only because those three were <code>None</code> for every candidate and the scheme renormalises over what is present. Populate any of them — which is the explicit intent — and the two paths score on different criteria subsets, with nothing to flag it.</dd>
+<dt>What the fix exposed</dt><dd><strong>Fixing construction was not enough.</strong> The emitted frame renamed <code>emissivity_hemispherical</code> and dropped three criteria, so re-scoring a composition series would have silently lost 0.25 of the weight. The guard test caught that; reading the code had not.</dd></dl>
 </article>
-<article class="finding" id="f4" role="tabpanel" aria-labelledby="t4">
-  <header>
-    <p class="eyebrow">M2 · Medium</p>
-    <h2>The optimiser swallowed every exception</h2>
-    <p class="src">pvdlowe/optimize/thickness.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">100</td><td class="c">        try:</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">M2 · Medium</p>
+<h2>The optimiser swallowed every exception</h2><p class="src">pvdlowe/optimize/thickness.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">100</td><td class="c">        try:</td></tr>
 <tr class="ln"><td class="n">101</td><td class="c">            return -objective_value(build(metal, m, b, t, preset), scheme,</td></tr>
 <tr class="ln"><td class="n">102</td><td class="c">                                    criteria)</td></tr>
 <tr class="ln hit"><td class="n">103</td><td class="c">        except (ValueError, KeyError, ZeroDivisionError, FloatingPointError) as exc:</td></tr>
@@ -243,46 +207,45 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <tr class="ln hit"><td class="n">107</td><td class="c">            # way. Note this branch is close to unreachable in normal use --</td></tr>
 <tr class="ln hit"><td class="n">108</td><td class="c">            # sub-percolation coatings do not raise, they score badly (4.72 at</td></tr>
 <tr class="ln hit"><td class="n">109</td><td class="c">            # 0.1 nm) -- so a failure here almost certainly IS a bug, which is</td></tr>
-<tr class="ln hit"><td class="n">110</td><td class="c">            # exactly why it must be visible rather than absorbed.</td></tr>
+<tr class="ln"><td class="n">110</td><td class="c">            # exactly why it must be visible rather than absorbed.</td></tr>
 <tr class="ln"><td class="n">111</td><td class="c">            failures.append((float(m), float(b), float(t),</td></tr>
 <tr class="ln"><td class="n">112</td><td class="c">                             f&quot;{type(exc).__name__}: {exc}&quot;))</td></tr>
 <tr class="ln"><td class="n">113</td><td class="c">            return 1e3</td></tr>
 <tr class="ln"><td class="n">114</td><td class="c">&nbsp;</td></tr>
-<tr class="ln"><td class="n">115</td><td class="c">    result = optimize.differential_evolution(</td></tr>
-<tr class="ln"><td class="n">116</td><td class="c">        negative_score, bounds, seed=seed, maxiter=60, tol=1e-4,</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd>A bare <code>except Exception</code> returning a 1e3 sentinel, which made a genuine bug indistinguishable from a poor design.</dd>
-    <dt>Why it matters</dt><dd>And the guard was not doing what it appeared to. Sub-percolation coatings do not raise — they return finite scores, 4.72 at 0.1 nm — so the rejection was coming from the desirability functions all along.</dd>
-    <dt>What the fix exposed</dt><dd>Narrowed and counted. A full silver optimisation now reports <strong>0 failures across 1,284 evaluations</strong>, confirming the branch was dead protection — which is exactly why a failure there would almost certainly be a bug.</dd>
-  </dl>
+<tr class="ln"><td class="n">115</td><td class="c">    result = optimize.differential_evolution(</td></tr></table></div>
+<dl><dt>What it is</dt><dd>A bare <code>except Exception</code> returning a 1e3 sentinel, which made a genuine bug indistinguishable from a poor design.</dd>
+<dt>Why it matters</dt><dd>And the guard was not doing what it appeared to. Sub-percolation coatings do not raise — they return finite scores, 4.72 at 0.1 nm — so the rejection was coming from the desirability functions all along.</dd>
+<dt>What the fix exposed</dt><dd>Narrowed and counted. A full silver optimisation reports <strong>0 failures across 1,284 evaluations</strong>, confirming the branch was dead protection — which is exactly why a failure there would almost certainly be a bug.</dd></dl>
 </article>
-<article class="finding" id="f5" role="tabpanel" aria-labelledby="t5">
-  <header>
-    <p class="eyebrow">M3 · Medium</p>
-    <h2>A cache that advertised memoisation it did not do</h2>
-    <p class="src">pvdlowe/optics/stack.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">258</td><td class="c">        &quot;&quot;&quot;</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">M3 · Medium</p>
+<h2>A cache that advertised memoisation it did not do</h2><p class="src">pvdlowe/optics/stack.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">258</td><td class="c">        &quot;&quot;&quot;</td></tr>
 <tr class="ln hit"><td class="n">259</td><td class="c">        cached = self._cache.get(&quot;stack&quot;)</td></tr>
 <tr class="ln hit"><td class="n">260</td><td class="c">        if cached is not None:</td></tr>
 <tr class="ln hit"><td class="n">261</td><td class="c">            return cached</td></tr>
 <tr class="ln"><td class="n">262</td><td class="c">        layers = []</td></tr>
 <tr class="ln"><td class="n">263</td><td class="c">        if self.top_thickness_nm &gt; 0:</td></tr>
-<tr class="ln"><td class="n">264</td><td class="c">            layers.append(Layer(self.top_tco.dispersion(), self.top_thickness_nm,</td></tr>
-<tr class="ln"><td class="n">265</td><td class="c">                                self.top_tco.key, &quot;tco&quot;))</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd><code>_cache</code> was declared as a field and reset in three <code>replace()</code> calls, but never read or written.</dd>
-    <dt>Why it matters</dt><dd>Worse than useless: it advertised memoisation that did not exist, while <code>stack()</code> — the actual hot path — rebuilt every dispersion object on every call. A composition series calls it tens of thousands of times.</dd>
-    <dt>What the fix exposed</dt><dd>Implemented rather than deleted, because the cost was real. <strong>200 repeat calls now take 1 ms.</strong> Safe because the coating is only ever modified through <code>dataclasses.replace</code>, which produces a new instance.</dd>
-  </dl>
+<tr class="ln"><td class="n">264</td><td class="c">            layers.append(Layer(self.top_tco.dispersion(), self.top_thickness_nm,</td></tr></table></div>
+<dl><dt>What it is</dt><dd><code>_cache</code> was declared as a field and reset in three <code>replace()</code> calls, but never read or written.</dd>
+<dt>Why it matters</dt><dd>Worse than useless: it advertised memoisation that did not exist, while <code>stack()</code> — the actual hot path — rebuilt every dispersion object on every call. A composition series calls it tens of thousands of times.</dd>
+<dt>What the fix exposed</dt><dd>Implemented rather than deleted, because the cost was real. <strong>200 repeat calls now take 1 ms.</strong> Safe because the coating is only ever modified through <code>dataclasses.replace</code>.</dd></dl>
 </article>
-<article class="finding" id="f6" role="tabpanel" aria-labelledby="t6">
-  <header>
-    <p class="eyebrow">N1 · Untested</p>
-    <h2>Judgement extracted so it could be tested at all</h2>
-    <p class="src">pvdlowe/ml/surrogate.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">628</td><td class="c">    # A site spread comparable with the binding energy means the adatom is</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">L5 · Unguarded</p>
+<h2>Correct code that nothing referenced</h2><p class="src">pvdlowe/optics/stack.py</p></header>
+<div class="code"><table><tr class="ln hit"><td class="n">297</td><td class="c">    def with_metal_thickness(self, thickness_nm: float) -&gt; &quot;LowECoating&quot;:</td></tr>
+<tr class="ln hit"><td class="n">298</td><td class="c">        return replace(self, metal_thickness_nm=float(thickness_nm), _cache={})</td></tr>
+<tr class="ln"><td class="n">299</td><td class="c">&nbsp;</td></tr>
+<tr class="ln"><td class="n">300</td><td class="c">    def with_tco_thickness(self, bottom_nm: float | None = None,</td></tr></table></div>
+<dl><dt>What it is</dt><dd>Seven immutable-update builders were referenced by nothing — not the package, tests or examples.</dd>
+<dt>Why it matters</dt><dd>They are correct: each resets <code>_cache</code> so a modified coating does not inherit the parent's memoised stack. But <strong>that correctness was unguarded</strong>, and the hazard exists only because the memoisation was added <em>after</em> the builders were written.</dd>
+<dt>What the fix exposed</dt><dd>An edit dropping the <code>_cache={}</code> would have produced a coating reporting 14 nm of silver while being evaluated as 10 — silently, with every other number consistent with the wrong one. Two tests now cover them, one asserting that a bare <code>replace()</code> <em>does</em> serve a stale cache, so removing the memoisation fails rather than passing vacuously.</dd></dl>
+</article>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">N1 · Untested</p>
+<h2>Judgement extracted so it could be tested at all</h2><p class="src">pvdlowe/ml/surrogate.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">628</td><td class="c">    # A site spread comparable with the binding energy means the adatom is</td></tr>
 <tr class="ln"><td class="n">629</td><td class="c">    # falling into whichever dangling-bond pocket it happens to land near,</td></tr>
 <tr class="ln"><td class="n">630</td><td class="c">    # rather than sampling a representative surface. That is a property of an</td></tr>
 <tr class="ln"><td class="n">631</td><td class="c">    # artificially cleaved crystal, not of a real passivated film, and such a</td></tr>
@@ -293,22 +256,15 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <tr class="ln"><td class="n">636</td><td class="c">&nbsp;</td></tr>
 <tr class="ln"><td class="n">637</td><td class="c">    if trusted.empty:</td></tr>
 <tr class="ln"><td class="n">638</td><td class="c">        df.attrs[&quot;verdict&quot;] = (</td></tr>
-<tr class="ln"><td class="n">639</td><td class="c">            &quot;every surface shows a site spread comparable with its binding &quot;</td></tr>
-<tr class="ln"><td class="n">640</td><td class="c">            &quot;energy; no ordering can be claimed from this data&quot;)</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd>The <code>ml/</code> subpackage shipped with no coverage of its numerical paths, because MACE cannot be installed in the environment the suite runs in.</dd>
-    <dt>Why it matters</dt><dd>But the defects there were never in the energy evaluations — those are the model's job and are gated at runtime against known Materials Project values. They were in the <em>judgement applied to the results</em>, and that is pure logic over tables.</dd>
-    <dt>What the fix exposed</dt><dd>Extracting <code>judge_wetting()</code> made it testable without a backend. Eight tests now run against the figures actually measured on Vertex AI — each case is a run that happened.</dd>
-  </dl>
+<tr class="ln"><td class="n">639</td><td class="c">            &quot;every surface shows a site spread comparable with its binding &quot;</td></tr></table></div>
+<dl><dt>What it is</dt><dd>The <code>ml/</code> subpackage shipped with no coverage of its numerical paths, because MACE cannot be installed where the suite runs.</dd>
+<dt>Why it matters</dt><dd>But the defects there were never in the energy evaluations — those are the model's job and are gated at runtime. They were in the <em>judgement applied to the results</em>, and that is pure logic over tables.</dd>
+<dt>What the fix exposed</dt><dd>Extracting <code>judge_wetting()</code> made it testable without a backend. Eight tests now run against the figures actually measured on Vertex AI — each case is a run that happened.</dd></dl>
 </article>
-<article class="finding" id="f7" role="tabpanel" aria-labelledby="t7">
-  <header>
-    <p class="eyebrow">N1 · Found by test</p>
-    <h2>A verdict decided by sort order</h2>
-    <p class="src">pvdlowe/ml/surrogate.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">653</td><td class="c">                f&quot;{&#x27; = &#x27;.join(sorted(winners))} share a crystalline proxy and &quot;</td></tr>
-<tr class="ln"><td class="n">654</td><td class="c">                &quot;are the same calculation; no ordering between them is &quot;</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">N1 · Found by test</p>
+<h2>A verdict decided by sort order</h2><p class="src">pvdlowe/ml/surrogate.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">654</td><td class="c">                &quot;are the same calculation; no ordering between them is &quot;</td></tr>
 <tr class="ln"><td class="n">655</td><td class="c">                &quot;meaningful&quot;)</td></tr>
 <tr class="ln"><td class="n">656</td><td class="c">&nbsp;</td></tr>
 <tr class="ln"><td class="n">657</td><td class="c">    # Consistency is judged against the whole tied set, not the row that</td></tr>
@@ -323,22 +279,15 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <tr class="ln hit"><td class="n">666</td><td class="c">               if winners &amp; {&quot;AZO&quot;, &quot;ZnO&quot;} else</td></tr>
 <tr class="ln"><td class="n">667</td><td class="c">               &quot;NOT consistent with the measured ordering.&quot;))</td></tr>
 <tr class="ln"><td class="n">668</td><td class="c">    if not unreliable.empty:</td></tr>
-<tr class="ln"><td class="n">669</td><td class="c">        worst = float((unreliable.site_spread_eV</td></tr>
-<tr class="ln"><td class="n">670</td><td class="c">                       / unreliable.dE_wet_eV.abs()).max())</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd>AZO and GZO share the ZnO(0001) proxy and return <em>identical</em> energies, so which sorts first is arbitrary.</dd>
-    <dt>Why it matters</dt><dd>The verdict named GZO and concluded “NOT consistent with the measured ordering” — when AZO, the measured winner, was tied with it at the same value. Consistency is now judged against the whole tied set.</dd>
-    <dt>What the fix exposed</dt><dd><strong>Third time this function's judgement was wrong, and the first time a test caught it.</strong> It had been read three times and corrected twice by eye.</dd>
-  </dl>
+<tr class="ln"><td class="n">669</td><td class="c">        worst = float((unreliable.site_spread_eV</td></tr></table></div>
+<dl><dt>What it is</dt><dd>AZO and GZO share the ZnO(0001) proxy and return <em>identical</em> energies, so which sorts first is arbitrary.</dd>
+<dt>Why it matters</dt><dd>The verdict named GZO and concluded “NOT consistent with the measured ordering” — when AZO, the measured winner, was tied with it at the same value. Consistency is now judged against the whole tied set.</dd>
+<dt>What the fix exposed</dt><dd><strong>Third time this function's judgement was wrong, and the first time a test caught it.</strong> It had been read three times and corrected twice by eye.</dd></dl>
 </article>
-<article class="finding" id="f8" role="tabpanel" aria-labelledby="t8">
-  <header>
-    <p class="eyebrow">6th · Diagnostic</p>
-    <h2>The diagnostic was itself wrong</h2>
-    <p class="src">pvdlowe/screening/scoring.py</p>
-  </header>
-  <div class="code"><table><tr class="ln"><td class="n">282</td><td class="c">                        scheme.weights.get(a, 0.0) + scheme.weights.get(b, 0.0), 3),</td></tr>
-<tr class="ln"><td class="n">283</td><td class="c">                    # A correlated pair only double-counts if BOTH sides carry</td></tr>
+<article class="finding" role="tabpanel">
+<header><p class="eyebrow">6th · Diagnostic</p>
+<h2>The diagnostic was itself wrong</h2><p class="src">pvdlowe/screening/scoring.py</p></header>
+<div class="code"><table><tr class="ln"><td class="n">283</td><td class="c">                    # A correlated pair only double-counts if BOTH sides carry</td></tr>
 <tr class="ln hit"><td class="n">284</td><td class="c">                    # weight. Where one is zeroed and reported as a derived</td></tr>
 <tr class="ln hit"><td class="n">285</td><td class="c">                    # figure -- R_sheet, cost and supply risk all are -- the</td></tr>
 <tr class="ln hit"><td class="n">286</td><td class="c">                    # correlation is worth knowing but is not a defect.</td></tr>
@@ -347,56 +296,29 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <tr class="ln hit"><td class="n">289</td><td class="c">                        scheme.weights.get(a, 0.0) &gt; 0</td></tr>
 <tr class="ln"><td class="n">290</td><td class="c">                        and scheme.weights.get(b, 0.0) &gt; 0),</td></tr>
 <tr class="ln"><td class="n">291</td><td class="c">                })</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd><code>redundant_criteria()</code> flagged correlated pairs regardless of whether both carried weight.</dd>
-    <dt>Why it matters</dt><dd>Reporting a zeroed criterion alongside a live double-count buries the cases that matter. Silver mass, metal cost and supply risk correlate at r = 1.000 and 0.991 — together they carried 36% of the effective weight on one physical property.</dd>
-    <dt>What the fix exposed</dt><dd>That was the fifth weighting defect, found by re-auditing the fix for the second. A sixth followed: three criteria carried 30% of the nominal weight while being <code>None</code> for every candidate — one of them with no definition at all.</dd>
-  </dl>
-</article>
-<article class="finding" id="f9" role="tabpanel" aria-labelledby="t9">
-  <header>
-    <p class="eyebrow">Design · Preserve</p>
-    <h2>Report the sweep, not the ranking</h2>
-    <p class="src">pvdlowe/screening/scoring.py</p>
-  </header>
-  <div class="code"><table><tr class="ln hit"><td class="n">216</td><td class="c">def weight_sweep(records, key: str = &quot;Ag_g_per_m2&quot;,</td></tr>
-<tr class="ln"><td class="n">217</td><td class="c">                 weights=(0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40),</td></tr>
-<tr class="ln"><td class="n">218</td><td class="c">                 scheme: &quot;ScoringScheme | None&quot; = None) -&gt; &quot;pd.DataFrame&quot;:</td></tr>
-<tr class="ln"><td class="n">219</td><td class="c">    &quot;&quot;&quot;How the winner changes as one criterion&#x27;s weight is varied.</td></tr>
-<tr class="ln"><td class="n">220</td><td class="c">&nbsp;</td></tr>
-<tr class="ln"><td class="n">221</td><td class="c">    **Why this exists.** A weight is a value judgement, not a measurement, and</td></tr>
-<tr class="ln"><td class="n">222</td><td class="c">    some of them decide the answer. Silver mass is the clearest case here: at</td></tr>
-<tr class="ln"><td class="n">223</td><td class="c">    weight 0 the winner is a 0.065 g/m2 design, at 0.15 it is 0.008, and at</td></tr>
-<tr class="ln"><td class="n">224</td><td class="c">    0.25 and above it is silver-free. Quoting a single ranking hides that the</td></tr>
-<tr class="ln"><td class="n">225</td><td class="c">    recommendation was chosen by a number nobody derived.</td></tr></table></div>
-  <dl>
-    <dt>What it is</dt><dd>The silver weight of 0.15 is a judgement, not a measurement — and it selects the answer.</dd>
-    <dt>Why it matters</dt><dd>At weight 0 the winner carries 0.065 g/m²; at 0.30 it carries none, and the winner changes three times in between. Five of eight settings separate first from second by under half a point.</dd>
-    <dt>Do not break</dt><dd>So the honest output is the transitions, not a single ranking. Choosing among them is a decision about how much silver consumption matters to Saint-Gobain — not one the framework can make.</dd>
-  </dl>
+<dl><dt>What it is</dt><dd><code>redundant_criteria()</code> flagged correlated pairs regardless of whether both carried weight.</dd>
+<dt>Why it matters</dt><dd>Reporting a zeroed criterion alongside a live double-count buries the cases that matter. Silver mass, metal cost and supply risk correlate at r = 1.000 and 0.991 — together 36% of the effective weight on one property.</dd>
+<dt>What the fix exposed</dt><dd>That was the fifth weighting defect, found by re-auditing the fix for the second. A sixth followed: three criteria carried 30% of the nominal weight while being <code>None</code> for every candidate — one with no definition at all.</dd></dl>
 </article></section>
 </main>
-
 <p class="hint"><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move &nbsp;·&nbsp; <kbd>1</kbd>–<kbd>9</kbd> to jump</p>
-
 <script>
-const tabs = [...document.querySelectorAll('.stratum')];
-const cards = [...document.querySelectorAll('.finding')];
-let at = -1;
+const tabs=[...document.querySelectorAll('.stratum')];
+const cards=[...document.querySelectorAll('.finding')];
+let at=-1;
 function show(i){
-  if(i<0 || i>=tabs.length || i===at) return;
-  tabs.forEach((t,k)=>t.setAttribute('aria-selected', k===i));
-  cards.forEach((c,k)=>c.classList.toggle('on', k===i));
-  at = i;
-  if(window.innerWidth <= 860) tabs[i].scrollIntoView({block:'nearest'});
+ if(i<0||i>=tabs.length||i===at) return;
+ tabs.forEach((t,k)=>t.setAttribute('aria-selected',k===i));
+ cards.forEach((c,k)=>c.classList.toggle('on',k===i));
+ at=i; window.scrollTo({top:0,behavior:'instant'});
+ if(window.innerWidth<=900) tabs[i].scrollIntoView({block:'nearest'});
 }
 tabs.forEach((t,i)=>t.addEventListener('click',()=>show(i)));
 document.addEventListener('keydown',e=>{
-  if(e.metaKey||e.ctrlKey||e.altKey) return;
-  if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();show(Math.min(at+1,tabs.length-1));tabs[at].focus();}
-  if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();show(Math.max(at-1,0));tabs[at].focus();}
-  if(/^[1-9]$/.test(e.key)){const i=+e.key-1; if(i<tabs.length){show(i);tabs[i].focus();}}
+ if(e.metaKey||e.ctrlKey||e.altKey) return;
+ if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();show(Math.min(at+1,tabs.length-1));tabs[at].focus();}
+ if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();show(Math.max(at-1,0));tabs[at].focus();}
+ if(/^[1-9]$/.test(e.key)){const i=+e.key-1; if(i<tabs.length){show(i);tabs[i].focus();}}
 });
 show(0);
-</script>
-</body></html>
+</script></body></html>

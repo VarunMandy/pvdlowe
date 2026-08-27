@@ -5,131 +5,136 @@
 <style>
 /* Palette from the subject: float glass seen edge-on is green from its iron
    content; a sputtering plasma burns sodium-amber; pewter is the silver film. */
-:root{
-  --glass:#EDF1EE; --glass-deep:#DDE6E1;
-  --ink:#101B17; --ink-soft:#3D4F48;
-  --edge:#1B6B58; --plasma:#B8541B; --pewter:#8D97A0;
-  --paper:#FBFCFB; --rule:#C6D2CC;
-  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,monospace;
-}
+:root{--glass:#EDF1EE;--glass-deep:#DDE6E1;--ink:#101B17;--ink-soft:#3D4F48;
+ --edge:#1B6B58;--plasma:#B8541B;--pewter:#8D97A0;--paper:#FBFCFB;--rule:#C6D2CC;
+ --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,monospace;}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 body{margin:0;background:var(--glass);color:var(--ink);
-  font:400 16px/1.62 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
-
-header.top{padding:42px 32px 24px;border-bottom:1px solid var(--rule);
-  display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
-h1{margin:0;font-size:clamp(27px,3.8vw,42px);letter-spacing:-.02em;font-weight:600}
+ font:400 16px/1.6 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+header.top{padding:44px 32px 26px;border-bottom:1px solid var(--rule);
+ display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+h1{margin:0;font-size:clamp(28px,4vw,44px);letter-spacing:-.02em;font-weight:600}
 h1 em{font-style:normal;color:var(--edge)}
-.sub{margin:8px 0 0;color:var(--ink-soft);max-width:66ch}
-.counts{display:flex;gap:24px;font-family:var(--mono);font-size:11.5px;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
-.counts b{display:block;font:600 25px/1.1 "Iowan Old Style",Georgia,serif;
-  letter-spacing:-.01em;color:var(--ink);text-transform:none}
-
-main{display:grid;grid-template-columns:296px 1fr;min-height:calc(100vh - 148px)}
-nav{border-right:1px solid var(--rule);padding:18px 0 40px;position:sticky;top:0;
-  align-self:start;max-height:100vh;overflow-y:auto}
-.navhead{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--pewter);padding:0 22px 9px;margin:0}
-.navhead.second{padding-top:24px;border-top:1px solid var(--rule);margin-top:18px}
+.sub{margin:8px 0 0;color:var(--ink-soft);max-width:64ch}
+.counts{display:flex;gap:26px;font-family:var(--mono);font-size:12px;
+ letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.counts b{display:block;font:600 26px/1.1 "Iowan Old Style",Georgia,serif;
+ letter-spacing:-.01em;color:var(--ink);text-transform:none}
+main{display:grid;grid-template-columns:310px 1fr;min-height:calc(100vh - 150px)}
+nav{border-right:1px solid var(--rule);padding:22px 0 40px;position:sticky;top:0;
+ align-self:start;max-height:100vh;overflow-y:auto}
+.navhead{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+ text-transform:uppercase;color:var(--pewter);padding:0 22px 12px;margin:0}
 .stratum{display:block;width:100%;text-align:left;border:0;background:none;
-  padding:9px 20px 9px 32px;cursor:pointer;position:relative;font:inherit;
-  color:var(--ink-soft);border-top:1px solid var(--rule);
-  transition:background .15s,color .15s}
+ padding:11px 22px 11px 34px;cursor:pointer;position:relative;font:inherit;
+ font-size:14.5px;color:var(--ink-soft);border-top:1px solid var(--rule);
+ transition:background .15s,color .15s}
+.stratum:last-child{border-bottom:1px solid var(--rule)}
 .stratum::before{content:"";position:absolute;left:0;top:-1px;bottom:0;width:5px;background:var(--pewter)}
-.stratum.core::before{background:var(--edge)}
-.stratum.outer::before{background:var(--plasma)}
+.stratum.fixed::before{background:var(--plasma)}
+.stratum.keep::before{background:var(--edge)}
 .stratum:hover{background:var(--glass-deep);color:var(--ink)}
 .stratum[aria-selected="true"]{background:var(--paper);color:var(--ink)}
 .stratum[aria-selected="true"]::before{width:9px}
 .stratum:focus-visible{outline:2px solid var(--edge);outline-offset:-2px}
-.tag{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;
-  color:var(--pewter);margin-bottom:1px}
+.tag{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+ color:var(--pewter);margin-bottom:2px}
 .stratum[aria-selected="true"] .tag{color:var(--edge)}
+.stratum.fixed[aria-selected="true"] .tag{color:var(--plasma)}
+section.stage{padding:34px 40px 80px;max-width:900px}
+.finding{display:none;animation:rise .28s ease both}
+.finding.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.eyebrow{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+ text-transform:uppercase;color:var(--plasma)}
+.finding h2{margin:6px 0 4px;font-size:clamp(21px,2.6vw,30px);letter-spacing:-.015em;
+ font-weight:600;line-height:1.2}
+.src{margin:0 0 18px;font-family:var(--mono);font-size:12.5px;color:var(--pewter)}
+.code{background:var(--paper);border:1px solid var(--rule);border-radius:3px;
+ overflow-x:auto;margin:0 0 26px}
+.code table{border-collapse:collapse;width:100%;font-family:var(--mono);
+ font-size:12.5px;line-height:1.72}
+.code td{padding:0}
+.code .n{width:1%;white-space:nowrap;text-align:right;padding:0 14px;
+ color:#B3BFB8;user-select:none;border-right:1px solid var(--rule)}
+.code .c{padding:0 18px;white-space:pre;color:#243A32}
+.ln.hit{background:#FDF3EC}
+.ln.hit .n{color:var(--plasma);font-weight:600}
+.ln.hit .c{box-shadow:inset 3px 0 0 var(--plasma)}
+dl{margin:0;display:grid;grid-template-columns:150px 1fr;gap:0 26px}
+dt{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+ color:var(--pewter);padding:15px 0;border-top:1px solid var(--rule)}
+dd{margin:0;padding:15px 0;border-top:1px solid var(--rule);color:var(--ink-soft)}
+dd strong{color:var(--ink)}
+code{font-family:var(--mono);font-size:.88em;background:var(--glass-deep);
+ padding:1px 5px;border-radius:2px;color:var(--edge)}
+.hint{position:fixed;right:20px;bottom:18px;font-family:var(--mono);font-size:11px;
+ color:var(--pewter);background:var(--glass);padding:6px 11px;
+ border:1px solid var(--rule);border-radius:3px}
+kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule);
+ border-bottom-width:2px;border-radius:3px;padding:0 4px;color:var(--ink-soft)}
+@media (max-width:900px){
+ main{grid-template-columns:1fr}
+ nav{position:static;border-right:0;border-bottom:1px solid var(--rule);max-height:none}
+ section.stage{padding:26px 20px 60px}
+ dl{grid-template-columns:1fr;gap:0}
+ dt{padding-bottom:0}dd{padding-top:6px;border-top:0}
+ header.top{grid-template-columns:1fr;padding:28px 20px 20px}
+ .hint{display:none}}
+
+.navhead.second{padding-top:26px;border-top:1px solid var(--rule);margin-top:20px}
+.stratum.core::before{background:var(--edge)}
+.stratum.side::before{background:var(--pewter)}
+.stratum.outer::before{background:var(--plasma)}
 .stratum.outer[aria-selected="true"] .tag{color:var(--plasma)}
 .st{font-family:var(--mono);font-size:12.5px}
-
-section.stage{padding:32px 44px 90px;max-width:880px}
 .pane{display:none;animation:rise .26s ease both}
 .pane.on{display:block}
-@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.eyebrow{margin:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--plasma)}
 .pane h2{margin:6px 0 12px;font-family:var(--mono);font-size:clamp(18px,2.2vw,24px);
-  letter-spacing:-.01em;font-weight:600}
+ letter-spacing:-.01em;font-weight:600}
 .blurb{margin:0 0 22px;font-size:18.5px;line-height:1.5;color:var(--ink);max-width:60ch}
-
-.stats{display:flex;gap:0;margin:0 0 26px;border:1px solid var(--rule);
-  border-radius:3px;background:var(--paper);overflow:hidden}
+.stats{display:flex;margin:0 0 26px;border:1px solid var(--rule);border-radius:3px;
+ background:var(--paper);overflow:hidden}
 .stats div{padding:14px 20px;flex:1}
 .stats div+div{border-left:1px solid var(--rule)}
 .stats b{display:block;font:600 26px/1.1 "Iowan Old Style",Georgia,serif;
-  letter-spacing:-.015em;color:var(--edge)}
+ letter-spacing:-.015em;color:var(--edge)}
 .stats span{display:block;margin-top:4px;font-family:var(--mono);font-size:10.5px;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--pewter)}
-
+ letter-spacing:.08em;text-transform:uppercase;color:var(--pewter)}
 .detail{max-width:66ch}
 .detail p{margin:0 0 14px;color:var(--ink-soft)}
-.detail strong{color:var(--ink)}
-.detail em{color:var(--ink)}
+.detail strong,.detail em{color:var(--ink)}
 table.mini{border-collapse:collapse;margin:4px 0 18px;font-family:var(--mono);font-size:12.5px}
 table.mini td{padding:5px 20px 5px 0;border-bottom:1px solid var(--rule);color:var(--ink-soft)}
 table.mini td:first-child{color:var(--ink)}
 table.mini strong{color:var(--plasma)}
-
 .breaks{margin:22px 0 0;padding:15px 18px;background:var(--paper);
-  border-left:4px solid var(--plasma);color:var(--ink-soft);max-width:66ch;font-size:15.5px}
+ border-left:4px solid var(--plasma);color:var(--ink-soft);max-width:66ch;font-size:15.5px}
 .breaks span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--plasma);margin-bottom:5px}
-
+ text-transform:uppercase;color:var(--plasma);margin-bottom:5px}
 .fh{margin:34px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--pewter)}
+ text-transform:uppercase;color:var(--pewter)}
 ul.files{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--rule)}
 ul.files li{padding:12px 0;border-bottom:1px solid var(--rule);
-  display:grid;grid-template-columns:1fr auto;gap:2px 18px}
+ display:grid;grid-template-columns:1fr auto;gap:2px 18px}
 ul.files code{font-family:var(--mono);font-size:13px;color:var(--edge)}
 ul.files .ll{font-family:var(--mono);font-size:11px;color:var(--pewter);text-align:right;align-self:start}
 ul.files p{grid-column:1/-1;margin:2px 0 0;font-size:14px;color:var(--ink-soft);max-width:62ch}
-code{font-family:var(--mono);font-size:.87em;background:var(--glass-deep);
-  padding:1px 5px;border-radius:2px;color:var(--edge)}
-
-.hint{position:fixed;right:20px;bottom:18px;font-family:var(--mono);font-size:11px;
-  color:var(--pewter);background:var(--glass);padding:6px 11px;
-  border:1px solid var(--rule);border-radius:3px}
-kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule);
-  border-bottom-width:2px;border-radius:3px;padding:0 4px;color:var(--ink-soft)}
-
-@media (max-width:880px){
-  main{grid-template-columns:1fr}
-  nav{position:static;border-right:0;border-bottom:1px solid var(--rule);max-height:none}
-  section.stage{padding:24px 20px 60px}
-  header.top{grid-template-columns:1fr;padding:26px 20px 18px}
-  .stats{flex-direction:column}.stats div+div{border-left:0;border-top:1px solid var(--rule)}
-  .hint{display:none}
-}
 </style></head><body>
-
 <header class="top">
-  <div>
-    <h1>pvdlowe — <em>layer by layer</em></h1>
-    <p class="sub">119 files, and a dependency order that runs one way. Nothing
-    below optics knows what a coating is: the solver takes a stack of complex
-    indices and would work for a laser mirror. Every file description is that
-    file's own docstring; every figure is read from a live run.</p>
-  </div>
-  <div class="counts">
-    <div><b>9,631</b>package lines</div>
-    <div><b>136</b>tests</div>
-    <div><b>12</b>subpackages</div>
-  </div>
+ <div><h1>pvdlowe — <em>layer by layer</em></h1>
+ <p class="sub">122 files, and a dependency order that runs one way. Nothing
+ below optics knows what a coating is: the solver takes a stack of complex
+ indices and would work for a laser mirror. Every file description is that
+ file's own docstring; every figure is read from a live run.</p></div>
+ <div class="counts">
+  <div><b>9,634</b>package lines</div><div><b>136</b>tests</div><div><b>12</b>subpackages</div>
+ </div>
 </header>
-
 <main>
-  <nav role="tablist" aria-label="Project areas">
-    <p class="navhead">The dependency stack</p>
-    <button class="stratum core" data-i="0" role="tab" aria-selected="false"><span class="tag">Layer 0 · Leaf</span><span class="st">pvdlowe</span></button>
+ <nav role="tablist" aria-label="Project areas"><p class="navhead">The dependency stack</p><button class="stratum core" data-i="0" role="tab" aria-selected="false"><span class="tag">Layer 0 · Leaf</span><span class="st">pvdlowe</span></button>
 <button class="stratum core" data-i="1" role="tab" aria-selected="false"><span class="tag">Layer 1 · Optical constants</span><span class="st">pvdlowe/materials</span></button>
 <button class="stratum core" data-i="2" role="tab" aria-selected="false"><span class="tag">Layer 2 · Transport</span><span class="st">pvdlowe/electrical</span></button>
 <button class="stratum core" data-i="3" role="tab" aria-selected="false"><span class="tag">Layer 3 · The solver</span><span class="st">pvdlowe/optics</span></button>
@@ -146,180 +151,145 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <p class="navhead second">Around the code</p>
 <button class="stratum outer" data-i="13" role="tab" aria-selected="false"><span class="tag">5 files</span><span class="st">data/</span></button>
 <button class="stratum outer" data-i="14" role="tab" aria-selected="false"><span class="tag">8 files</span><span class="st">tests/</span></button>
-<button class="stratum outer" data-i="15" role="tab" aria-selected="false"><span class="tag">15 files</span><span class="st">docs/</span></button>
+<button class="stratum outer" data-i="15" role="tab" aria-selected="false"><span class="tag">18 files</span><span class="st">docs/</span></button>
 <button class="stratum outer" data-i="16" role="tab" aria-selected="false"><span class="tag">5 files</span><span class="st">report/</span></button>
 <button class="stratum outer" data-i="17" role="tab" aria-selected="false"><span class="tag">4 files</span><span class="st">experiments/</span></button>
 <button class="stratum outer" data-i="18" role="tab" aria-selected="false"><span class="tag">10 files</span><span class="st">examples/</span></button>
 <button class="stratum outer" data-i="19" role="tab" aria-selected="false"><span class="tag">16 files</span><span class="st">results/</span></button>
-<button class="stratum outer" data-i="20" role="tab" aria-selected="false"><span class="tag">4 files</span><span class="st">vertex/</span></button>
-  </nav>
-  <section class="stage"><article class="pane" role="tabpanel">
-<p class="eyebrow">Layer 0 · imports only from below</p>
-<h2>pvdlowe</h2>
-<p class="blurb">No dependencies at all. Physical constants, the evidence-grading enum, and the CIE and solar weighting curves.</p>
-<div class="stats"><div><b>10</b><span>evidence grades</span></div><div><b>0</b><span>dependencies</span></div></div>
-<div class="detail"><p>The interesting one is <code>provenance.py</code>. Every quantity in the framework carries an evidence grade — <code>MEASURED</code>, <code>LITERATURE</code>, <code>MODEL</code>, <code>HYPOTHESIS</code> and six others — and <code>assert_reportable()</code> refuses to admit hypothesis-grade values into headline tables.</p><p>The brief itself cautions against putting DFT numbers for a dilute titanium ternary into a thesis as though they were established. This makes that a <em>type constraint</em> rather than a footnote, so it survives contact with a spreadsheet.</p></div>
-<p class="breaks"><span>Worth knowing</span>It did real work: it is what kept the titanium ternary predictions out of the results tables.</p>
+<button class="stratum outer" data-i="20" role="tab" aria-selected="false"><span class="tag">4 files</span><span class="st">vertex/</span></button></nav>
+ <section class="stage"><article class="pane" role="tabpanel"><p class="eyebrow">Layer 0 · imports only from below</p>
+<h2>pvdlowe</h2><p class="blurb">No dependencies at all. Physical constants, the evidence-grading enum, and the CIE and solar weighting curves.</p><div class="stats"><div><b>11</b><span>evidence grades</span></div><div><b>0</b><span>dependencies</span></div></div>
+<div class="detail"><p>The one worth stopping on is <code>provenance.py</code>. Every quantity carries one of <strong>eleven</strong> evidence grades, and <code>assert_reportable()</code> refuses hypothesis-grade values in headline tables.</p><p>The brief itself cautions against putting DFT numbers for a dilute titanium ternary into a thesis as though established. This makes that a <em>type constraint</em> rather than a footnote, so it survives contact with a spreadsheet — and it is what kept those predictions out of the results.</p></div>
+<p class="breaks"><span>Worth knowing</span>If the grading is removed, nothing stops an unverified figure reaching a headline table.</p>
 <p class="fh">Files</p><ul class="files"><li><code>cli.py</code><span class="ll">459</span><p>Command-line interface.</p></li>
-<li><code>validate.py</code><span class="ll">373</span><p>Validation: does the model reproduce the literature, and is the literature internally consistent? Two separate jobs, both worth doing before any of the numbers are used.</p></li>
+<li><code>validate.py</code><span class="ll">376</span><p>Validation: does the model reproduce the literature, and is the literature internally consistent? Two separate jobs, both worth doing before any of the numbers are used.</p></li>
 <li><code>provenance.py</code><span class="ll">251</span><p>Provenance tracking for every number that enters the framework.</p></li>
 <li><code>spectra.py</code><span class="ll">220</span><p>Spectral grids and the weighting functions the glazing standards use.</p></li>
 <li><code>constants.py</code><span class="ll">146</span><p>Physical constants and unit conversions.</p></li>
 <li><code>__init__.py</code><span class="ll">50</span><p>pvdlowe -- computational framework for sustainable Low-E PVD coatings.</p></li>
 <li><code>__main__.py</code><span class="ll">5</span></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Layer 1 · imports only from below</p>
-<h2>pvdlowe/materials</h2>
-<p class="blurb">How each material responds to light, and how that changes with composition.</p>
-<div class="stats"><div><b>2.8×</b><span>damping discrepancy</span></div><div><b>53 nm</b><span>Ag mean free path</span></div></div>
-<div class="detail"><p>Lorentz–Drude fits from Rakić et al. (1998), with one deliberate departure that is the most instructive correction in the project.</p><p>Rakić's fitted damping for silver implies a DC resistivity of <strong>4.4 µΩ·cm against a true 1.587</strong> — a factor of 2.8 — because in the visible the Drude term trades off against the interband oscillators. Using the published value <em>and</em> a thin-film size-effect multiplier counts the same scattering twice.</p><p>That double-count inflated modelled emissivity roughly <strong>threefold</strong> in an early build.</p></div>
-<p class="breaks"><span>Worth knowing</span>Documented in METHODOLOGY §2 because anyone building on published optical fits will hit the same trap.</p>
+<article class="pane" role="tabpanel"><p class="eyebrow">Layer 1 · imports only from below</p>
+<h2>pvdlowe/materials</h2><p class="blurb">How each material responds to light, and how that changes with composition.</p><div class="stats"><div><b>2.8×</b><span>damping discrepancy</span></div><div><b>53 nm</b><span>Ag mean free path</span></div></div>
+<div class="detail"><p>Lorentz–Drude fits from Rakić et al. (1998), with one deliberate departure that is the most instructive correction in the project.</p><p>Rakić's fitted damping for silver implies a DC resistivity of <strong>4.4 µΩ·cm against a true 1.587</strong> — a factor of 2.8 — because in the visible the Drude term trades off against the interband oscillators. Using the published value <em>and</em> a thin-film size-effect multiplier counts the same scattering twice.</p><p>That double-count inflated modelled emissivity roughly <strong>threefold</strong>.</p></div>
+<p class="breaks"><span>Worth knowing</span>Documented in METHODOLOGY §2, because anyone building on published optical fits will hit the same trap.</p>
 <p class="fh">Files</p><ul class="files"><li><code>tco.py</code><span class="ll">375</span><p>Transparent conductive oxides: AZO, GZO, ITO, FTO and undoped ZnO.</p></li>
 <li><code>dispersion.py</code><span class="ll">367</span><p>Dispersion models returning a complex refractive index.</p></li>
 <li><code>alloys.py</code><span class="ll">353</span><p>Binary and ternary metal alloys for the Low-E layer.</p></li>
 <li><code>metals.py</code><span class="ll">239</span><p>Elemental metals: optical dispersion plus the transport data needed to predict a thin-film sheet resistance.</p></li>
 <li><code>glass.py</code><span class="ll">167</span><p>Soda-lime float glass, the substrate.</p></li>
 <li><code>__init__.py</code><span class="ll">15</span><p>Material models: dispersion, metals, alloys, TCOs, glass.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Layer 2 · imports only from below</p>
-<h2>pvdlowe/electrical</h2>
-<p class="blurb">What happens to conduction when the film is thinner than the electron mean free path.</p>
-<div class="stats"><div><b>2.79×</b><span>bulk at 10 nm</span></div><div><b>8×</b><span>the copper gap</span></div></div>
-<div class="detail"><p>The full Fuchs–Sondheimer integral for surface scattering, Mayadas–Shatzkes for grain boundaries, and a percolation model below a critical thickness.</p><p>The magnitude is easy to underestimate:</p><table class='mini'><tr><td>10 nm</td><td>2.79× bulk</td><td>4.44 µΩ·cm</td></tr><tr><td>20 nm</td><td>1.94×</td><td>3.08</td></tr><tr><td>50 nm</td><td>1.39×</td><td>2.21</td></tr><tr><td>100 nm</td><td>1.19×</td><td>1.90</td></tr></table><p>A 10 nm silver film is nearly three times more resistive than bulk. Any claim that a thin film reaches bulk resistivity is wrong on its face — which is how one of the brief's transcribed values was caught.</p></div>
-<p class="breaks"><span>Worth knowing</span>This is also where the framework's largest known error lives: it under-predicts sputtered copper by roughly eightfold, and grain structure is the leading explanation.</p>
+<article class="pane" role="tabpanel"><p class="eyebrow">Layer 2 · imports only from below</p>
+<h2>pvdlowe/electrical</h2><p class="blurb">What happens to conduction when the film is thinner than the electron mean free path.</p><div class="stats"><div><b>2.79×</b><span>bulk at 10 nm</span></div><div><b>8×</b><span>the copper gap</span></div></div>
+<div class="detail"><p>Full Fuchs–Sondheimer for surface scattering, Mayadas–Shatzkes for grain boundaries, and percolation below a critical thickness.</p><table class='mini'><tr><td>10 nm</td><td>2.79× bulk</td><td>4.44 µΩ·cm</td></tr><tr><td>20 nm</td><td>1.94×</td><td>3.08</td></tr><tr><td>50 nm</td><td>1.39×</td><td>2.21</td></tr><tr><td>100 nm</td><td>1.19×</td><td>1.90</td></tr></table><p>A 10 nm silver film is nearly three times more resistive than bulk. <strong>That single fact caught one of the brief's transcribed values</strong> — a claim of 1.59 µΩ·cm, which is bulk silver to three figures.</p></div>
+<p class="breaks"><span>Worth knowing</span>This is where the framework's largest error lives: it under-predicts sputtered copper by roughly eightfold, and a Ti seed layer recovers most of it.</p>
 <p class="fh">Files</p><ul class="files"><li><code>calibrate.py</code><span class="ll">410</span><p>Fit the transport model to a measured sheet-resistance series.</p></li>
 <li><code>thinfilm.py</code><span class="ll">264</span><p>Thin-film resistivity: the classical size effect, and percolation.</p></li>
 <li><code>__init__.py</code><span class="ll">15</span><p>Thin-film transport.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Layer 3 · imports only from below</p>
-<h2>pvdlowe/optics</h2>
-<p class="blurb">A vectorised transfer-matrix solver, and the European standards that turn spectra into numbers.</p>
-<div class="stats"><div><b>5</b><span>decimal places on Fresnel</span></div><div><b>1e-10</b><span>energy conservation</span></div></div>
-<div class="detail"><p>Arbitrary layer count, complex indices, both polarisations, oblique incidence, incoherent thick substrate. It takes arrays rather than scalars — a whole spectrum per call — which is why a 168-point composition series with geometry re-optimised at every point finishes in minutes.</p><p><strong>How we know it is right is not by inspection.</strong> Four checks against closed-form answers:</p><table class='mini'><tr><td>bare interface</td><td>R = 0.04258</td><td>Fresnel 0.04258</td></tr><tr><td>quarter-wave</td><td>exact null</td><td>at √(n₁n₂)</td></tr><tr><td>absorbing stack</td><td>R+T+A = 1</td><td>to 1e-10</td></tr><tr><td>normal incidence</td><td>s = p</td><td>identically</td></tr></table><p>Then <code>integrate.py</code> applies EN 410 / ISO 9050 for transmittance, EN 12898 for emissivity against a 283 K Planck radiance, EN 673 for the U-value.</p></div>
-<p class="breaks"><span>Worth knowing</span>These are the tests worth having: they check the model obeys physical law, not that a function returns the right type.</p>
+<article class="pane" role="tabpanel"><p class="eyebrow">Layer 3 · imports only from below</p>
+<h2>pvdlowe/optics</h2><p class="blurb">A vectorised transfer-matrix solver, and the standards that turn spectra into numbers.</p><div class="stats"><div><b>5</b><span>decimals on Fresnel</span></div><div><b>1e-10</b><span>energy conservation</span></div></div>
+<div class="detail"><p>Arbitrary layers, complex indices, both polarisations, oblique incidence, incoherent thick substrate. It takes arrays rather than scalars, which is why a 168-point composition series with geometry re-optimised at every point finishes in minutes.</p><p><strong>How we know it is right is not by inspection.</strong> Four checks against closed-form answers:</p><table class='mini'><tr><td>bare interface</td><td>R = 0.04258</td><td>Fresnel 0.04258</td></tr><tr><td>quarter-wave</td><td>exact null</td><td>at √(n₁n₂)</td></tr><tr><td>absorbing stack</td><td>R+T+A = 1</td><td>to 1e-10</td></tr><tr><td>normal incidence</td><td>s = p</td><td>identically</td></tr></table><p>Then EN 410 / ISO 9050 for transmittance, EN 12898 for emissivity against a 283 K Planck radiance, EN 673 for the U-value.</p></div>
+<p class="breaks"><span>Worth knowing</span>These tests check the model obeys physical law, not that a function returns the right type.</p>
 <p class="fh">Files</p><ul class="files"><li><code>stack.py</code><span class="ll">579</span><p>Layer stacks and the Low-E coating design object.</p></li>
 <li><code>integrate.py</code><span class="ll">467</span><p>Turning spectra into the numbers a glazing specification is written in.</p></li>
 <li><code>tmm.py</code><span class="ll">242</span><p>Transfer-matrix solver for absorbing multilayers.</p></li>
 <li><code>__init__.py</code><span class="ll">14</span><p>Optical modelling: transfer matrix, stacks, standards integration.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Layer 4 · imports only from below</p>
-<h2>pvdlowe/screening</h2>
-<p class="blurb">Turning performance into an ordering — and auditing the scheme that does it.</p>
-<div class="stats"><div><b>6</b><span>weighting defects found</span></div><div><b>r=1.000</b><span>cost is silver, restated</span></div></div>
-<div class="detail"><p>Derringer–Suich desirability with geometric aggregation, so a candidate scoring zero on any criterion goes to zero overall. A weighted sum does not do that, and the brief explicitly asks for behaviour a weighted sum cannot give.</p><p><strong>The diagnostics are the valuable part, because they audit their own inputs.</strong> <code>check-weights</code> found six defects in the proposed weighting, including:</p><table class='mini'><tr><td>emissivity ~ sheet resistance</td><td>r = 0.978</td></tr><tr><td>silver mass ~ metal cost</td><td>r = 1.000</td></tr><tr><td>silver mass ~ supply risk</td><td>r = 0.991</td></tr></table><p>Three criteria that are the same physical quantity, carrying 36% of the effective weight between them.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Layer 4 · imports only from below</p>
+<h2>pvdlowe/screening</h2><p class="blurb">Turning performance into an ordering — and auditing the scheme that does it.</p><div class="stats"><div><b>6</b><span>weighting defects</span></div><div><b>29%</b><span>more silver at 100/100</span></div></div>
+<div class="detail"><p>Derringer–Suich desirability, aggregated geometrically so a candidate scoring zero on any criterion goes to zero overall. A weighted sum cannot deliver what the brief asks for; a geometric mean can.</p><p><strong>The valuable part is that it audits its own inputs.</strong> <code>check-weights</code> found six defects:</p><table class='mini'><tr><td>emissivity ~ sheet resistance</td><td>r = 0.978</td></tr><tr><td>silver mass ~ metal cost</td><td><strong>r = 1.000</strong></td></tr><tr><td>silver mass ~ supply risk</td><td>r = 0.991</td></tr></table><p>Three criteria that are one physical quantity, carrying 36% of the effective weight between them. And three more carried 30% of the nominal weight while being <code>None</code> for every candidate.</p></div>
 <p class="breaks"><span>Worth knowing</span>Also here: <code>record_for()</code>, the single place a scoreable record is built. There were two, differing by ten keys.</p>
 <p class="fh">Files</p><ul class="files"><li><code>scoring.py</code><span class="ll">330</span><p>Multi-objective scoring: the brief&#x27;s sections 14 and 16.</p></li>
 <li><code>elements.py</code><span class="ll">205</span><p>Stage 1 of the brief&#x27;s workflow: element screening.</p></li>
 <li><code>candidates.py</code><span class="ll">194</span><p>Loading candidate architectures and evaluating them end to end.</p></li>
 <li><code>pareto.py</code><span class="ll">114</span><p>Pareto analysis for the multi-objective problem.</p></li>
 <li><code>__init__.py</code><span class="ll">17</span><p>Screening: element filter, desirability scoring, Pareto analysis.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Layer 5 · imports only from below</p>
-<h2>pvdlowe/optimize</h2>
-<p class="blurb">Everything below, searched over.</p>
-<div class="stats"><div><b>~1,300</b><span>evaluations per optimisation</span></div><div><b>0.5 nm</b><span>how much silver can be thinned</span></div></div>
-<div class="detail"><p>Nelder–Mead thickness optimisation, composition series with the geometry re-optimised at every composition, and the silver-reduction curve.</p><p>Re-optimising at every point matters more than it sounds. An early conclusion — that an optimum existed at Ag₆₀Cu₄₀ — turned out to be an artifact of three sample points at fixed geometry. At 5% resolution with geometry free, the curve is monotonic and every optimum sits at 0–10 at.% Ag.</p><p><strong>And this is where the wall is.</strong> Thinning the silver in AZO/Ag/AZO:</p><table class='mini'><tr><td>10.0 nm</td><td>continuous</td><td>R_s 4.18</td></tr><tr><td>9.5 nm</td><td><strong>discontinuous</strong></td><td>R_s 5.90</td></tr></table><p>Percolation, not any of the three specified properties, is the binding constraint. A 5% thickness reduction costs 41% in sheet resistance.</p></div>
-<p class="breaks"><span>Worth knowing</span>Three of four overturned conclusions in this project came from reading structure into too few points. This is the module where that happened.</p>
+<article class="pane" role="tabpanel"><p class="eyebrow">Layer 5 · imports only from below</p>
+<h2>pvdlowe/optimize</h2><p class="blurb">Everything below, searched over.</p><div class="stats"><div><b>~1,300</b><span>evaluations per optimisation</span></div><div><b>0.5 nm</b><span>how much silver can be thinned</span></div></div>
+<div class="detail"><p>Nelder–Mead thickness optimisation, composition series with geometry re-optimised at every composition, and the silver-reduction curve.</p><p>Re-optimising at every point matters. An early conclusion — an optimum at Ag₆₀Cu₄₀ — was an artifact of three sample points at fixed geometry. At 5% resolution with geometry free, the curve is monotonic and every optimum sits at 0–10 at.% Ag.</p><p><strong>And this is where the answer to the brief's actual question is:</strong></p><table class='mini'><tr><td>10.0 nm</td><td>continuous</td><td>R_s 4.18</td></tr><tr><td>9.5 nm</td><td><strong>discontinuous</strong></td><td>R_s 5.90</td></tr></table><p>Percolation is the binding constraint, not any of the three specified properties. A 5% thickness reduction costs 41% in sheet resistance.</p></div>
+<p class="breaks"><span>Worth knowing</span>Three of five overturned conclusions came from reading structure into too few points. This is the module where that happened.</p>
 <p class="fh">Files</p><ul class="files"><li><code>thickness.py</code><span class="ll">329</span><p>Optimising layer thicknesses against the figure of merit.</p></li>
 <li><code>sweep.py</code><span class="ll">229</span><p>Parameter sweeps and maps across composition and thickness.</p></li>
 <li><code>__init__.py</code><span class="ll">12</span><p>Optimisation and parameter sweeps.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Independent · nothing in the core imports it</p>
-<h2>pvdlowe/mp</h2><div class="detail"><p>Retrieves convex-hull data for the fifteen chemical systems the brief nominates. Cached, network-gated, and it <strong>raises rather than inventing data</strong> when offline with a cold cache. It established that Ag–Cu has no stable ordered compound — Cu₃Ag at 0.0904 eV/atom above the hull, CuAg₃ at 0.0857.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Independent · nothing in the core imports it</p>
+<h2>pvdlowe/mp</h2><div class="detail"><p>Convex-hull data for the fifteen nominated systems. Cached, network-gated, and it <strong>raises rather than inventing data</strong> when offline with a cold cache. It established that Ag–Cu has no stable ordered compound — Cu₃Ag at 0.0904 eV/atom above the hull, CuAg₃ at 0.0857.</p></div>
 <p class="fh">Files</p><ul class="files"><li><code>client.py</code><span class="ll">198</span><p>Materials Project client -- stage 2 of the brief&#x27;s workflow.</p></li>
 <li><code>screen.py</code><span class="ll">133</span><p>Stage-2 compound screening against the Materials Project.</p></li>
 <li><code>__init__.py</code><span class="ll">9</span><p>Materials Project integration (stage 2 of the workflow).</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Independent · nothing in the core imports it</p>
-<h2>pvdlowe/ml</h2><div class="detail"><p>Machine-learning interatomic potentials as a stand-in for DFT. Gated: it must reproduce two known Materials Project hull distances before any prediction is accepted. It produced the Ag–Cu mixing energies, and <strong>failed twice</strong> at the nucleation question — once on lattice mismatch, once on termination sensitivity. Both failures are documented with the diagnostic that caught them.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Independent · nothing in the core imports it</p>
+<h2>pvdlowe/ml</h2><div class="detail"><p>Interatomic potentials standing in for DFT, gated against two known hull distances before any prediction is accepted. It produced the Ag–Cu mixing energies, and <strong>failed twice</strong> at the nucleation question — once on lattice mismatch, once on termination sensitivity. Both failures are documented with the diagnostic that caught them.</p></div>
 <p class="fh">Files</p><ul class="files"><li><code>surrogate.py</code><span class="ll">734</span><p>Machine-learning interatomic potentials as a DFT surrogate.</p></li>
 <li><code>__init__.py</code><span class="ll">19</span><p>ML interatomic potentials as a DFT surrogate.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Independent · nothing in the core imports it</p>
-<h2>pvdlowe/dft</h2><div class="detail"><p>Generates VASP inputs for the stage the framework cannot compute itself — deterministic POSCAR construction, exact supercell selection. Never executed: no licence, no allocation.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Independent · nothing in the core imports it</p>
+<h2>pvdlowe/dft</h2><div class="detail"><p>VASP inputs for the stage the framework cannot compute itself — deterministic POSCAR construction, exact supercell selection. Never executed: no licence, no allocation.</p></div>
 <p class="fh">Files</p><ul class="files"><li><code>plans.py</code><span class="ll">462</span><p>Planning the first-principles work: the brief&#x27;s sections 9, 14 and 15.</p></li>
 <li><code>surrogate.py</code><span class="ll">77</span><p>Deprecated.</p></li>
 <li><code>__init__.py</code><span class="ll">18</span><p>DFT planning and analysis.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Independent · nothing in the core imports it</p>
-<h2>pvdlowe/doe</h2><div class="detail"><p>Factorial, fractional-factorial, Box–Behnken, central-composite and Latin hypercube designs, plus a sputter-rate model that <strong>refuses to give absolute rates</strong> before calibration on the actual tool.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Independent · nothing in the core imports it</p>
+<h2>pvdlowe/doe</h2><div class="detail"><p>Factorial, Box–Behnken, central-composite and Latin hypercube designs, plus a sputter-rate model that <strong>refuses to give absolute rates</strong> before calibration on the actual tool.</p></div>
 <p class="fh">Files</p><ul class="files"><li><code>design.py</code><span class="ll">376</span><p>Design of experiments over the sputter parameter space (brief section 14).</p></li>
 <li><code>sputter.py</code><span class="ll">263</span><p>Deposition rate and the brief&#x27;s section 15 efficiency figure of merit.</p></li>
 <li><code>__init__.py</code><span class="ll">13</span><p>Design of experiments and sputter process modelling.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Independent · nothing in the core imports it</p>
-<h2>pvdlowe/characterise</h2><div class="detail"><p>What a diffractogram should show under each competing hypothesis, so the scan can be planned rather than interpreted afterwards. Segregated Ag–Cu gives two peak sets at 38.12° and 43.32°; a solid solution gives one at 39.54°. Scherrer width gives the grain size.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Independent · nothing in the core imports it</p>
+<h2>pvdlowe/characterise</h2><div class="detail"><p>What a diffractogram should show under each competing hypothesis, so the scan can be planned rather than interpreted afterwards. Segregated Ag–Cu gives two peak sets; a solid solution gives one. Scherrer width gives the grain size.</p></div>
 <p class="fh">Files</p><ul class="files"><li><code>xrd.py</code><span class="ll">193</span><p>Predicted X-ray diffraction signatures for the metal layer.</p></li>
 <li><code>__init__.py</code><span class="ll">16</span><p>Predicted signatures for the characterisation measurements this project needs.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Independent · nothing in the core imports it</p>
-<h2>pvdlowe/report</h2><div class="detail"><p>Tables, plots and markdown / CSV / Excel output. Everything regenerated from the framework — <code>pvdlowe report</code> is the path that does not drift.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Independent · nothing in the core imports it</p>
+<h2>pvdlowe/report</h2><div class="detail"><p>Tables, plots and markdown / CSV / Excel output. <code>pvdlowe report</code> is the path that does not drift — a pasted table drifted from its generated values three times in this project.</p></div>
 <p class="fh">Files</p><ul class="files"><li><code>tables.py</code><span class="ll">155</span><p>Result tables, formatted for a report rather than for a console.</p></li>
 <li><code>export.py</code><span class="ll">125</span><p>Export results to markdown, CSV and Excel.</p></li>
 <li><code>__init__.py</code><span class="ll">10</span><p>Report tables, plots and export.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Independent · nothing in the core imports it</p>
-<h2>pvdlowe/api</h2><div class="detail"><p>Optional Flask server. Every endpoint calls the same functions the CLI and the tests call; nothing is recomputed and nothing is reimplemented in the browser.</p></div>
+<article class="pane" role="tabpanel"><p class="eyebrow">Independent · nothing in the core imports it</p>
+<h2>pvdlowe/api</h2><div class="detail"><p>Optional Flask server. Every endpoint calls the same functions the CLI and tests call; nothing is recomputed or reimplemented.</p></div>
 <p class="fh">Files</p><ul class="files"><li><code>server.py</code><span class="ll">239</span><p>HTTP interface to the framework.</p></li>
 <li><code>ui.py</code><span class="ll">138</span><p>The single-page form served at `/`.</p></li>
 <li><code>__init__.py</code><span class="ll">8</span><p>HTTP interface to the framework.</p></li>
 <li><code>__main__.py</code><span class="ll">4</span></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">The inputs that decide the answer</p><h2>data/</h2>
-<div class="detail"><p>Candidate definitions, the benchmark transcriptions with their verification status, and the two weighting files.</p><p><strong>A ranking from this framework is meaningless without the weighting file that produced it.</strong> The heating and cooling profiles disagree on the winner and on nine of ten top-ten positions. That is not a caveat — it is a property of multi-objective scoring, and it is why both files ship.</p><p><code>benchmarks.yaml</code> carries verification state per entry: three fully verified from full text, four confirmed against abstracts, and <strong>two disputed</strong> whose figures appear in no locatable source.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>candidates.yaml</code><span class="ll">452</span></li>
-<li><code>benchmarks.yaml</code><span class="ll">331</span></li>
-<li><code>targets.yaml</code><span class="ll">182</span></li>
-<li><code>targets_cooling.yaml</code><span class="ll">182</span></li>
+<article class="pane" role="tabpanel"><p class="eyebrow">The inputs that decide the answer</p><h2>data/</h2>
+<div class="detail"><p>Candidate definitions, benchmark transcriptions with verification status, and the two weighting files.</p><p><strong>A ranking is meaningless without the weighting file that produced it.</strong> The heating and cooling profiles disagree on the winner and on nine of ten top-ten positions. That is not a caveat — it is a property of multi-objective scoring, which is why both files ship.</p><p><code>benchmarks.yaml</code> carries verification state per entry: three verified from full text, four confirmed against abstracts, and <strong>two disputed</strong> whose figures appear in no locatable source.</p></div><p class="fh">Files</p><ul class="files"><li><code>candidates.yaml</code><span class="ll">452</span></li>
+<li><code>benchmarks.yaml</code><span class="ll">387</span></li>
+<li><code>targets.yaml</code><span class="ll">207</span></li>
+<li><code>targets_cooling.yaml</code><span class="ll">187</span></li>
 <li><code>elements.csv</code><span class="ll">18</span></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">133 assertions, mostly about physics</p><h2>tests/</h2>
-<div class="detail"><p>Energy conservation, quarter-wave nulls, the impedance round-trip, the conductive oxide rejecting solar near-infrared. These check that the model obeys physical law.</p><p>Plus a guard for every defect that has been fixed, so it fails if one regresses — including one that asserts excluding disputed benchmarks must <em>raise</em> the reported error, because if it lowered it the exclusion would be flattering the model rather than protecting against it.</p><p>No pytest. <code>python tests/run_tests.py</code> runs the lot in about ninety seconds.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>test_screening.py</code><span class="ll">428</span><p>Screening, scoring, Pareto and provenance.</p></li>
-<li><code>test_validate_doe_dft.py</code><span class="ll">324</span><p>Validation, DoE and DFT planning.</p></li>
-<li><code>test_optics.py</code><span class="ll">264</span><p>Optics: TMM correctness, energy conservation, and known analytic limits.</p></li>
+<article class="pane" role="tabpanel"><p class="eyebrow">136 assertions, mostly about physics</p><h2>tests/</h2>
+<div class="detail"><p>Energy conservation, quarter-wave nulls, the impedance round-trip, the conductive oxide rejecting solar near-infrared.</p><p>Plus a guard for every defect that has been fixed — including one asserting that excluding disputed benchmarks must <em>raise</em> the reported error, because if it lowered it the exclusion would be flattering the model rather than protecting against it.</p><p>No pytest. <code>python tests/run_tests.py</code> runs the lot in about a minute.</p></div><p class="fh">Files</p><ul class="files"><li><code>test_screening.py</code><span class="ll">469</span><p>Screening, scoring, Pareto and provenance.</p></li>
+<li><code>test_validate_doe_dft.py</code><span class="ll">329</span><p>Validation, DoE and DFT planning.</p></li>
+<li><code>test_optics.py</code><span class="ll">316</span><p>Optics: TMM correctness, energy conservation, and known analytic limits.</p></li>
 <li><code>test_materials.py</code><span class="ll">210</span><p>Materials: dispersion sign conventions, alloys, TCOs, resistivity.</p></li>
 <li><code>test_ml_numerics.py</code><span class="ll">136</span><p>Numerical-path tests for the ML surrogate, without an MLIP installed.</p></li>
 <li><code>test_electrical.py</code><span class="ll">123</span><p>Thin-film transport: size effect, percolation, and its optical coupling.</p></li>
 <li><code>test_api.py</code><span class="ll">104</span><p>Tests for the HTTP interface.</p></li>
 <li><code>run_tests.py</code><span class="ll">77</span><p>Self-contained test runner.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Findings, methodology, evidence</p><h2>docs/</h2>
-<div class="detail"><p>Fifteen documents. The evidence chain is the valuable part — three of them record a source that <em>corrected</em> the model rather than confirming it.</p><p><code>CARRETERO_COMPARISON.md</code> reversed the dielectric finding. <code>LITERATURE_CALIBRATION.md</code> eliminated the classical size effect as an explanation for the copper gap. <code>NUCLEATION_MECHANISM.md</code> found the mechanism in a patent after two calculations failed.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>FINDINGS.md</code><span class="ll">900</span><p>Findings</p></li>
-<li><code>CODE_WALKTHROUGH.md</code><span class="ll">457</span><p>Code walkthrough</p></li>
+<article class="pane" role="tabpanel"><p class="eyebrow">Findings, methodology, evidence</p><h2>docs/</h2>
+<div class="detail"><p>Sixteen documents. The evidence chain is the valuable part — four record a source that <em>corrected</em> the model rather than confirming it.</p><p>CARRETERO_COMPARISON reversed the dielectric finding. LITERATURE_CALIBRATION eliminated the classical size effect. NUCLEATION_MECHANISM found the mechanism in a patent after two calculations failed. AZO_CU_AZO_LITERATURE reframed the copper gap as poor nucleation.</p></div><p class="fh">Files</p><ul class="files"><li><code>interactive_data.json</code><span class="ll">723</span></li>
+<li><code>FINDINGS.md</code><span class="ll">646</span><p>Findings</p></li>
+<li><code>INTERACTIVE_SCRIPT.md</code><span class="ll">478</span><p>Script — driving the two interactive views</p></li>
+<li><code>CODE_WALKTHROUGH.md</code><span class="ll">357</span><p>Code walkthrough</p></li>
 <li><code>VERTEX_AI.md</code><span class="ll">340</span><p>Running pvdlowe on Google Cloud Vertex AI</p></li>
-<li><code>CODE_REVIEW.md</code><span class="ll">325</span><p>Code review — pvdlowe v0.1.0</p></li>
+<li><code>CODE_REVIEW.md</code><span class="ll">339</span><p>Code review — pvdlowe v0.1.0</p></li>
+<li><code>REFERENCES.md</code><span class="ll">293</span><p>References and verification status</p></li>
 <li><code>MLIP_MIXING_ENERGY.md</code><span class="ll">253</span><p>Ag–Cu mixing energies from an ML interatomic potential</p></li>
 <li><code>NUCLEATION_MECHANISM.md</code><span class="ll">218</span><p>The nucleation mechanism, resolved from literature</p></li>
-<li><code>REFERENCES.md</code><span class="ll">206</span><p>References and verification status</p></li>
 <li><code>CARRETERO_COMPARISON.md</code><span class="ll">172</span><p>Experimental check of the dielectric finding</p></li>
 <li><code>METHODOLOGY.md</code><span class="ll">166</span><p>Methodology</p></li>
+<li><code>AZO_CU_AZO_LITERATURE.md</code><span class="ll">164</span><p>AZO/Cu/AZO in the literature</p></li>
 <li><code>LITERATURE_CALIBRATION.md</code><span class="ll">161</span><p>Can literature substitute for the copper thickness series?</p></li>
 <li><code>ROADMAP.md</code><span class="ll">124</span><p>Experimental roadmap</p></li>
 <li><code>build_interactive.py</code><span class="ll">122</span><p>Regenerate the two interactive HTML views from the repository.</p></li>
 <li><code>SUMMARY.md</code><span class="ll">118</span><p>Executive summary</p></li>
 <li><code>PROVENANCE.md</code><span class="ll">67</span><p>Provenance</p></li>
-<li><code>INDEX.md</code><span class="ll">55</span><p>Documentation index</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">What gets sent</p><h2>report/</h2>
-<div class="detail"><p>The eighteen-page technical report, the nine-page project dossier, and the build scripts that regenerate their PDFs from markdown.</p><p>The markdown is the source of truth; the PDF is a build artifact. That distinction exists because a pasted table drifted from its generated values three times in this project.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>TECHNICAL_REPORT.md</code><span class="ll">1445</span><p>Computational screening of sustainable low-emissivity PVD coatings on soda-lime float glass</p></li>
-<li><code>PROJECT_DOSSIER.md</code><span class="ll">704</span><p>Project dossier — computational screening of sustainable Low-E PVD coatings</p></li>
+<li><code>INDEX.md</code><span class="ll">60</span><p>Documentation index</p></li></ul></article>
+<article class="pane" role="tabpanel"><p class="eyebrow">What gets sent</p><h2>report/</h2>
+<div class="detail"><p>The technical report and the project dossier, with the scripts that regenerate their PDFs from markdown.</p><p>The markdown is the source of truth; the PDF is a build artifact. That distinction exists because a pasted table drifted from its generated values three times.</p></div><p class="fh">Files</p><ul class="files"><li><code>TECHNICAL_REPORT.md</code><span class="ll">818</span><p>Computational screening of sustainable low-emissivity PVD coatings on soda-lime float glass</p></li>
+<li><code>PROJECT_DOSSIER.md</code><span class="ll">573</span><p>Project dossier</p></li>
 <li><code>BRIEFING_SCRIPT.md</code><span class="ll">329</span><p>Briefing script — technical report walkthrough</p></li>
 <li><code>style.css</code><span class="ll">42</span></li>
 <li><code>build_pdf.sh</code><span class="ll">31</span></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">What to run at the bench</p><h2>experiments/</h2>
-<div class="detail"><p>A printable procedure for the copper thickness series, and a protocol with <strong>decision rules written before any data exists</strong> — four outcomes, each with what it means and what to do, including the one where six candidates fall over.</p><p>Pre-registration is unusual in materials screening and it is the strongest methodological point in the project.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>PROTOCOL_cu_series.md</code><span class="ll">214</span><p>Experiment 1 — Copper thickness series</p></li>
+<article class="pane" role="tabpanel"><p class="eyebrow">What to run at the bench</p><h2>experiments/</h2>
+<div class="detail"><p>A printable procedure and a protocol with <strong>decision rules written before any data exists</strong> — four outcomes, each with what it means and what to do, including the one where six candidates fall over.</p><p>Pre-registration is unusual in materials screening and is the strongest methodological point in the project.</p></div><p class="fh">Files</p><ul class="files"><li><code>PROTOCOL_cu_series.md</code><span class="ll">214</span><p>Experiment 1 — Copper thickness series</p></li>
 <li><code>BENCH_cu_series.md</code><span class="ll">155</span><p>Bench procedure — copper thickness series</p></li>
 <li><code>EXAMPLE_filled_runsheet.csv</code><span class="ll">10</span></li>
 <li><code>cu_series_runsheet.csv</code><span class="ll">10</span></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Ten runnable scripts</p><h2>examples/</h2>
-<div class="detail"><p>From a quickstart to the MLIP cross-check. Each is a <em>use</em> of the framework rather than a demonstration of it — <code>04_validate_the_brief.py</code> is how the consistency checks were first run.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>10_mlip_cross_check.py</code><span class="ll">107</span><p>Cross-check the mixing energies against a second interatomic potential.</p></li>
+<article class="pane" role="tabpanel"><p class="eyebrow">Runnable scripts</p><h2>examples/</h2>
+<div class="detail"><p>From a quickstart to the MLIP cross-check. Each is a <em>use</em> of the framework rather than a demonstration of it — <code>04_validate_the_brief.py</code> is how the consistency checks were first run.</p></div><p class="fh">Files</p><ul class="files"><li><code>10_mlip_cross_check.py</code><span class="ll">107</span><p>Cross-check the mixing energies against a second interatomic potential.</p></li>
 <li><code>09_mlip_terminations.py</code><span class="ll">68</span><p>How much does the surface termination change the answer? Example 10 ranked dielectrics by adatom wetting and took whichever slab the generator returned first.</p></li>
 <li><code>08_mlip_wetting.py</code><span class="ll">60</span><p>Does adatom binding explain the measured dielectric ordering? A better-posed question than the bulk adhesion attempt in example 09, which failed because lattice matching a metal film to an oxide cell left 5-21% strain and the calculation measured elastic energy rather than binding.</p></li>
 <li><code>07_mlip_adhesion.py</code><span class="ll">49</span><p>Does adhesion energy explain the measured dielectric ordering? Cueva &amp; Carretero measured that silver on AZO gives lower emissivity than silver on SiAlNx, and attributed it to silver growing more efficiently on AZO.</p></li>
@@ -329,10 +299,8 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <li><code>05_generate_run_sheet.py</code><span class="ll">18</span><p>Generate a randomised sputter run sheet with centre points.</p></li>
 <li><code>02_silver_reduction.py</code><span class="ll">16</span><p>The brief&#x27;s central question, as a trade-off curve.</p></li>
 <li><code>04_validate_the_brief.py</code><span class="ll">10</span><p>Check the brief&#x27;s own numbers against physics.</p></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Generated output</p><h2>results/</h2>
-<div class="detail"><p>Reproducible from the framework; nothing here is a source of truth. <code>README.md</code> in that directory gives the cost to regenerate each file, so nobody spends thirty minutes rerunning something they did not need.</p><p>Two files carry scores predating the weighting correction and say so in a header comment. Their physical columns are unaffected.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>report.md</code><span class="ll">235</span><p>Low-E coating screening results</p></li>
+<article class="pane" role="tabpanel"><p class="eyebrow">Generated output</p><h2>results/</h2>
+<div class="detail"><p>Reproducible from the framework; nothing here is a source of truth. <code>README.md</code> in that directory gives the cost to regenerate each file, so nobody spends thirty minutes rerunning something they did not need.</p></div><p class="fh">Files</p><ul class="files"><li><code>report.md</code><span class="ll">235</span><p>Low-E coating screening results</p></li>
 <li><code>composition_series_all.csv</code><span class="ll">174</span></li>
 <li><code>agcu_fine_sweep.csv</code><span class="ll">86</span></li>
 <li><code>broad_metal_search.csv</code><span class="ll">63</span></li>
@@ -348,36 +316,29 @@ kbd{font-family:var(--mono);background:var(--paper);border:1px solid var(--rule)
 <li><code>microstructure_comparison.csv</code><span class="ll">7</span></li>
 <li><code>double_metal.csv</code><span class="ll">6</span></li>
 <li><code>si3n4_with_phonons.csv</code><span class="ll">6</span></li></ul></article>
-<article class="pane" role="tabpanel">
-<p class="eyebrow">Cloud deployment</p><h2>vertex/</h2>
-<div class="detail"><p>Custom-job entrypoint, container build and bucket setup for running the sweeps at scale. The provisioning notes in <code>docs/VERTEX_AI.md</code> record which machine families are actually available — eleven creation attempts failed before <code>e2-standard-8</code> succeeded.</p></div>
-<p class="fh">Files</p><ul class="files"><li><code>job.py</code><span class="ll">164</span><p>Batch entrypoint for Vertex AI Custom Jobs.</p></li>
+<article class="pane" role="tabpanel"><p class="eyebrow">Cloud deployment</p><h2>vertex/</h2>
+<div class="detail"><p>Custom-job entrypoint, container build and bucket setup. The provisioning notes in <code>docs/VERTEX_AI.md</code> record which machine families are actually available — eleven creation attempts failed before <code>e2-standard-8</code> succeeded.</p></div><p class="fh">Files</p><ul class="files"><li><code>job.py</code><span class="ll">164</span><p>Batch entrypoint for Vertex AI Custom Jobs.</p></li>
 <li><code>setup_bucket.sh</code><span class="ll">135</span></li>
 <li><code>submit.sh</code><span class="ll">37</span></li>
 <li><code>custom_job.yaml</code><span class="ll">25</span></li></ul></article></section>
 </main>
-
 <p class="hint"><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</p>
-
 <script>
 const tabs=[...document.querySelectorAll('.stratum')];
 const panes=[...document.querySelectorAll('.pane')];
 let at=-1;
 function show(i){
-  if(i<0||i>=tabs.length||i===at) return;
-  tabs.forEach((t,k)=>t.setAttribute('aria-selected',k===i));
-  panes.forEach((p,k)=>p.classList.toggle('on',k===i));
-  at=i;
-  document.querySelector('section.stage').scrollTop=0;
-  window.scrollTo({top:0,behavior:'instant'});
-  if(window.innerWidth<=880) tabs[i].scrollIntoView({block:'nearest'});
+ if(i<0||i>=tabs.length||i===at) return;
+ tabs.forEach((t,k)=>t.setAttribute('aria-selected',k===i));
+ panes.forEach((p,k)=>p.classList.toggle('on',k===i));
+ at=i; window.scrollTo({top:0,behavior:'instant'});
+ if(window.innerWidth<=900) tabs[i].scrollIntoView({block:'nearest'});
 }
 tabs.forEach((t,i)=>t.addEventListener('click',()=>show(i)));
 document.addEventListener('keydown',e=>{
-  if(e.metaKey||e.ctrlKey||e.altKey) return;
-  if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();show(Math.min(at+1,tabs.length-1));tabs[at].focus();}
-  if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();show(Math.max(at-1,0));tabs[at].focus();}
+ if(e.metaKey||e.ctrlKey||e.altKey) return;
+ if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();show(Math.min(at+1,tabs.length-1));tabs[at].focus();}
+ if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();show(Math.max(at-1,0));tabs[at].focus();}
 });
 show(0);
-</script>
-</body></html>
+</script></body></html>
