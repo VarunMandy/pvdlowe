@@ -36,8 +36,8 @@ mean none had been checked, and checking changed the status of eight of them.
 | 6 | Ag–Cu ~13% lattice mismatch, segregation tendency | 5 | **SUPPORTED** | Not the original source, but independently confirmed: the Materials Project convex hull has no stable ordered Ag–Cu compound (Cu₃Ag 0.0904, CuAg₃ 0.0857 eV/atom above hull), and MACE gives ΔE_mix > 0 across the whole composition range. FINDINGS §3.7, §3.8 |
 | 7 | GGA underestimates Cu-alloy formation energies; +U improves | 6 | **partial**, with a magnitude | *Central role of d-band energy level in Cu-based intermetallic alloys*, npj Comput. Mater. (2024), DOI 10.1038/s41524-024-01257-y. Confirms the claim and quantifies it: GGA formation energies for Cu–Au are **nearly 40% smaller than experiment**, an error the authors state is common across Cu–transition-metal intermetallics, caused by GGA placing Cu-3d bands too shallow and so mis-describing d–d hybridisation. The Hubbard U correction eliminates it. **This has a consequence for §5.6 — see below** |
 | 8 | ~10 nm films: Ag 1.59, Ag–Cu 2.97, Cu 20.5 µΩ·cm | 7 | **VERIFIED — brief is faithful** | The journal (*Appl. Mater. Today* 2025) states 1.59; the group's own patent states 1.29. **Two sources, same films, different numbers**, one of them below bulk and impossible. The brief quoted the journal correctly. Both figures are anomalous — see below |
-| 9 | AZO/Cu/AZO: 16.6 Ω/sq, 67% FIR at 15 nm, continuity ~11 nm | 8 | partial | Located by title; abstract not retrieved. RF sputtering — a different study from #10, and the two should not be pooled |
-| 10 | AZO(40)/Cu/AZO(40): 87.7% T_vis, 9.96 Ω/sq, ε = 0.055 | 16 | partial, **fails consistency** | *Applied Surface Science* **578** (2022) 152051. Numbers confirmed, all three from the same sample. ε = 0.055 at 9.96 Ω/sq is below the thin-sheet impedance limit of 0.096, and below the 0.106 an industrial formula in use since 2000 gives. Four explanations tested and eliminated. **§16's conclusion rests on this.** FINDINGS §1.2 |
+| 9 | AZO/Cu/AZO: 16.6 Ω/sq, 67% FIR at 15 nm, continuity ~11 nm | 8 | **partial — every figure confirmed** | *J. Mater. Sci.: Mater. Electron.* **25** (2014) 5248–5254, DOI 10.1007/s10854-014-2297-0. Miao et al., Hong Kong PolyU. Glass, RF sputtering, four-point probe + FTIR. **Passes the impedance check** — and is the source of the framework's 7.7× copper error. See below |
+| 10 | AZO(40)/Cu/AZO(40): 87.7% T_vis, 9.96 Ω/sq, ε = 0.055 | 16 | partial, **fails consistency — all explanations now eliminated** | *Applied Surface Science* **578** (2022) 152051, DC sputtering. Numbers confirmed, all three from one sample. **Six explanations tested, including the measurement basis, which was the last one standing.** §16's conclusion rests on this and should not be used. See below |
 | 11 | Al:ZnO negative formation energies, 6.25–18.75% Al | 2 | **SUPPORTED** | Materials Project Al–Zn–O screening returns 4 entries with 2 near the hull (Al₂ZnO₄ spinel, Al₁₀ZnO₁₆), consistent with negative formation energies for Al in ZnO. Not the original source |
 | 12 | Cu/Al co-doped ZnO, gap down to 1.13 eV at high Cu | 9 | **mechanism supported, value not located** | Multiple first-principles studies confirm Cu doping *narrows* the ZnO gap through Cu-3d states in the gap and a downward conduction-band shift (e.g. *Materials* **12**, 196, 2019). The specific figure of 1.13 eV for Cu/Al co-doping was not found in any located source. Direction confirmed, magnitude not |
 | 13 | Ga:ZnO, formation energy rises with Ga content | 11 | **not located** | Searched. Al/Ga-doped and co-doped ZnO first-principles studies are plentiful and consistent on optical gaps — AZO 4.61 eV against GZO 4.52 eV in one — but no located source states formation energy rising with Ga content. Remains unverified |
@@ -173,6 +173,51 @@ conclusion holds at 5–10 at.% Ag and becomes marginal at 15%.**
 
 That is worth stating rather than leaving implicit, and it is a caveat that
 only emerged from verifying a citation the brief made in passing.
+
+## The two copper claims sit in opposite positions
+
+This is the strongest single result of the citation audit, and it only emerged
+once both entries were checked against the same physical bound.
+
+| | Group, technique | R_s | ε | Impedance floor | |
+|---|---|---|---|---|---|
+| **#9** | Miao 2014, Hong Kong PolyU, **RF** | 16.60 | 0.330 | 0.150 | **passes**, +0.18 margin |
+| **#10** | ApSS 2022, Xi'an, **DC** | 9.96 | 0.055 | 0.096 | **below floor by 42%** |
+
+**The entry that obeys the electrodynamic limit is the one that disagrees with
+this framework.** The model predicts 2.16 Ω/sq for a 15 nm copper layer against
+#9's measured 16.6 — a factor of **7.7**. That is the copper discrepancy, and
+it comes from the physically consistent source.
+
+Meanwhile #10 agrees with the model's optimism and is impossible. A model that
+matched both would have to be wrong about one of them; matching the impossible
+one would be worse.
+
+**And they must not be pooled.** Different groups, different technique (RF
+against DC), different decade, and #9 is from a textiles laboratory that also
+coats polyester fabric with the same stacks — not a glazing group.
+
+## Claim 10: every explanation is now eliminated
+
+The measurement basis was the last benign explanation standing. The impedance
+floor is a normal-incidence quantity, so the open question was whether 0.055
+might be hemispherical and therefore not comparable.
+
+| Reading | Normal-basis value | vs floor 0.0956 |
+|---|---|---|
+| 0.055 is **normal** | 0.0550 | fails by **42%** |
+| 0.055 is **hemispherical** | 0.0472 | fails by **51%** |
+
+**Reading it as hemispherical makes the discrepancy worse**, because the normal
+equivalent is lower still. Neither basis rescues it.
+
+Six explanations tested and eliminated: different samples, transcription, far-IR
+glass index, band-limited emissometer, this framework's own convention (an
+industrial formula in use since 2000 gives the same answer), and now measurement
+basis. ε = 0.055 would require about **5.48 Ω/sq** against the 9.96 reported.
+
+The full text remains paywalled, but the arithmetic above does not depend on it
+— what the method section would add is the instrument model, not a resolution.
 
 ## Two entries that should be withdrawn
 

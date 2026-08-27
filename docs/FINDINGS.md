@@ -817,6 +817,30 @@ constants must be measured -- ellipsometry on a deposited film -- before any
 optical prediction is attempted. Reading across from conductivity would be
 exactly the kind of unsupported inference this framework exists to catch.
 
+## 3.14 The two copper measurements are in opposite positions
+
+Both copper benchmarks were checked against the thin-sheet impedance limit,
+which contains no fitted parameter.
+
+| | Technique | R_s | ε | Floor | |
+|---|---|---|---|---|---|
+| Miao 2014, HK PolyU | RF | 16.60 | 0.330 | 0.150 | **consistent** |
+| ApSS 2022, Xi'an | DC | 9.96 | 0.055 | 0.096 | **below floor** |
+
+**The physically consistent measurement is the one that contradicts this
+framework**, and by a factor of 7.7 -- the model gives 2.16 Ohm/sq for a 15 nm
+copper layer against 16.6 measured. The measurement that agrees with the model's
+optimism is the one that violates the limit.
+
+That contrast is stronger evidence than either entry alone, and it points the
+same way as section 3.6: the framework is optimistic about sputtered copper, and
+the fault is in the model rather than in the literature.
+
+**Section 16 of the brief rests on the inconsistent entry.** Its measurement
+basis has now been tested as an explanation and eliminated -- reading 0.055 as
+hemispherical gives a normal equivalent of 0.0472, failing by 51% rather than
+42%. Six explanations have been tested; none survives.
+
 ---
 
 # 4. Limitations

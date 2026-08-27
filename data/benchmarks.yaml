@@ -113,8 +113,11 @@ benchmarks:
     label: "AZO/Cu(15)/AZO"
     brief_section: 8
     citation: >
-      Transparent conductive and infrared reflective AZO/Cu/AZO multilayer film
-      prepared by RF magnetron sputtering (2014).
+      Miao, Jiang, Shang & Chen, "Transparent conductive and infrared reflective
+      AZO/Cu/AZO multilayer film prepared by RF magnetron sputtering",
+      J. Mater. Sci.: Mater. Electron. 25 (2014) 5248-5254,
+      DOI 10.1007/s10854-014-2297-0. Institute of Textiles and Clothing,
+      The Hong Kong Polytechnic University.
     verified: partial
     architecture:
       metal: {Cu: 1.0}
@@ -126,11 +129,31 @@ benchmarks:
       far_ir_reflectance: 0.67
       continuity_thickness_nm: 11.0
     verified_note: >
-      LOCATED by title; abstract not retrieved, numbers not yet confirmed.
-      Note this is RF sputtering, whereas the section 16 AZO/Cu/AZO paper
-      (ApSS 2022) is DC -- they are different studies from different groups and
-      should not be pooled.
+      FULLY CONFIRMED AGAINST THE ABSTRACT, but the full text has not been
+      read, so this stays `partial` by the rule that a `true` flag records what
+      was read rather than how convincing it is. Every element confirmed:
+      "Cu inner layer started forming a continuous film at the thickness around
+      11 nm ... sample with 15 nm Cu inner layer showed the highest infrared
+      reflection rate of 67 % in FIR region and the lowest sheet resistance of
+      16.6 Ohm/sq." On GLASS substrate, by RF magnetron sputtering, measured by
+      four-point probe and FTIR -- the same basis this framework uses.
 
+      NOT THE SAME STUDY AS azo_cu_azo_optimised, and the two must not be
+      pooled. Different group, different technique (RF against DC), different
+      decade, and this one is from a textiles laboratory that also coats
+      polyester fabric with the same stacks -- not a glazing group.
+
+      PASSES THE IMPEDANCE CHECK, which is the significant part. 67% far-IR
+      reflectance implies emissivity 0.330; the thin-sheet floor at 16.6 Ohm/sq
+      is 0.150. Consistent with a margin of +0.18.
+
+      THIS IS ALSO THE SOURCE OF THE FRAMEWORK'S LARGEST ERROR. The model
+      predicts 2.16 Ohm/sq for a 15 nm Cu layer against the 16.6 measured here
+      -- a factor of 7.7. So the two copper entries sit in exactly opposite
+      positions: this one obeys the electrodynamic limit and disagrees with the
+      model, while azo_cu_azo_optimised agrees with the model's optimism and
+      violates the limit. That contrast is stronger evidence than either entry
+      alone. See docs/LITERATURE_CALIBRATION.md.
   - id: azo_cu_azo_optimised
     label: "AZO(40)/Cu/AZO(40), DC magnetron, optimised"
     brief_section: 16
@@ -140,13 +163,6 @@ benchmarks:
       Applied Surface Science 578 (2022) 152051. PII S0169433221030865.
       ADS 2022ApSS..57852051S. Xi'an University of Architecture and Technology.
     verified: partial
-    verified_note: >
-      Numbers confirmed correctly transcribed from the published abstract, and
-      confirmed to come from THE SAME SAMPLE (the 40 nm AZO variant) -- which
-      rules out the "different samples" explanation for the impedance
-      discrepancy. Full text not read: the measurement basis (normal vs
-      hemispherical, and the instrument band) is still unknown, and that is now
-      the only remaining explanation. Requires institutional access.
     architecture:
       metal: {Cu: 1.0}
       metal_thickness_nm: 12.0
@@ -156,12 +172,35 @@ benchmarks:
       T_vis: 0.877
       R_sheet: 9.96
       emissivity: 0.055
-    note: >
-      This is the brief's pivotal result -- section 16 concludes from it that
-      an Ag-free stack may already meet the emissivity target. It is therefore
-      the single most important entry to verify against the primary source
-      before building a research programme on it.
+    verified_note: >
+      Numbers confirmed against the published abstract of Applied Surface
+      Science 578 (2022) 152051: "The multilayer film with 40 nm-thickness AZO
+      layer shows the lowest sheet resistance of 9.96 Ohm/sq, lowest infrared
+      emissivity of 0.055 and high transmittance of 87.7 %." Glass substrate,
+      DIRECT-CURRENT magnetron sputtering at room temperature. All three
+      figures are attributed to one sample.
 
+      THE MEASUREMENT-BASIS QUESTION IS NOW CLOSED, and it was the last benign
+      explanation standing. The impedance floor is a normal-incidence quantity,
+      so the question was whether 0.055 might be hemispherical and therefore
+      not comparable. Testing both readings:
+
+        if 0.055 is NORMAL         -> floor 0.0956, fails by 42%
+        if 0.055 is HEMISPHERICAL  -> normal equivalent 0.0472, fails by 51%
+
+      Reading it as hemispherical makes the discrepancy WORSE, because the
+      normal equivalent is lower still. Neither basis rescues the value.
+
+      Every explanation has now been tested and eliminated: different samples,
+      transcription, far-IR glass index, band-limited emissometer, this
+      framework's own convention (an industrial formula in use since 2000 gives
+      the same answer), and now measurement basis. eps 0.055 would require
+      about 5.48 Ohm/sq, against the 9.96 reported.
+
+      THE BRIEF'S SECTION 16 CONCLUSION RESTS ENTIRELY ON THIS ENTRY and
+      should not be used. The full text remains paywalled; what it would add is
+      the instrument model, not a resolution -- the arithmetic above does not
+      depend on it.
   - id: azo_standalone
     label: "AZO single layer"
     brief_section: 2
