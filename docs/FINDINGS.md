@@ -841,6 +841,51 @@ basis has now been tested as an explanation and eliminated -- reading 0.055 as
 hemispherical gives a normal equivalent of 0.0472, failing by 51% rather than
 42%. Six explanations have been tested; none survives.
 
+## 3.15 A seed layer may account for most of the copper discrepancy
+
+Six further AZO/Cu/AZO studies were located beyond the two the brief cites
+(`docs/AZO_CU_AZO_LITERATURE.md`). One reframes the framework's largest error.
+
+| Film | Seed | R_s |
+|---|---|---|
+| AZO/**Ti**/Cu/AZO, Opt. Lett. 2017 | 1-2 nm Ti | **4.31 ohm/sq** |
+| AZO/Cu/AZO, ApSS 2022 | none | 9.96 |
+| AZO/Cu/AZO, Miao 2014 | none | 16.6 |
+| **this framework, 15 nm Cu** | -- | **2.16** |
+
+The framework is eightfold optimistic against the unseeded measurements and
+roughly **twofold** against the seeded one. So the model is not wrong about
+copper as a material -- it is wrong about *poorly nucleated* copper, and a seed
+layer recovers most of the gap.
+
+That is the same mechanism as section 3.10: the layer beneath the metal
+determines the metal's microstructure. It is now visible in three independent
+places -- silver on ZnO against amorphous titania, silver on nitride requiring
+a NiCr layer in industrial practice, and copper on AZO with and without a Ti
+seed.
+
+**Consequence.** The copper thickness series should include a seeded arm. If a
+1-2 nm Ti seed recovers the gap, the framework's largest error becomes a
+process variable rather than an anomaly, and the copper candidates become
+considerably more credible than section 5.8 currently allows.
+
+**Two further items from that survey**, both unresolved:
+
+- One study reports **no detectable Cu diffraction peaks** for 3-13 nm layers
+  in this architecture, which would defeat the XRD discrimination proposed in
+  section 6.2. Another sees a weak Cu(111) at the predicted position. The
+  protocol is amended to require grazing incidence and a thicker calibration
+  film so that a null is interpretable.
+- A 2025 comparative study was initially recorded here as reporting copper
+  giving higher visible transmittance than silver, which would have contradicted
+  section 5.4. **That was an error on this side** -- the claim came from an
+  aggregator highlight, and the paper's own abstract says copper is better in
+  the NEAR-INFRARED, not the visible. A companion paper states it plainly:
+  Ag-rich layers improve visible transmittance, Cu-rich layers favour
+  near-infrared transparency. The framework reproduces the correct claim,
+  silver winning the visible by 12-17 points at every AZO thickness. Section
+  5.4 stands.
+
 ---
 
 # 4. Limitations

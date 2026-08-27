@@ -15,9 +15,11 @@ specification?**
 ## What it does
 
 ```bash
+python -m pvdlowe screen            # element and compound pre-screen
 python -m pvdlowe evaluate          # score every candidate architecture
 python -m pvdlowe evaluate --targets data/targets_cooling.yaml   # cooling climate
 python -m pvdlowe series            # composition series, geometry re-optimised
+python -m pvdlowe sweep             # thickness sweep at fixed composition
 python -m pvdlowe silver            # the silver-reduction trade-off curve
 python -m pvdlowe optimise --metal Ag
 python -m pvdlowe validate          # model vs literature + consistency checks
@@ -58,7 +60,7 @@ plots and `openpyxl` for Excel export are optional. Nothing needs to be
 compiled and nothing needs network access to run.
 
 ```bash
-python tests/run_tests.py     # 133 tests, no pytest required
+python tests/run_tests.py     # 136 tests, no pytest required
 pytest tests/                 # identical, if pytest is available
 ```
 

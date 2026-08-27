@@ -26,6 +26,7 @@ Read in this order — each corrected something.
 | [`REFERENCES.md`](REFERENCES.md) | All fourteen of the brief's claims and what became of each. Two are disputed |
 | [`CARRETERO_COMPARISON.md`](CARRETERO_COMPARISON.md) | The measurement that **reversed** the dielectric finding and added `metal_growth_factor` |
 | [`NUCLEATION_MECHANISM.md`](NUCLEATION_MECHANISM.md) | Why the underlayer changes the metal — and that it is the same effect as the copper discrepancy |
+| [`AZO_CU_AZO_LITERATURE.md`](AZO_CU_AZO_LITERATURE.md) | Six further AZO/Cu/AZO studies — one threatens the XRD plan, one contradicts a model assumption |
 | [`LITERATURE_CALIBRATION.md`](LITERATURE_CALIBRATION.md) | Why no published scattering parameters explain the 8× copper gap |
 | [`MLIP_MIXING_ENERGY.md`](MLIP_MIXING_ENERGY.md) | Ag–Cu mixing energies, and two nucleation calculations that failed |
 

@@ -261,3 +261,55 @@ def test_third_metal_layer_gives_diminishing_returns():
     # and each layer costs silver: 0.115 -> 0.252 -> 0.315 g/m2
     assert ag1 < ag2 < ag3, (ag1, ag2, ag3)
     assert ag3 > 2.5 * ag1, (ag1, ag3)
+
+
+def test_with_builders_do_not_serve_a_stale_cache():
+    """Every immutable-update builder must reset `_cache`.
+
+    `stack()` is memoised. A builder that calls `dataclasses.replace` without
+    `_cache={}` would hand back the parent's cached stack, so a coating that
+    reports 14 nm of silver would be evaluated as 10 nm -- silently, and with
+    every other number consistent with the wrong one.
+
+    These builders were correct when written but were unreferenced by anything
+    in the package, so nothing would have caught a later edit dropping the
+    reset. That is the condition this test removes.
+    """
+    from dataclasses import replace
+    from pvdlowe.materials.alloys import Alloy
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optimize.thickness import build
+
+    base = build("Ag", 10.0, 35.0, 35.0, tco("AZO"))
+    primed = base.stack()                       # populate the cache
+
+    thicker = base.with_metal_thickness(14.0)
+    assert thicker.stack() is not primed
+    assert thicker.stack().layers[1].thickness_nm == 14.0
+    assert base.stack().layers[1].thickness_nm == 10.0, "parent was mutated"
+
+    wider = base.with_tco_thickness(50.0, 50.0)
+    assert wider.stack() is not primed
+    assert wider.bottom_thickness_nm == 50.0 and wider.top_thickness_nm == 50.0
+
+    coppered = base.with_alloy(Alloy({"Cu": 1.0}))
+    assert coppered.stack() is not primed
+    assert "Cu" in coppered.metal_alloy.composition
+
+    # a builder that forgot the reset would fail this
+    naive = replace(base, metal_thickness_nm=18.0)
+    assert naive.stack().layers[1].thickness_nm == 10.0, (
+        "replace() without _cache={} no longer serves a stale stack -- if the "
+        "cache was removed, this test and the memoisation guard both need "
+        "revisiting")
+
+
+def test_stack_with_thickness_returns_a_new_stack():
+    """`Stack.with_thickness` builds a fresh Stack, so it needs no cache reset."""
+    from pvdlowe.materials.tco import tco
+    from pvdlowe.optimize.thickness import build
+    s = build("Ag", 10.0, 35.0, 35.0, tco("AZO")).stack()
+    t = s.with_thickness(1, 16.0)
+    assert t is not s
+    assert t.layers[1].thickness_nm == 16.0
+    assert s.layers[1].thickness_nm == 10.0

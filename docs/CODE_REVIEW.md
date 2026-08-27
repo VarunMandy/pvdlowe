@@ -3,7 +3,7 @@
 **Repository:** https://github.com/VarunMandy/pvdlowe (private)
 **Reviewed at:** commit [`a9c4b31`](https://github.com/VarunMandy/pvdlowe/commit/a9c4b31),
 re-audited after the nucleation correction and the `ml/` subpackage.
-**Scope:** 9,198 lines across 44 modules; 133 tests passing.
+**Scope:** 9,586 lines across 44 modules; 136 tests passing.
 
 **Status: every finding closed.** M1, M2 and M3 are fixed and guarded; N1 is
 fixed by extracting the logic that had defects into pure functions and testing
@@ -47,7 +47,7 @@ whoever inherits the code.
 | [`pvdlowe/mp/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/pvdlowe/mp) | ~350 | Materials Project client and screening |
 | `pvdlowe/ml/` | 436 | ML interatomic potential surrogate (see N1) |
 | [`pvdlowe/validate.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/validate.py) | 310 | model-vs-literature, consistency checks |
-| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 133 tests, physics-level assertions |
+| [`tests/`](https://github.com/VarunMandy/pvdlowe/tree/a9c4b31/tests) | — | 136 tests, physics-level assertions |
 
 **Where to start reading:**
 [`optics/stack.py`](https://github.com/VarunMandy/pvdlowe/blob/a9c4b31/pvdlowe/optics/stack.py)
@@ -63,7 +63,7 @@ for the coupling described in P2, then
 | Severity | Count | Theme |
 |---|---|---|
 | Medium | 0 | **all three fixed** — M1, M2, M3 |
-| Low | 1 | function length, partly addressed (L1, L3, L4 fixed) |
+| Low | 1 | function length; L1, L3, L4 fixed, L5 documented and partly covered |
 | Positive | 5 | worth preserving through any refactor |
 | **N1** | **0** | **fixed — pure judgement logic extracted and tested** |
 
@@ -254,15 +254,53 @@ the right fix and is not a one-line change.
 There were three distinct reasons and none was stated. Now each is:
 
 - **`cli.py`** — one module-level note covering all fourteen. Every `cmd_*`
-  imports at call time so that `pvdlowe --help` or any single subcommand does
+  imports at call time so that `python -m pvdlowe --help` or any single subcommand does
   not pay for loading the optics solver, the Materials Project client and the
   ML surrogate.
 - **Cycle-breaking** — `materials/glass.py`, `optics/integrate.py`,
-  `report/export.py`, `electrical/calibrate.py`, `optimize/sweep.py` each
+  `pvdlowe/report/export.py`, `electrical/calibrate.py`, `optimize/sweep.py` each
   import from a package above them in the dependency order. Individually noted.
 - **Leaf constants** — `dispersion.py`, `tco.py`, `integrate.py` pull numeric
   constants where used, keeping `constants` a leaf with no importers to
   invalidate. Noted once per file.
+
+## L5 — Nineteen public functions are referenced by nothing
+
+**Evidence.** A scan for public functions whose name appears exactly once in
+the package, the tests and the examples combined:
+
+| Group | Functions |
+|---|---|
+| Immutable-update builders | `with_metal_thickness`, `with_tco_thickness`, `with_alloy`, `with_thickness`, `with_value`, `with_resistivity`, `with_damping_scale` |
+| Trivial accessors | `total_thickness_nm`, `silver_fraction`, `absolute_error`, `relative_error`, `resample` |
+| Provenance helpers | `provenance_record`, `score_quantity`, `resistivity_quantity` |
+| Query helpers | `by_id`, `by_stage`, `cached_queries`, `evaluate_one` |
+
+None is exported in an `__all__`. None is called anywhere.
+
+**Why this is not simply dead code.** The builders are the immutable-update
+idiom a caller would reach for first, and they are correct — each resets
+`_cache` so a modified coating does not inherit the parent's memoised stack.
+That correctness was **unguarded**, though: nothing referenced them, so a later
+edit dropping the `_cache={}` would have produced a coating that reported 14 nm
+of silver while being evaluated as 10, silently, with every other number
+consistent with the wrong one.
+
+**Action taken.** The three coating builders and `Stack.with_thickness` are now
+covered by `test_with_builders_do_not_serve_a_stale_cache` and
+`test_stack_with_thickness_returns_a_new_stack`, which assert both that a
+builder produces a fresh stack and that the parent is unmutated. One of them
+deliberately checks that a bare `replace()` *does* serve a stale cache, so that
+if the memoisation is ever removed the test says so rather than passing
+vacuously.
+
+**Remaining.** The other twelve are one- to three-line accessors with no
+behaviour to get wrong. They are left in place: deleting API surface that a
+successor might reasonably expect is a worse trade than carrying twelve short
+functions, and this entry records that the choice was made rather than
+overlooked.
+
+---
 
 ## Worth preserving
 
