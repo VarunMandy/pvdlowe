@@ -115,7 +115,6 @@ if __name__ == "__main__":
     print(f"{len(rows)} files, {c['package_lines']:,} package lines, "
           f"{c['tests']} tests, {c['subpackages']} subpackages")
     print("This module supplies the data; the page templates live alongside it.")
-    print("See docs/INTERACTIVE_SCRIPT.md for how the two views are used.")
     (OUT / "interactive_data.json").write_text(
         json.dumps({"files": rows, "counts": c}, indent=1))
     print(f"wrote {OUT / 'interactive_data.json'}")

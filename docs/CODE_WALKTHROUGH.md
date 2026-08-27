@@ -13,8 +13,8 @@ python tests/run_tests.py        # 136 passed
 ```
 
 Two companion HTML views open in a browser with no install:
-`docs/project_map.html` (what every file is) and `docs/loc_review.html` (ten
-places worth stopping on). `docs/INTERACTIVE_SCRIPT.md` scripts those.
+`docs/project_map.html` (what every file is) and `docs/loc_review.html` (eleven
+places worth stopping on).
 
 ---
 
