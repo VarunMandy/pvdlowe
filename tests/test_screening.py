@@ -425,3 +425,44 @@ def test_stack_is_memoised_and_the_cache_is_not_dead():
     thicker = replace(coating, metal_thickness_nm=14.0, _cache={})
     assert thicker.stack() is not first, "replace() served a stale cached stack"
     assert thicker.stack().layers[1].thickness_nm == 14.0
+
+
+def test_both_weighting_profiles_are_audited_not_just_the_default():
+    """Every shipped weighting file must pass the same checks.
+
+    The six weighting defects were found and fixed in `targets.yaml`. The
+    cooling profile was left behind and still carried all of them a week
+    later: weights on three criteria that are None for every candidate, one of
+    them with no definition at all, and the same silver / cost / supply-risk
+    triple-count at r = 1.000 and 0.991.
+
+    Fixing the default and not the alternative is how a correction gets undone
+    by whoever runs the other profile, so both are checked here.
+    """
+    import pathlib
+    from pvdlowe.screening.candidates import evaluate_all
+    from pvdlowe.screening.scoring import ScoringScheme, redundant_criteria
+
+    records = evaluate_all().to_dict("records")
+    profiles = sorted(pathlib.Path("data").glob("targets*.yaml"))
+    assert len(profiles) >= 2, "expected at least two weighting profiles"
+
+    for path in profiles:
+        scheme = ScoringScheme.from_yaml(str(path))
+        weighted = [k for k, w in scheme.weights.items() if w > 0]
+
+        undefined = [k for k in weighted if k not in scheme.criteria]
+        assert not undefined, f"{path.name}: weighted but undefined: {undefined}"
+
+        unpopulated = [k for k in weighted
+                       if not any(r.get(k) is not None for r in records)]
+        assert not unpopulated, (
+            f"{path.name}: weighted but None for every candidate: "
+            f"{unpopulated} -- these renormalise away silently")
+
+        active = [d for d in redundant_criteria(records, scheme)
+                  if d["active_double_count"]]
+        assert not active, (
+            f"{path.name}: criteria both weighted and correlated: "
+            + ", ".join(f"{d['criterion_a']}~{d['criterion_b']} r={d['pearson_r']}"
+                        for d in active))

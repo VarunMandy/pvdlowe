@@ -29,6 +29,19 @@ python -m pvdlowe dft -o dft/
 python -m pvdlowe report -o report.md
 ```
 
+An HTTP interface is available for anyone who would rather not use the CLI:
+
+```bash
+pip install -e ".[api]"
+python -m pvdlowe.api            # http://127.0.0.1:5000
+```
+
+`/` is a form, `/docs` lists the endpoints, and `/candidates`, `/weight-sweep`
+and `/validate` return the same tables the CLI prints. **Every number comes
+from a round trip to Python** — nothing is recomputed in the browser, because a
+second implementation of the physics is the defect class this project has
+already been bitten by twice.
+
 ```python
 from pvdlowe.optics.stack import dmd
 from pvdlowe.optics.integrate import performance_summary
@@ -45,7 +58,7 @@ plots and `openpyxl` for Excel export are optional. Nothing needs to be
 compiled and nothing needs network access to run.
 
 ```bash
-python tests/run_tests.py     # 127 tests, no pytest required
+python tests/run_tests.py     # 133 tests, no pytest required
 pytest tests/                 # identical, if pytest is available
 ```
 
@@ -145,6 +158,7 @@ checks, and one of those carries the brief's central recommendation. Run
 | `optimize/` | thickness optimisation, sweeps, composition series |
 | `ml/` | ML interatomic potential surrogate (optional, needs `mace-torch`) |
 | `characterise/` | predicted XRD signatures for the experiments in `experiments/` |
+| `api/` | HTTP interface and a browser form (optional, needs `flask`) |
 | `report/` | tables, plots, markdown/CSV/Excel export |
 | `validate.py` | model-vs-literature and internal-consistency checks |
 

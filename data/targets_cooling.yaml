@@ -155,27 +155,32 @@ criteria:
 #    Restore it (and cut emissivity to 0.15) if the coating must also serve as
 #    a transparent electrode, where R_s matters in its own right.
 weights:
-  T_vis: 0.10
-  LSG: 0.15
-  g_value: 0.10
+  # Cooling-dominated. Solar rejection is the objective, so LSG and g-value
+  # carry weight that they do not in the heating profile -- that difference is
+  # the whole reason two files exist.
   emissivity_hemispherical: 0.20
+  LSG: 0.20
   Ag_g_per_m2: 0.15
-  R_sheet: 0.0
-  structural_stability: 0.10
-  thermal_stability_c: 0.10
-  cost_usd_per_m2: 0.05
-  supply_risk: 0.05
-  deposition_efficiency: 0.05
+  g_value: 0.15
+  T_vis: 0.10
 
-# WARNING, and the reason the aggregation defaults to a geometric mean:
-#
-# In a metal-based Low-E stack, emissivity and sheet resistance are not
-# independent objectives. Both are set by the free-carrier response of the
-# same metal layer; the framework's own correlation check typically returns
-# r < -0.95 between them across a thickness sweep. Weighting them separately
-# at 0.25 and 0.15 therefore places 0.40 of the total weight on one physical
-# property. That is a defensible choice if you intend the coating to be a
-# transparent electrode as well as a Low-E, and a distortion if you do not.
-# Run `pvdlowe check-weights` to see the realised correlation for your own
-# candidate set before defending this table in a review.
+  # Reported, not scored. Each correlates with a weighted criterion above:
+  # cost with silver mass at r = 1.000, supply risk at r = 0.991, sheet
+  # resistance with emissivity at r = 0.978. Weighting them alongside silver
+  # mass placed a third of the effective weight on one physical property. This
+  # is the same correction applied to the heating profile in targets.yaml --
+  # it was made there first, and this file was left behind for a week.
+  R_sheet: 0.0
+  cost_usd_per_m2: 0.0
+  supply_risk: 0.0
+  U_g: 0.0
+
+  # Not predicted for any candidate. Weight on an always-missing criterion
+  # renormalises away silently, inflating the influence of the criteria that
+  # do have values without saying so. structural_stability additionally had
+  # no definition in this file at all, so it could never have scored.
+  structural_stability: 0.0
+  thermal_stability_c: 0.0
+  deposition_efficiency: 0.0
+
 aggregation: geometric

@@ -234,57 +234,74 @@ benchmarks:
       resistivity_cu_uohm_cm: 20.5
       thickness_nm: 10.0
     source_actual:
-      resistivity_ag_uohm_cm: 1.29
-      resistivity_agcu_uohm_cm: 2.97
-      resistivity_cu_uohm_cm: 20.5
+      resistivity_ag_uohm_cm_patent: 1.29
+      resistivity_ag_uohm_cm_journal: 1.59
       note: >
-        `reported` is what the brief transcribed and is what the consistency
-        checks run against, since that is the number the brief's argument uses.
-        `source_actual` is what US 10,822,692 states. The silver figure differs,
-        and the source's own value is the more anomalous of the two.
+        The two sources by the same group DISAGREE with each other. The journal
+        article reports 1.59; the patent reports 1.29. `reported` holds 1.59
+        because that is what both the brief and the journal state, and it is
+        what the consistency check must judge.
     verified_note: >
-      FULLY VERIFIED. Full text of the associated patent read: US 10,822,692 B2, US 10,822,692 B2
-      ("Binary Ag-Cu amorphous thin-films for electronic applications", Das &
-      Mukherjee, University of North Texas, filed 2017-08-14, granted
-      2020-11-03, priority to provisional 62/374,209 of 2016-08-12). The
-      journal article is paywalled; the patent carries the same measurements
-      and is freely readable, so full text was obtained that way.
+      VERIFIED, and a correction to an earlier entry in this file.
 
-      THE BRIEF MISTRANSCRIBED THE SILVER VALUE. The patent states, verbatim:
-      "The room temperature resistivity of 99.999% Ag and 99.999% Cu thin film
-      shows 1.29e-6 +/- 5.54e-9 and 2.05e-5 +/- 7.39e-7 Ohm-cm, respectively."
+      Sources: Applied Materials Today (2025), PII S2589152925001930, and the
+      associated patent US 10,822,692 B2 (Das & Mukherjee, University of North
+      Texas). Film DC magnetron sputtered from an Ag-Cu eutectic target,
+      60.12 at.% Ag / 39.88 at.% Cu.
 
-        Ag     brief 1.59   patent 1.29   MISMATCH
-        Ag-Cu  brief 2.97   patent 2.97   confirmed
-        Cu     brief 20.5   patent 20.5   confirmed
+      WHAT WAS ACTUALLY READ. The patent full text, in its entirety, via Google
+      Patents. The journal article is paywalled and its figures here are second
+      hand -- confirmed independently by a reader with access, not read by the
+      author of this file. That asymmetry is the direct cause of the retraction
+      below: having read only the patent, its figure was taken as authoritative
+      and the difference attributed to the brief. Retaining `verified: true` is
+      justified by the patent full text; the journal figures carry the weaker
+      standing and are labelled as such above.
 
-      The correction makes the anomaly WORSE, not better. Bulk silver is
-      1.587 uohm.cm. The brief's 1.59 was exactly 1.00x bulk, already
-      impossible for a 10 nm film given a 53 nm mean free path. The patent's
-      actual 1.29 is 0.81x bulk -- BELOW bulk, which is impossible at any
-      thickness, because surface and grain-boundary scattering can only add
-      resistivity to a polycrystalline film.
+      RETRACTION. An earlier version of this note stated that the brief had
+      mistranscribed the silver value, on the grounds that the patent says 1.29
+      where the brief says 1.59. That was wrong, and wrong in a way this project
+      has now recorded twice. The journal article reports 1.59. THE BRIEF IS
+      FAITHFUL TO ITS SOURCE. What actually exists is an inconsistency between
+      two publications by the same group describing the same films:
 
-      Framework model for comparison: 4.44 uohm.cm at 10 nm, 1.90 at 100 nm,
-      1.62 at 1000 nm -- asymptotically approaching but never crossing bulk.
+        journal 1.59 uohm.cm   =  1.00x bulk silver
+        patent  1.29 uohm.cm   =  0.81x bulk -- impossible at room temperature
 
-      ALSO ESTABLISHED. Composition is stated as "close to 60 at % Ag - 40 at %
-      Cu", the eutectic, with claim 1 covering 20-70 at % Cu. Deposited by DC
-      magnetron on a thermal oxide grown on silicon -- NOT on glass, and not in
-      a Low-E stack. The application is sub-20 nm IC interconnects. The patent
-      cites Chawla et al., Phys. Rev. B 84, 235423 (2011), the same
-      thin-film-scattering literature used in docs/LITERATURE_CALIBRATION.md.
+      The error was reading one source, finding a different number, and
+      concluding the other party had transcribed badly. That is the same
+      mistake made over the AZO transmittance in section 3.1 of REFERENCES.md,
+      where a paper reporting 82.4% in Results and 81.4% in its abstract was
+      likewise assumed to have been mistranscribed.
 
-      The patent also prints the Ag-Cu figure as "2.97e6 Ohm-cm", twelve orders
-      of magnitude out. Read alongside the mistranscribed silver value, the
-      numeric care in this source is not high.
+      THE ANOMALY STANDS, AND IS INDEPENDENT OF WHICH SOURCE IS TAKEN. Silver's
+      electron mean free path is 53 nm, so a 10 nm film sits deep in the
+      size-effect regime. Fuchs-Sondheimer with diffuse surface scattering,
+      rho/rho_0 ~ 1 + (3/8)(lambda/d), gives 2.99x bulk = 4.74 uohm.cm before
+      any grain-boundary term. This framework's full FS + Mayadas-Shatzkes
+      model gives 4.44. An independent measurement of a 12 nm Ag film on
+      sapphire gives 4.8, which this framework reproduces to 17%.
 
-      CONSEQUENCE FOR THE BRIEF. Section 7 argues that amorphous Ag-Cu
-      "retains unusually good conductivity" by comparing 2.97 against a silver
-      baseline. That baseline is both mistranscribed and unphysical. The
-      comparison should be made against the copper value, 20.5, against which
-      the alloy is genuinely seven times better -- an argument that survives
-      in stronger form.
+      A 10 nm polycrystalline silver film landing exactly at bulk resistivity
+      would be a headline result in its own right, and the paper does not treat
+      it as one -- it is a control. Sloppy control characterisation is the more
+      likely explanation than a physical effect.
+
+      The patent also prints the alloy value as "2.97e6 Ohm-cm", twelve orders
+      of magnitude out. Numeric care across this group's record is not high.
+
+      WHAT IS DEFENSIBLE TO CITE. The comparative claim: amorphous Ag-Cu at
+      2.97 uohm.cm beats polycrystalline Cu of the same thickness at 20.5 by
+      about sevenfold, and the absence of grain boundaries in an amorphous
+      structure is the paper's actual contribution. Do NOT cite 1.59 as a
+      validated pure-Ag thin-film benchmark.
+
+      AND A LIMIT ON ITS RELEVANCE HERE. This is an interconnect paper, not an
+      optics one. A conductivity figure says nothing about infrared reflectance,
+      and amorphous metals do not share crystalline silver's optical constants.
+      The low-loss Drude response that makes silver the Low-E workhorse depends
+      on it being crystalline, so a conductivity gain from amorphisation does
+      not transfer to emissivity or to light-to-solar-gain. See FINDINGS 3.13.
 
   - id: agc_underlayer_sheet_resistance
     label: "16 nm Ag on ZnO/a-TiOx vs a-TiOx alone"

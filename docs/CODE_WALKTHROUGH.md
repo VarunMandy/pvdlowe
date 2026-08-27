@@ -15,7 +15,7 @@ python tests/run_tests.py        # 110 passed
 
 ## 0. Shape of the thing (3 min)
 
-9,198 lines, 11 subpackages, 127 tests. The dependency order runs one way:
+9,198 lines, 12 subpackages, 133 tests. The dependency order runs one way:
 
 ```
 constants  provenance  spectra          ← no dependencies
@@ -421,7 +421,7 @@ intensity ratio tests templating. **Three answers, one film, one afternoon.**
 > The DoE, DFT, ML and XRD subpackages are optional and independent — nothing
 > in the core imports them.
 
-**"127 tests on 9,198 lines — is that enough?"**
+**"133 tests on 9,198 lines — is that enough?"**
 > It is not a coverage figure and I would not claim it as one. The physics
 > assertions are the valuable ones — the four closed-form checks in §2, the
 > optics–transport coupling in §1, and the guards that stop each fixed defect

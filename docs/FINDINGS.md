@@ -717,6 +717,106 @@ Cu(111) texture answers the templating question, Scherrer width gives the
 grain size for that underlayer. Section 6.2's scan should record the metal
 reflections, not only the film thickness.
 
+## 3.11 The specification, completed — and the one the candidates fail
+
+The brief supplies three constraints. Two more matter and were unspecified, so
+they have been anchored to the Indian building code rather than invented.
+
+**How the 38 candidates fare against the brief's three:**
+
+| Criterion | Spec | Pass | Achieved range |
+|---|---|---|---|
+| T_vis | >= 0.80 | 31/38 | 0.738 - 0.918 |
+| R_sheet | <= 5.0 ohm/sq | 19/38 | 2.63 - 7.55 |
+| eps_h | <= 0.10 | **38/38** | 0.042 - 0.098 |
+
+All three simultaneously: **15 of 38**. Note that **emissivity never binds** --
+the brief's target is generous relative to what any percolating metal layer
+gives automatically. Sheet resistance is the real constraint, then
+transmittance.
+
+**Two criteria the brief left unspecified, now anchored to ECBC 2017:**
+
+| Criterion | Anchor | Value |
+|---|---|---|
+| `g_value` | ECBC prescriptive SHGC, composite climate | <= 0.27 |
+| `U_g` | ECBC assembly U-factor | <= 3.0 W/m2K |
+
+**BASIS WARNING, and it matters.** ECBC specifies *assembly* values -- frame
+and glass, area-weighted, for a complete window. The framework computes
+centre-of-glass, and its g-value is single-pane with the standard N = 0.36
+inward fraction. These are not the same quantity, and the conversion has to be
+stated rather than assumed.
+
+**The finding that falls out.** Chaining a clear second pane (T_sol 0.83) gives
+an approximate DGU SHGC of 0.83x the single-pane figure:
+
+| | g single | g DGU (approx) | ECBC 0.27 |
+|---|---|---|---|
+| M6, the best | 0.558 | **0.463** | fails by +0.19 |
+| N35e, the worst | 0.793 | 0.658 | fails by +0.39 |
+
+**Not one of the 38 candidates meets the Indian code's solar-heat-gain
+requirement, and the best misses by seventy per cent.**
+
+That is an external, regulatory confirmation of what section 3.4 already found
+from the light-to-solar-gain ratio: these are thermal Low-E coatings, not
+solar-control coatings. For Indian commercial glazing under ECBC, the
+single-metal architecture is not merely suboptimal -- it is non-compliant, and
+the double-silver stack of section 3.4 is not an refinement but a requirement.
+
+**U-value is not binding.** Every candidate lands between 1.12 and 1.29 W/m2K
+centre-pane against an assembly limit of 3.0. Even after a frame adds 0.5-1.5,
+there is room. Defined and weighted 0.0 so that headroom is visible rather than
+assumed.
+
+## 3.12 The corrections were applied to one weighting file and not the other
+
+The six defects of section 2 were found and fixed in `data/targets.yaml`. The
+cooling profile was left behind and still carried **all of them** a week later:
+
+- weights on `structural_stability`, `thermal_stability_c` and
+  `deposition_efficiency`, all `None` for every candidate, together 0.25 of the
+  nominal total renormalising away silently
+- `structural_stability` weighted 0.10 with **no definition in that file at
+  all**, so it could never have scored
+- the same silver / cost / supply-risk triple-count at r = 1.000 and 0.991
+
+Fixing a default and not its alternative is how a correction gets undone by
+whoever runs the other profile. Both are now audited by
+`test_both_weighting_profiles_are_audited_not_just_the_default`, which applies
+the same three checks to every `data/targets*.yaml`.
+
+The cooling ranking is unchanged at the top -- M6, then H2 -- because the
+corrections removed weight that was renormalising away rather than weight that
+was discriminating.
+
+## 3.13 A conductivity result does not transfer to an optical one
+
+The brief's section 7 cites amorphous Ag-Cu at 2.97 uohm.cm for a 10 nm film
+against 20.5 for polycrystalline copper -- a sevenfold advantage, and a real
+one. The temptation is to read that as a route to a better Low-E metal layer.
+
+**It is not, and the reason is the same physics the framework rests on.**
+
+Sheet resistance and far-infrared emissivity are linked through the free-carrier
+response, which is why they correlate at r = 0.978 across this candidate set.
+But that link assumes a Drude metal with a well-defined plasma frequency and low
+damping -- which is a property of *crystalline* silver. An amorphous metal has a
+different band structure, higher damping, and different optical constants
+entirely. The low-loss Drude response that makes silver the Low-E workhorse
+depends on its being crystalline.
+
+So a conductivity gain obtained by amorphising the film cannot be assumed to
+give the corresponding emissivity gain. The source is an interconnect paper: it
+reports no optical data at all, and none of its claims are about reflectance.
+
+**Consequence.** The framework does not model amorphous metal layers and should
+not be asked to. If an amorphous Ag-Cu layer is of interest, its optical
+constants must be measured -- ellipsometry on a deposited film -- before any
+optical prediction is attempted. Reading across from conductivity would be
+exactly the kind of unsupported inference this framework exists to catch.
+
 ---
 
 # 4. Limitations

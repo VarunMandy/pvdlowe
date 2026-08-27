@@ -1,0 +1,723 @@
+{
+ "files": [
+  {
+   "path": ".gitignore",
+   "dir": "(root)",
+   "lines": 32,
+   "desc": ""
+  },
+  {
+   "path": "Dockerfile",
+   "dir": "(root)",
+   "lines": 29,
+   "desc": ""
+  },
+  {
+   "path": "README.md",
+   "dir": "(root)",
+   "lines": 192,
+   "desc": "pvdlowe"
+  },
+  {
+   "path": "data/benchmarks.yaml",
+   "dir": "data",
+   "lines": 331,
+   "desc": ""
+  },
+  {
+   "path": "data/candidates.yaml",
+   "dir": "data",
+   "lines": 452,
+   "desc": ""
+  },
+  {
+   "path": "data/elements.csv",
+   "dir": "data",
+   "lines": 18,
+   "desc": ""
+  },
+  {
+   "path": "data/targets.yaml",
+   "dir": "data",
+   "lines": 182,
+   "desc": ""
+  },
+  {
+   "path": "data/targets_cooling.yaml",
+   "dir": "data",
+   "lines": 182,
+   "desc": ""
+  },
+  {
+   "path": "docs/CARRETERO_COMPARISON.md",
+   "dir": "docs",
+   "lines": 172,
+   "desc": "Experimental check of the dielectric finding"
+  },
+  {
+   "path": "docs/CODE_REVIEW.md",
+   "dir": "docs",
+   "lines": 325,
+   "desc": "Code review \u2014 pvdlowe v0.1.0"
+  },
+  {
+   "path": "docs/CODE_WALKTHROUGH.md",
+   "dir": "docs",
+   "lines": 457,
+   "desc": "Code walkthrough"
+  },
+  {
+   "path": "docs/FINDINGS.md",
+   "dir": "docs",
+   "lines": 900,
+   "desc": "Findings"
+  },
+  {
+   "path": "docs/INDEX.md",
+   "dir": "docs",
+   "lines": 55,
+   "desc": "Documentation index"
+  },
+  {
+   "path": "docs/LITERATURE_CALIBRATION.md",
+   "dir": "docs",
+   "lines": 161,
+   "desc": "Can literature substitute for the copper thickness series?"
+  },
+  {
+   "path": "docs/METHODOLOGY.md",
+   "dir": "docs",
+   "lines": 166,
+   "desc": "Methodology"
+  },
+  {
+   "path": "docs/MLIP_MIXING_ENERGY.md",
+   "dir": "docs",
+   "lines": 253,
+   "desc": "Ag\u2013Cu mixing energies from an ML interatomic potential"
+  },
+  {
+   "path": "docs/NUCLEATION_MECHANISM.md",
+   "dir": "docs",
+   "lines": 218,
+   "desc": "The nucleation mechanism, resolved from literature"
+  },
+  {
+   "path": "docs/PROVENANCE.md",
+   "dir": "docs",
+   "lines": 67,
+   "desc": "Provenance"
+  },
+  {
+   "path": "docs/REFERENCES.md",
+   "dir": "docs",
+   "lines": 206,
+   "desc": "References and verification status"
+  },
+  {
+   "path": "docs/ROADMAP.md",
+   "dir": "docs",
+   "lines": 124,
+   "desc": "Experimental roadmap"
+  },
+  {
+   "path": "docs/SUMMARY.md",
+   "dir": "docs",
+   "lines": 118,
+   "desc": "Executive summary"
+  },
+  {
+   "path": "docs/VERTEX_AI.md",
+   "dir": "docs",
+   "lines": 340,
+   "desc": "Running pvdlowe on Google Cloud Vertex AI"
+  },
+  {
+   "path": "docs/build_interactive.py",
+   "dir": "docs",
+   "lines": 122,
+   "desc": "Regenerate the two interactive HTML views from the repository."
+  },
+  {
+   "path": "examples/01_quickstart.py",
+   "dir": "examples",
+   "lines": 18,
+   "desc": "Evaluate a single coating and print its performance."
+  },
+  {
+   "path": "examples/02_silver_reduction.py",
+   "dir": "examples",
+   "lines": 16,
+   "desc": "The brief's central question, as a trade-off curve."
+  },
+  {
+   "path": "examples/03_microstructure_experiment.py",
+   "dir": "examples",
+   "lines": 25,
+   "desc": "Design the experiment that settles the Ag-Cu microstructure question."
+  },
+  {
+   "path": "examples/04_validate_the_brief.py",
+   "dir": "examples",
+   "lines": 10,
+   "desc": "Check the brief's own numbers against physics."
+  },
+  {
+   "path": "examples/05_generate_run_sheet.py",
+   "dir": "examples",
+   "lines": 18,
+   "desc": "Generate a randomised sputter run sheet with centre points."
+  },
+  {
+   "path": "examples/06_mlip_validate.py",
+   "dir": "examples",
+   "lines": 38,
+   "desc": "Validate an ML interatomic potential before trusting it."
+  },
+  {
+   "path": "examples/07_mlip_adhesion.py",
+   "dir": "examples",
+   "lines": 49,
+   "desc": "Does adhesion energy explain the measured dielectric ordering? Cueva & Carretero measured that silver on AZO gives lower emissivity than silver on SiAlNx, and attributed it to silver growing more efficiently on AZO."
+  },
+  {
+   "path": "examples/08_mlip_wetting.py",
+   "dir": "examples",
+   "lines": 60,
+   "desc": "Does adatom binding explain the measured dielectric ordering? A better-posed question than the bulk adhesion attempt in example 09, which failed because lattice matching a metal film to an oxide cell left 5-21% strain and the calculation measured elastic energy rather than binding."
+  },
+  {
+   "path": "examples/09_mlip_terminations.py",
+   "dir": "examples",
+   "lines": 68,
+   "desc": "How much does the surface termination change the answer? Example 10 ranked dielectrics by adatom wetting and took whichever slab the generator returned first."
+  },
+  {
+   "path": "examples/10_mlip_cross_check.py",
+   "dir": "examples",
+   "lines": 107,
+   "desc": "Cross-check the mixing energies against a second interatomic potential."
+  },
+  {
+   "path": "experiments/BENCH_cu_series.md",
+   "dir": "experiments",
+   "lines": 155,
+   "desc": "Bench procedure \u2014 copper thickness series"
+  },
+  {
+   "path": "experiments/EXAMPLE_filled_runsheet.csv",
+   "dir": "experiments",
+   "lines": 10,
+   "desc": ""
+  },
+  {
+   "path": "experiments/PROTOCOL_cu_series.md",
+   "dir": "experiments",
+   "lines": 214,
+   "desc": "Experiment 1 \u2014 Copper thickness series"
+  },
+  {
+   "path": "experiments/cu_series_runsheet.csv",
+   "dir": "experiments",
+   "lines": 10,
+   "desc": ""
+  },
+  {
+   "path": "pvdlowe/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 50,
+   "desc": "pvdlowe -- computational framework for sustainable Low-E PVD coatings."
+  },
+  {
+   "path": "pvdlowe/__main__.py",
+   "dir": "pvdlowe",
+   "lines": 5,
+   "desc": ""
+  },
+  {
+   "path": "pvdlowe/api/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 8,
+   "desc": "HTTP interface to the framework."
+  },
+  {
+   "path": "pvdlowe/api/__main__.py",
+   "dir": "pvdlowe",
+   "lines": 4,
+   "desc": ""
+  },
+  {
+   "path": "pvdlowe/api/server.py",
+   "dir": "pvdlowe",
+   "lines": 239,
+   "desc": "HTTP interface to the framework."
+  },
+  {
+   "path": "pvdlowe/api/ui.py",
+   "dir": "pvdlowe",
+   "lines": 138,
+   "desc": "The single-page form served at `/`."
+  },
+  {
+   "path": "pvdlowe/characterise/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 16,
+   "desc": "Predicted signatures for the characterisation measurements this project needs."
+  },
+  {
+   "path": "pvdlowe/characterise/xrd.py",
+   "dir": "pvdlowe",
+   "lines": 193,
+   "desc": "Predicted X-ray diffraction signatures for the metal layer."
+  },
+  {
+   "path": "pvdlowe/cli.py",
+   "dir": "pvdlowe",
+   "lines": 459,
+   "desc": "Command-line interface."
+  },
+  {
+   "path": "pvdlowe/constants.py",
+   "dir": "pvdlowe",
+   "lines": 146,
+   "desc": "Physical constants and unit conversions."
+  },
+  {
+   "path": "pvdlowe/dft/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 18,
+   "desc": "DFT planning and analysis."
+  },
+  {
+   "path": "pvdlowe/dft/plans.py",
+   "dir": "pvdlowe",
+   "lines": 462,
+   "desc": "Planning the first-principles work: the brief's sections 9, 14 and 15."
+  },
+  {
+   "path": "pvdlowe/dft/surrogate.py",
+   "dir": "pvdlowe",
+   "lines": 77,
+   "desc": "Deprecated."
+  },
+  {
+   "path": "pvdlowe/doe/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 13,
+   "desc": "Design of experiments and sputter process modelling."
+  },
+  {
+   "path": "pvdlowe/doe/design.py",
+   "dir": "pvdlowe",
+   "lines": 376,
+   "desc": "Design of experiments over the sputter parameter space (brief section 14)."
+  },
+  {
+   "path": "pvdlowe/doe/sputter.py",
+   "dir": "pvdlowe",
+   "lines": 263,
+   "desc": "Deposition rate and the brief's section 15 efficiency figure of merit."
+  },
+  {
+   "path": "pvdlowe/electrical/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 15,
+   "desc": "Thin-film transport."
+  },
+  {
+   "path": "pvdlowe/electrical/calibrate.py",
+   "dir": "pvdlowe",
+   "lines": 410,
+   "desc": "Fit the transport model to a measured sheet-resistance series."
+  },
+  {
+   "path": "pvdlowe/electrical/thinfilm.py",
+   "dir": "pvdlowe",
+   "lines": 264,
+   "desc": "Thin-film resistivity: the classical size effect, and percolation."
+  },
+  {
+   "path": "pvdlowe/materials/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 15,
+   "desc": "Material models: dispersion, metals, alloys, TCOs, glass."
+  },
+  {
+   "path": "pvdlowe/materials/alloys.py",
+   "dir": "pvdlowe",
+   "lines": 353,
+   "desc": "Binary and ternary metal alloys for the Low-E layer."
+  },
+  {
+   "path": "pvdlowe/materials/dispersion.py",
+   "dir": "pvdlowe",
+   "lines": 367,
+   "desc": "Dispersion models returning a complex refractive index."
+  },
+  {
+   "path": "pvdlowe/materials/glass.py",
+   "dir": "pvdlowe",
+   "lines": 167,
+   "desc": "Soda-lime float glass, the substrate."
+  },
+  {
+   "path": "pvdlowe/materials/metals.py",
+   "dir": "pvdlowe",
+   "lines": 239,
+   "desc": "Elemental metals: optical dispersion plus the transport data needed to predict a thin-film sheet resistance."
+  },
+  {
+   "path": "pvdlowe/materials/tco.py",
+   "dir": "pvdlowe",
+   "lines": 375,
+   "desc": "Transparent conductive oxides: AZO, GZO, ITO, FTO and undoped ZnO."
+  },
+  {
+   "path": "pvdlowe/ml/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 19,
+   "desc": "ML interatomic potentials as a DFT surrogate."
+  },
+  {
+   "path": "pvdlowe/ml/surrogate.py",
+   "dir": "pvdlowe",
+   "lines": 734,
+   "desc": "Machine-learning interatomic potentials as a DFT surrogate."
+  },
+  {
+   "path": "pvdlowe/mp/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 9,
+   "desc": "Materials Project integration (stage 2 of the workflow)."
+  },
+  {
+   "path": "pvdlowe/mp/client.py",
+   "dir": "pvdlowe",
+   "lines": 198,
+   "desc": "Materials Project client -- stage 2 of the brief's workflow."
+  },
+  {
+   "path": "pvdlowe/mp/screen.py",
+   "dir": "pvdlowe",
+   "lines": 133,
+   "desc": "Stage-2 compound screening against the Materials Project."
+  },
+  {
+   "path": "pvdlowe/optics/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 14,
+   "desc": "Optical modelling: transfer matrix, stacks, standards integration."
+  },
+  {
+   "path": "pvdlowe/optics/integrate.py",
+   "dir": "pvdlowe",
+   "lines": 467,
+   "desc": "Turning spectra into the numbers a glazing specification is written in."
+  },
+  {
+   "path": "pvdlowe/optics/stack.py",
+   "dir": "pvdlowe",
+   "lines": 579,
+   "desc": "Layer stacks and the Low-E coating design object."
+  },
+  {
+   "path": "pvdlowe/optics/tmm.py",
+   "dir": "pvdlowe",
+   "lines": 242,
+   "desc": "Transfer-matrix solver for absorbing multilayers."
+  },
+  {
+   "path": "pvdlowe/optimize/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 12,
+   "desc": "Optimisation and parameter sweeps."
+  },
+  {
+   "path": "pvdlowe/optimize/sweep.py",
+   "dir": "pvdlowe",
+   "lines": 229,
+   "desc": "Parameter sweeps and maps across composition and thickness."
+  },
+  {
+   "path": "pvdlowe/optimize/thickness.py",
+   "dir": "pvdlowe",
+   "lines": 329,
+   "desc": "Optimising layer thicknesses against the figure of merit."
+  },
+  {
+   "path": "pvdlowe/provenance.py",
+   "dir": "pvdlowe",
+   "lines": 251,
+   "desc": "Provenance tracking for every number that enters the framework."
+  },
+  {
+   "path": "pvdlowe/report/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 10,
+   "desc": "Report tables, plots and export."
+  },
+  {
+   "path": "pvdlowe/report/export.py",
+   "dir": "pvdlowe",
+   "lines": 125,
+   "desc": "Export results to markdown, CSV and Excel."
+  },
+  {
+   "path": "pvdlowe/report/tables.py",
+   "dir": "pvdlowe",
+   "lines": 155,
+   "desc": "Result tables, formatted for a report rather than for a console."
+  },
+  {
+   "path": "pvdlowe/screening/__init__.py",
+   "dir": "pvdlowe",
+   "lines": 17,
+   "desc": "Screening: element filter, desirability scoring, Pareto analysis."
+  },
+  {
+   "path": "pvdlowe/screening/candidates.py",
+   "dir": "pvdlowe",
+   "lines": 194,
+   "desc": "Loading candidate architectures and evaluating them end to end."
+  },
+  {
+   "path": "pvdlowe/screening/elements.py",
+   "dir": "pvdlowe",
+   "lines": 205,
+   "desc": "Stage 1 of the brief's workflow: element screening."
+  },
+  {
+   "path": "pvdlowe/screening/pareto.py",
+   "dir": "pvdlowe",
+   "lines": 114,
+   "desc": "Pareto analysis for the multi-objective problem."
+  },
+  {
+   "path": "pvdlowe/screening/scoring.py",
+   "dir": "pvdlowe",
+   "lines": 330,
+   "desc": "Multi-objective scoring: the brief's sections 14 and 16."
+  },
+  {
+   "path": "pvdlowe/spectra.py",
+   "dir": "pvdlowe",
+   "lines": 220,
+   "desc": "Spectral grids and the weighting functions the glazing standards use."
+  },
+  {
+   "path": "pvdlowe/validate.py",
+   "dir": "pvdlowe",
+   "lines": 373,
+   "desc": "Validation: does the model reproduce the literature, and is the literature internally consistent? Two separate jobs, both worth doing before any of the numbers are used."
+  },
+  {
+   "path": "pyproject.toml",
+   "dir": "(root)",
+   "lines": 37,
+   "desc": ""
+  },
+  {
+   "path": "report/BRIEFING_SCRIPT.md",
+   "dir": "report",
+   "lines": 329,
+   "desc": "Briefing script \u2014 technical report walkthrough"
+  },
+  {
+   "path": "report/PROJECT_DOSSIER.md",
+   "dir": "report",
+   "lines": 704,
+   "desc": "Project dossier \u2014 computational screening of sustainable Low-E PVD coatings"
+  },
+  {
+   "path": "report/TECHNICAL_REPORT.md",
+   "dir": "report",
+   "lines": 1445,
+   "desc": "Computational screening of sustainable low-emissivity PVD coatings on soda-lime float glass"
+  },
+  {
+   "path": "report/build_pdf.sh",
+   "dir": "report",
+   "lines": 31,
+   "desc": ""
+  },
+  {
+   "path": "report/style.css",
+   "dir": "report",
+   "lines": 42,
+   "desc": ""
+  },
+  {
+   "path": "results/README.md",
+   "dir": "results",
+   "lines": 54,
+   "desc": "Results"
+  },
+  {
+   "path": "results/ag_thickness_sweep.csv",
+   "dir": "results",
+   "lines": 31,
+   "desc": ""
+  },
+  {
+   "path": "results/agcu_fine_sweep.csv",
+   "dir": "results",
+   "lines": 86,
+   "desc": ""
+  },
+  {
+   "path": "results/broad_metal_search.csv",
+   "dir": "results",
+   "lines": 63,
+   "desc": ""
+  },
+  {
+   "path": "results/composition_series_all.csv",
+   "dir": "results",
+   "lines": 174,
+   "desc": ""
+  },
+  {
+   "path": "results/double_metal.csv",
+   "dir": "results",
+   "lines": 6,
+   "desc": ""
+  },
+  {
+   "path": "results/evaluate_cooling.txt",
+   "dir": "results",
+   "lines": 44,
+   "desc": ""
+  },
+  {
+   "path": "results/evaluate_default.txt",
+   "dir": "results",
+   "lines": 44,
+   "desc": ""
+  },
+  {
+   "path": "results/metal_dielectric_search.csv",
+   "dir": "results",
+   "lines": 42,
+   "desc": ""
+  },
+  {
+   "path": "results/microstructure_comparison.csv",
+   "dir": "results",
+   "lines": 7,
+   "desc": ""
+  },
+  {
+   "path": "results/multimetal_n_scan.csv",
+   "dir": "results",
+   "lines": 14,
+   "desc": ""
+  },
+  {
+   "path": "results/provenance.txt",
+   "dir": "results",
+   "lines": 60,
+   "desc": ""
+  },
+  {
+   "path": "results/report.md",
+   "dir": "results",
+   "lines": 235,
+   "desc": "Low-E coating screening results"
+  },
+  {
+   "path": "results/si3n4_with_phonons.csv",
+   "dir": "results",
+   "lines": 6,
+   "desc": ""
+  },
+  {
+   "path": "results/silver_reduction_curve.csv",
+   "dir": "results",
+   "lines": 9,
+   "desc": ""
+  },
+  {
+   "path": "results/validation.txt",
+   "dir": "results",
+   "lines": 43,
+   "desc": ""
+  },
+  {
+   "path": "tests/run_tests.py",
+   "dir": "tests",
+   "lines": 77,
+   "desc": "Self-contained test runner."
+  },
+  {
+   "path": "tests/test_api.py",
+   "dir": "tests",
+   "lines": 104,
+   "desc": "Tests for the HTTP interface."
+  },
+  {
+   "path": "tests/test_electrical.py",
+   "dir": "tests",
+   "lines": 123,
+   "desc": "Thin-film transport: size effect, percolation, and its optical coupling."
+  },
+  {
+   "path": "tests/test_materials.py",
+   "dir": "tests",
+   "lines": 210,
+   "desc": "Materials: dispersion sign conventions, alloys, TCOs, resistivity."
+  },
+  {
+   "path": "tests/test_ml_numerics.py",
+   "dir": "tests",
+   "lines": 136,
+   "desc": "Numerical-path tests for the ML surrogate, without an MLIP installed."
+  },
+  {
+   "path": "tests/test_optics.py",
+   "dir": "tests",
+   "lines": 264,
+   "desc": "Optics: TMM correctness, energy conservation, and known analytic limits."
+  },
+  {
+   "path": "tests/test_screening.py",
+   "dir": "tests",
+   "lines": 428,
+   "desc": "Screening, scoring, Pareto and provenance."
+  },
+  {
+   "path": "tests/test_validate_doe_dft.py",
+   "dir": "tests",
+   "lines": 324,
+   "desc": "Validation, DoE and DFT planning."
+  },
+  {
+   "path": "vertex/custom_job.yaml",
+   "dir": "vertex",
+   "lines": 25,
+   "desc": ""
+  },
+  {
+   "path": "vertex/job.py",
+   "dir": "vertex",
+   "lines": 164,
+   "desc": "Batch entrypoint for Vertex AI Custom Jobs."
+  },
+  {
+   "path": "vertex/setup_bucket.sh",
+   "dir": "vertex",
+   "lines": 135,
+   "desc": ""
+  },
+  {
+   "path": "vertex/submit.sh",
+   "dir": "vertex",
+   "lines": 37,
+   "desc": ""
+  }
+ ],
+ "counts": {
+  "package_lines": 9631,
+  "tests": 133,
+  "subpackages": 12
+ }
+}

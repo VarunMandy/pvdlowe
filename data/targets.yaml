@@ -95,6 +95,41 @@ criteria:
              under-prediction of 20-40% inherited from GGA. Populate and
              re-weight together, not separately."
 
+  g_value:
+    label: Solar heat gain (SHGC)
+    direction: lower
+    floor: 0.75
+    target: 0.27
+    exponent: 1.0
+    unit: ""
+    source: "EN 410 / ISO 9050, SINGLE PANE with the standard N = 0.36 inward
+             fraction -- NOT the assembly value a building code specifies.
+             Target 0.27 is the ECBC 2017 prescriptive limit for vertical
+             fenestration in India's composite climate; floor 0.75 is roughly
+             uncoated double glazing.
+             BASIS WARNING: ECBC's 0.27 is an ASSEMBLY figure, frame and glass
+             area-weighted. This criterion is centre-of-glass and single-pane.
+             Chaining a clear second pane (T_sol 0.83) gives an approximate DGU
+             SHGC of 0.83x this value, and a frame lowers it further. Indicative,
+             not a compliance check -- see FINDINGS 3.11.
+             Weighted 0.0 in the heating profile, where solar gain is a benefit.
+             It carries real weight in targets_cooling.yaml."
+
+  U_g:
+    label: Centre-pane U-value
+    direction: lower
+    floor: 2.0
+    target: 1.0
+    exponent: 1.0
+    unit: W/m2K
+    source: "EN 673 centre-pane of an argon-filled double-glazed unit, 16 mm gap.
+             Uncoated double glazing is about 2.7; target 1.0 is the practical
+             floor for a single silver layer.
+             NOT BINDING for any candidate in this set: every one lands between
+             1.12 and 1.29 W/m2K, and ECBC's assembly limit of 3.0 leaves room
+             even after a frame adds 0.5-1.5. Defined and weighted 0.0 so the
+             headroom is visible rather than assumed."
+
   thermal_stability_c:
     label: Thermal stability
     direction: higher
@@ -139,43 +174,33 @@ weights:
   T_vis: 0.20
   emissivity_hemispherical: 0.25
   Ag_g_per_m2: 0.15
+
+  # Reported, not scored -- each correlates with a weighted criterion above.
+  # R_sheet with emissivity at r = 0.978; cost with silver mass at r = 1.000
+  # (silver dominates metal cost so completely that cost is the same quantity
+  # in different units); supply risk with silver mass at r = 0.991. Weighting
+  # all of them put 36% of the effective weight on one physical property.
   R_sheet: 0.0
-  # These three are weighted 0.0 because none of them is populated for any
-  # candidate. Carrying weight on an always-missing criterion does nothing
-  # except renormalise silently: 0.30 of the 0.90 nominal total -- a third --
-  # was being redistributed onto the three criteria that do have values,
-  # invisibly inflating their influence. Better to state that the framework
-  # does not predict these than to reserve weight it cannot use.
-  #
-  # structural_stability is now partly populatable from the Materials Project
-  # screening and the MLIP mixing energies; see its definition above. Restore
-  # its weight and populate it in the same change, never separately.
-  structural_stability: 0.0
-  thermal_stability_c: 0.0
-  # Both of these correlate with Ag_g_per_m2 at r = 1.000 and r = 0.991
-  # respectively: silver dominates metal cost so completely that cost is the
-  # same quantity in different units, and supply risk in this candidate set is
-  # silver's supply risk. Weighting all three put 36% of the effective weight
-  # on one physical property -- the same defect as emissivity/R_sheet, one
-  # trio further along. Weighted 0.0 and reported as derived figures, exactly
-  # as R_sheet is.
-  #
-  # Restore supply_risk if indium- or gallium-bearing candidates return, where
-  # the risk is genuinely independent of silver mass. Restore cost if a
-  # non-silver cost driver enters the set.
   cost_usd_per_m2: 0.0
   supply_risk: 0.0
+
+  # Defined so their headroom is visible, weighted 0.0 here because this is the
+  # HEATING profile, where solar gain is a benefit rather than a penalty.
+  # g_value carries real weight in targets_cooling.yaml, which is the point of
+  # having two files. U_g is not binding for any candidate in the set.
+  g_value: 0.0
+  U_g: 0.0
+
+  # Not predicted by this framework for any candidate. Carrying weight on an
+  # always-missing criterion does nothing except renormalise silently: 0.30 of
+  # a 0.90 nominal total was being redistributed onto the three criteria that
+  # do have values, inflating their influence without saying so.
+  #
+  # structural_stability is now partly populatable from the Materials Project
+  # screening and the surrogate mixing energies; see its definition above.
+  # Restore its weight and populate it in the same change, never separately.
+  structural_stability: 0.0
+  thermal_stability_c: 0.0
   deposition_efficiency: 0.0
 
-# WARNING, and the reason the aggregation defaults to a geometric mean:
-#
-# In a metal-based Low-E stack, emissivity and sheet resistance are not
-# independent objectives. Both are set by the free-carrier response of the
-# same metal layer; the framework's own correlation check typically returns
-# r < -0.95 between them across a thickness sweep. Weighting them separately
-# at 0.25 and 0.15 therefore places 0.40 of the total weight on one physical
-# property. That is a defensible choice if you intend the coating to be a
-# transparent electrode as well as a Low-E, and a distortion if you do not.
-# Run `pvdlowe check-weights` to see the realised correlation for your own
-# candidate set before defending this table in a review.
 aggregation: geometric

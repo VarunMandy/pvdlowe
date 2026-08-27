@@ -35,7 +35,7 @@ mean none had been checked, and checking changed the status of eight of them.
 | 5 | Ag–Cu Low-E, ~30 at.% Cu, neutral colour, good adhesion | 5 | **partial** | *Environmentally robust Ag–Cu based low-e coatings*, Sol. Energy Mater. Sol. Cells (2022), PII S0927024822004500. Abstract confirms it exactly: a range of Ag–Cu compositions tested for colour neutrality, transmittance, IR reflectance and adhesion, with **the best performing alloy identified as a 10 nm film of 70% Ag and 30% Cu**. Note the substrate is **polycarbonate**, not float glass — see below |
 | 6 | Ag–Cu ~13% lattice mismatch, segregation tendency | 5 | **SUPPORTED** | Not the original source, but independently confirmed: the Materials Project convex hull has no stable ordered Ag–Cu compound (Cu₃Ag 0.0904, CuAg₃ 0.0857 eV/atom above hull), and MACE gives ΔE_mix > 0 across the whole composition range. FINDINGS §3.7, §3.8 |
 | 7 | GGA underestimates Cu-alloy formation energies; +U improves | 6 | **partial**, with a magnitude | *Central role of d-band energy level in Cu-based intermetallic alloys*, npj Comput. Mater. (2024), DOI 10.1038/s41524-024-01257-y. Confirms the claim and quantifies it: GGA formation energies for Cu–Au are **nearly 40% smaller than experiment**, an error the authors state is common across Cu–transition-metal intermetallics, caused by GGA placing Cu-3d bands too shallow and so mis-describing d–d hybridisation. The Hubbard U correction eliminates it. **This has a consequence for §5.6 — see below** |
-| 8 | ~10 nm films: Ag 1.59, Ag–Cu 2.97, Cu 20.5 µΩ·cm | 7 | **VERIFIED**, and **mistranscribed** | US 10,822,692 B2 (Das & Mukherjee, UNT), full text read. **The patent says Ag = 1.29, not 1.59.** Ag–Cu 2.97 and Cu 20.5 confirmed. The correction makes it worse: 1.29 is **0.81× bulk silver**, below bulk, impossible at any thickness. See below |
+| 8 | ~10 nm films: Ag 1.59, Ag–Cu 2.97, Cu 20.5 µΩ·cm | 7 | **VERIFIED — brief is faithful** | The journal (*Appl. Mater. Today* 2025) states 1.59; the group's own patent states 1.29. **Two sources, same films, different numbers**, one of them below bulk and impossible. The brief quoted the journal correctly. Both figures are anomalous — see below |
 | 9 | AZO/Cu/AZO: 16.6 Ω/sq, 67% FIR at 15 nm, continuity ~11 nm | 8 | partial | Located by title; abstract not retrieved. RF sputtering — a different study from #10, and the two should not be pooled |
 | 10 | AZO(40)/Cu/AZO(40): 87.7% T_vis, 9.96 Ω/sq, ε = 0.055 | 16 | partial, **fails consistency** | *Applied Surface Science* **578** (2022) 152051. Numbers confirmed, all three from the same sample. ε = 0.055 at 9.96 Ω/sq is below the thin-sheet impedance limit of 0.096, and below the 0.106 an industrial formula in use since 2000 gives. Four explanations tested and eliminated. **§16's conclusion rests on this.** FINDINGS §1.2 |
 | 11 | Al:ZnO negative formation energies, 6.25–18.75% Al | 2 | **SUPPORTED** | Materials Project Al–Zn–O screening returns 4 entries with 2 near the hull (Al₂ZnO₄ spinel, Al₁₀ZnO₁₆), consistent with negative formation energies for Al in ZnO. Not the original source |
@@ -56,7 +56,49 @@ inconsistent, and the brief quoted the Results figure — which is the defensibl
 choice. The error came from checking only the abstract, which is precisely the
 shortcut the `partial` grade exists to flag.
 
-## A second mistranscription, and it matters
+## Claim 8: not a mistranscription — two sources that disagree
+
+> **This section replaces one asserting that the brief had mistranscribed the
+> silver value. That assertion was wrong**, and wrong in the same way as the
+> AZO transmittance error recorded above: one source was read, a different
+> number was found, and the other party was assumed careless.
+
+The journal article reports **1.59 µΩ·cm** for the pure-silver control. The
+group's own patent, describing the same films, reports **1.29**. The brief
+quoted the journal, and quoted it correctly.
+
+| | Ag | Ag–Cu | Cu |
+|---|---|---|---|
+| Brief | 1.59 | 2.97 | 20.5 |
+| Journal | **1.59** ✓ | 2.97 ✓ | 20.5 ✓ |
+| Patent | **1.29** | 2.97 | 20.5 |
+
+**Both silver figures are anomalous, independently of which is taken.** Silver's
+electron mean free path is 53 nm, so a 10 nm film is deep in the size-effect
+regime. Fuchs–Sondheimer with diffuse scattering, ρ/ρ₀ ≈ 1 + (3/8)(λ/d), gives
+**2.99× bulk = 4.74 µΩ·cm** before any grain-boundary term. This framework's
+full FS + Mayadas–Shatzkes model gives 4.44, and reproduces an independent
+12 nm measurement of 4.8 µΩ·cm to within 17%.
+
+1.59 is exactly handbook bulk silver at 300 K. 1.29 is *below* it, which is not
+possible at room temperature. A 10 nm polycrystalline silver film reaching bulk
+resistivity would be a headline result on its own, and the paper does not treat
+it as one — it is a control.
+
+**What is defensible to cite.** The comparative claim: amorphous Ag–Cu at
+2.97 µΩ·cm beats polycrystalline Cu of the same thickness at 20.5 by about
+sevenfold, and the absence of grain boundaries is the paper's real
+contribution. **Do not cite 1.59 as a validated pure-Ag thin-film benchmark** —
+a reader who knows FS/MS scaling will stop there.
+
+**And a limit on its relevance to this project.** This is an interconnect
+paper. A conductivity figure says nothing about infrared reflectance, and
+amorphous metals do not share crystalline silver's optical constants. The
+low-loss Drude response that makes silver the Low-E workhorse depends on its
+being crystalline, so a conductivity gain from amorphisation does not transfer
+to emissivity or to light-to-solar-gain. See FINDINGS §3.13.
+
+## The AZO retraction, for comparison
 
 Claim **8** was verified through the associated patent, US 10,822,692 B2 — the
 journal article is paywalled but the patent carries the same measurements and

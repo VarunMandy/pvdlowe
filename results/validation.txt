@@ -32,7 +32,7 @@ INTERNAL CONSISTENCY OF THE REPORTED VALUES
 [HIGH  ] ~10 nm Ag, Ag-Cu and Cu films
          check : Ag thin-film resistivity vs bulk
          detail: 1.59 uohm.cm quoted for a 10 nm film is 1.00x bulk (1.587 uohm.cm). A film this thin cannot reach bulk resistivity: the electron mean free path is 53 nm, so surface and grain-boundary scattering alone force a ratio above about 2
-         action: RESOLVED: the source states 1.29 uohm.cm, not the 1.59 transcribed in the brief -- and 1.29 is BELOW bulk, so the correction makes the anomaly worse rather than explaining it. See the source_actual block in data/benchmarks.yaml. No further check needed on the transcription; what remains unexplained is the measurement.
+         action: NOT a transcription error -- the brief is faithful. The two publications by the same group DISAGREE: journal 1.59 uohm.cm, patent 1.29, and 1.29 is below bulk silver and therefore impossible. Both are anomalous: Fuchs-Sondheimer alone puts a 10 nm Ag film near 4.7 uohm.cm, and an independent 12 nm measurement gives 4.8. Treat the pure-Ag control as unreliable and cite only the comparative Ag-Cu / Cu claim. See data/benchmarks.yaml.
 
 ==========================================================================
 VERIFICATION STATUS

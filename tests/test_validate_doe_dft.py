@@ -248,14 +248,18 @@ def test_surrogate_carries_mp_reference_values():
     assert abs(MP_REFERENCE["CuAg3"] - 0.0857) < 1e-4
 
 
-def test_source_actual_records_transcription_differences():
-    """Where a source's own figure differs from the brief's, record both.
+def test_source_actual_records_conflicts_between_sources():
+    """Where two publications of the same work disagree, record both figures.
 
-    The brief transcribed 1.59 uohm.cm for a 10 nm Ag film; the patent it came
-    from states 1.29. `reported` keeps the brief's number, because that is what
-    the brief's argument uses and what the consistency checks must judge.
-    `source_actual` records the source's. Collapsing them would hide either the
-    transcription error or the physical impossibility, and both matter.
+    The brief quotes 1.59 uohm.cm for a 10 nm Ag film. The journal article says
+    1.59 -- so the brief is FAITHFUL -- while the group's own patent says 1.29,
+    which is below bulk silver and therefore impossible.
+
+    An earlier version of this test encoded the opposite conclusion, that the
+    brief had mistranscribed the value. That was reached by reading one source,
+    finding a different number, and assuming the other party was careless. It
+    is the same error made over the AZO transmittance, and the guard now
+    asserts the corrected shape so it cannot quietly revert.
     """
     from pvdlowe.validate import load_benchmarks
     for bm in load_benchmarks():
@@ -264,12 +268,11 @@ def test_source_actual_records_transcription_differences():
             continue
         assert bm.get("verified") is True, (
             f"{bm['id']} records source_actual without full verification")
-        reported = bm.get("reported", {})
-        differing = [k for k in actual
-                     if k in reported and actual[k] != reported[k]]
-        assert differing, (
-            f"{bm['id']} has source_actual identical to reported — drop it")
         assert "note" in actual, "source_actual must explain the discrepancy"
+        figures = {k: v for k, v in actual.items() if k != "note"}
+        assert len(figures) >= 2, (
+            f"{bm['id']}: source_actual should carry the conflicting figures "
+            "from each source, not a single 'true' value")
 
 
 def test_disputed_benchmarks_are_excluded_from_validation_by_default():
@@ -318,6 +321,8 @@ def test_resolved_checks_do_not_suggest_work_already_done():
     resistivity = rows[rows["check"].str.contains("resistivity", case=False)]
     assert len(resistivity), "the Ag resistivity check should still fire"
     action = " ".join(resistivity["action"])
-    assert "RESOLVED" in action
     assert "tabulated alongside" not in action, (
         "the superseded action is still being suggested")
+    assert "faithful" in action.lower(), (
+        "the action must say the brief is faithful to its source -- the "
+        "conflict is between two publications, not a transcription error")

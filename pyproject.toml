@@ -16,6 +16,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+api = ["flask>=3.0"]
 plots = ["matplotlib>=3.7"]
 excel = ["openpyxl>=3.1"]
 mp = ["mp-api>=0.39"]

@@ -41,9 +41,14 @@ Read in this order — each corrected something.
 
 | File | What it is |
 |---|---|
+| [`project_map.html`](project_map.html) | Interactive: what every one of the 119 files is, grouped by dependency order |
+| [`loc_review.html`](loc_review.html) | Interactive: ten findings with the code read from the repo |
+| [`INTERACTIVE_SCRIPT.md`](INTERACTIVE_SCRIPT.md) | Script for driving both views in a meeting |
+| [`build_interactive.py`](build_interactive.py) | Regenerates both HTML views from the repository |
 | [`CODE_WALKTHROUGH.md`](CODE_WALKTHROUGH.md) | Guided tour of the implementation, with runnable blocks — for a handover session |
 | [`CODE_REVIEW.md`](CODE_REVIEW.md) | Self-review: every finding closed, each fix guarded, and five things not to break |
 | [`VERTEX_AI.md`](VERTEX_AI.md) | Running the framework, and the ML surrogate, on Google Cloud |
+| `pvdlowe/api/` | HTTP interface — `pip install -e ".[api]"` then `python -m pvdlowe.api` |
 
 ---
 

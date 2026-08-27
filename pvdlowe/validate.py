@@ -202,15 +202,18 @@ def _resistivity_action(bm: dict) -> str:
     `source_actual` block records that the brief mistranscribed the figure,
     say so rather than sending the reader to redo the check.
     """
-    actual = (bm.get("source_actual") or {}).get("resistivity_ag_uohm_cm")
-    reported = (bm.get("reported") or {}).get("resistivity_ag_uohm_cm")
-    if actual is not None and reported is not None and actual != reported:
-        return (f"RESOLVED: the source states {actual} uohm.cm, not the "
-                f"{reported} transcribed in the brief -- and {actual} is BELOW "
-                "bulk, so the correction makes the anomaly worse rather than "
-                "explaining it. See the source_actual block in "
-                "data/benchmarks.yaml. No further check needed on the "
-                "transcription; what remains unexplained is the measurement.")
+    actual = bm.get("source_actual") or {}
+    journal = actual.get("resistivity_ag_uohm_cm_journal")
+    patent = actual.get("resistivity_ag_uohm_cm_patent")
+    if journal is not None and patent is not None and journal != patent:
+        return (f"NOT a transcription error -- the brief is faithful. The two "
+                f"publications by the same group DISAGREE: journal {journal} "
+                f"uohm.cm, patent {patent}, and {patent} is below bulk silver "
+                "and therefore impossible. Both are anomalous: Fuchs-Sondheimer "
+                "alone puts a 10 nm Ag film near 4.7 uohm.cm, and an "
+                "independent 12 nm measurement gives 4.8. Treat the pure-Ag "
+                "control as unreliable and cite only the comparative Ag-Cu / Cu "
+                "claim. See data/benchmarks.yaml.")
     return ("check whether the bulk value was tabulated alongside measured "
             "values for the other films")
 
